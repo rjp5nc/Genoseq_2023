@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 
 
-# sbatch ~/Genoseq_2023/UK2023.sh
+# sbatch ~/Genoseq_2023/UK2023seq.sh
 ### sacct -j 45333345
 ###  cat /scratch/rjp5nc/download_40446865_1.err
 # sacct -j  
