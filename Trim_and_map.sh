@@ -55,7 +55,7 @@ samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${SLURM_ARRAY_TASK_ID}.L6.bam
 ### PCR duplicate removal
 java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
 REMOVE_DUPLICATES=true \
-I=${dir}/S${SLURM_ARRAY_TASK_ID}.sort.bam \
-O=${dir}/S${SLURM_ARRAY_TASK_ID}.sort.dedup.bam \
-M=${dir}/S${SLURM_ARRAY_TASK_ID}.mark_duplicates_report.txt \
+I=${dir}/${SLURM_ARRAY_TASK_ID}.sort.bam \
+O=${dir}/${SLURM_ARRAY_TASK_ID}.sort.dedup.bam \
+M=${dir}/${SLURM_ARRAY_TASK_ID}.mark_duplicates_report.txt \
 VALIDATION_STRINGENCY=SILENT
