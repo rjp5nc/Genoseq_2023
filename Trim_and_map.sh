@@ -11,6 +11,7 @@
 #SBATCH --account berglandlab
 
 module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 
+java -jar $EBROOTPICARD/picard.jar
 
 # sbatch --array=2 ~/Genoseq_2023/Trim_and_map.sh
 ### sacct -j 40641767
