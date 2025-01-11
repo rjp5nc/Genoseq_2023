@@ -13,7 +13,7 @@
 module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17
 java -jar $EBROOTPICARD/picard.jar
 
-# sbatch --array=4 ~/Genoseq_2023/Trim_and_map.sh
+# sbatch --array=2 ~/Genoseq_2023/Trim_and_map.sh
 ### sacct -j 40641767
 ###  cat /scratch/rjp5nc/download_40446865_1.err
 # sacct -j
@@ -45,7 +45,7 @@ bwa mem \
 /project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa \
 ${L6_1} ${L6_2} |
 ### samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/S${SLURM_ARRAY_TASK_ID}.sort.bam
-samtools view -@ 10 -Sbh -q 20 -F 0x100 - > /scratch/rjp5nc/${SLURM_ARRAY_TASK_ID}.sort.bam
+samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${SLURM_ARRAY_TASK_ID}.L6.bam
 
 ### merge bam files
 ### java -jar $EBROOTPICARD/picard.jar MergeSamFiles \
