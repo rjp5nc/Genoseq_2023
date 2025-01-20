@@ -10,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 
+module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17
 java -jar $EBROOTPICARD/picard.jar
 
 # sbatch --array=2 ~/Genoseq_2023/Trim_and_map.sh
@@ -41,22 +41,16 @@ ${L6_1} ${L6_2}
 
 bwa mem \
 -t 10 \
--R "@RG\tID:${SLURM_ARRAY_TASK_ID}_L6\tSM:sample_name\tPL:illumina\tLB:lib1" \
+-R "@RG\tID:${dir}_L6\tSM:sample_name\tPL:illumina\tLB:lib1" \
 /project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa \
 ${L6_1} ${L6_2} |
-### samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/S${SLURM_ARRAY_TASK_ID}.sort.bam
-samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${SLURM_ARRAY_TASK_ID}.L6.bam
-
-### merge bam files
-### java -jar $EBROOTPICARD/picard.jar MergeSamFiles \
-### I=${dir}/S${SLURM_ARRAY_TASK_ID}.L3.bam \
-### I=${dir}/S${SLURM_ARRAY_TASK_ID}.L4.bam \
-### O=${dir}/S${SLURM_ARRAY_TASK_ID}.sort.bam
+samtools view -@ 10 -Sbh -q 20 -F 0x100 - > /Bams/${dir}.L6.bam
+### samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${dir}.L6.bam
 
 ### PCR duplicate removal
 java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
-REMOVE_DUPLICATES=true \
-I=${dir}/${SLURM_ARRAY_TASK_ID}.sort.bam \
-O=${dir}/${SLURM_ARRAY_TASK_ID}.sort.dedup.bam \
-M=${dir}/${SLURM_ARRAY_TASK_ID}.mark_duplicates_report.txt \
-VALIDATION_STRINGENCY=SILENT
+-REMOVE_DUPLICATES true \
+-I /Bams/${dir}.L6.bam \
+-O /Bams/${dir}.sort.dedup.bam \
+-M /Bams/${dir}.mark_duplicates_report.txt \
+-VALIDATION_STRINGENCY SILENT
