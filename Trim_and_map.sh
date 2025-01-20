@@ -44,13 +44,13 @@ bwa mem \
 -R "@RG\tID:${dir}_L6\tSM:sample_name\tPL:illumina\tLB:lib1" \
 /project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa \
 ${L6_1} ${L6_2} |
-samtools view -@ 10 -Sbh -q 20 -F 0x100 - > /Bams/${dir}.L6.bam
+samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}.L6.bam
 ### samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${dir}.L6.bam
 
 ### PCR duplicate removal
 java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
 -REMOVE_DUPLICATES true \
--I /Bams/${dir}.L6.bam \
--O /Bams/${dir}.sort.dedup.bam \
--M /Bams/${dir}.mark_duplicates_report.txt \
+-I ${dir}.L6.bam \
+-O ${dir}.sort.dedup.bam \
+-M ${dir}.mark_duplicates_report.txt \
 -VALIDATION_STRINGENCY SILENT
