@@ -10,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17
+module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 java/11
 java -jar $EBROOTPICARD/picard.jar
 
 # sbatch --array=2 ~/Genoseq_2023/Trim_and_map.sh
@@ -25,7 +25,7 @@ dir=/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.Ra
 L6_1=$( ls ${dir}/*L6_1.fq.gz )
 L6_2=$( ls ${dir}/*L6_2.fq.gz )
 
-## adapter removal 
+## adapter removal
 
 #### adapter removal and inital mapping
 ### run for L3
