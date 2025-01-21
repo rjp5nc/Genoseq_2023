@@ -20,7 +20,11 @@ module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5
 ### example:
 # SLURM_ARRAY_TASK_ID=1
 
-dir=/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Ro*
+###dir=/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Ro*
+
+INPUT=${dir}
+
+echo ${dir}
 
 L6_1=$( ls ${dir}/*L6_1.fq.gz )
 L6_2=$( ls ${dir}/*L6_2.fq.gz )

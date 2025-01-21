@@ -1,7 +1,7 @@
 
 
 
-INPUT_FILES=("/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Gilmer5_A1")  # List of input file prefixes (without extensions)
+INPUT_FILES=("/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Ro*")  # List of input file prefixes (without extensions)
 
 chmod -x Trim_and_map.sh
 
