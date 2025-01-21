@@ -22,8 +22,7 @@ module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5
 
 ###dir=/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Ro*
 
-INPUT=${dir}
-
+dir=$1
 echo ${dir}
 
 L6_1=$( ls ${dir}/*L6_1.fq.gz )
