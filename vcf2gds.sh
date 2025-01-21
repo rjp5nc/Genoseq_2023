@@ -14,7 +14,7 @@
 ### sacct -j 22867938
 ### cat /scratch/aob2x/dest/slurmOutput/vcf2gds.22867938
 
-module load gcc/7.1.0 openmpi/3.1.4 R/4.1.1
+module load gcc openmpi R/4.3.1
 
-Rscript --vanilla /home/rjp5nc/Dappupool20182019/variantCalling/vcf2gds.R \
-/project/berglandlab/Robert/DorsetPooledSequencing2018_2019/AllPooledVCFsIncludingDcatDbunk/Allpools.concat.Removereps.vcf.gz
+Rscript --vanilla /home/rjp5nc/Genoseq_2023/vcf2gds.R \
+/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Bams/vcf/2022seq.concat.Removereps.vcf.gz
