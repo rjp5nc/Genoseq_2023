@@ -20,9 +20,32 @@ module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5
 ### example:
 # SLURM_ARRAY_TASK_ID=1
 
-dir=/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Gilmer5_A1
+dir=/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/*
 
+L6_1=$( ls ${dir}/*L6_1.fq.gz )
+L6_2=$( ls ${dir}/*L6_2.fq.gz )
 
+## adapter removal
+
+#### adapter removal and inital mapping
+### run for L3
+cutadapt \
+-q 18 \
+--minimum-length 75 \
+-o ${L6_1}.trimmed1.fq.gz \
+-p ${L6_2}.trimmed2.fq.gz \
+-O 15 \
+-n 3 \
+--cores=10 \
+${L6_1} ${L6_2}
+
+bwa mem \
+-t 10 \
+-R "@RG\tID:${dir}_L6\tSM:sample_name\tPL:illumina\tLB:lib1" \
+/project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa \
+${L6_1} ${L6_2} |
+samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}.L6.bam
+### samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${dir}.L6.bam
 
 
 
