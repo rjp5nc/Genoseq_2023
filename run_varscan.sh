@@ -11,9 +11,9 @@
 #SBATCH --account berglandlab
 
 
-module load samtools varscan
+module load samtools varscan 
 
-# sbatch --array=1-12 ~/Genoseq2023/variantCalling/run_varscan.sh
+# sbatch --array=1-12 ~/Genoseq_2023/run_varscan.sh
 # 40646429
 
 
@@ -24,8 +24,7 @@ echo $chr
 samtools mpileup \
 -r ${chr} \
 --fasta-ref /project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa \
-$(ls /project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Bams/sort.dedup.bam/*.bam) | bcftools call -mv -Ov -o output_variants.vcf
-
+/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Bams/sort.dedup.bam/*.bam | \
 
 
 java -jar $EBROOTVARSCAN/VarScan.v2.4.4.jar mpileup2snp \
