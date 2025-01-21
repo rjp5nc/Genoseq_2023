@@ -25,5 +25,5 @@ echo ${dir}
 
 samtools index \
 -@ 10 \
-${dir}*.sort.dedup.bam \
-${dir}*.sort.dedup.bam.bai
+${dir} \
+${dir}.bai
