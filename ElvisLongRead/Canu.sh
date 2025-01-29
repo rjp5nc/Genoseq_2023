@@ -8,7 +8,7 @@
 #SBATCH -o /scratch/csm6hg/err/run_hiCanu1.out # Standard output
 #SBATCH -e /scratch/csm6hg/err/run_hiCanu1.err # Standard error
 #SBATCH -p largemem
-#SBATCH --account berglandlab_standard
+#SBATCH --account berglandlab
 
 # Working directory
 wd="/scratch/rjp5nc/HMW/HMWDNAElvis3"
