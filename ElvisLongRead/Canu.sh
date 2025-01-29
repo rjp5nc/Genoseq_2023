@@ -15,10 +15,11 @@ wd="/scratch/rjp5nc/HMW/HMWDNAElvis3"
 cd ${wd}
 
 # Modules
-module load bioconda/py3.10 mamba
+module load bioconda/py3.10 
 conda init
 conda activate hicanu
-
+conda install mamba -c conda-forge
+module load mamba
 # Install canu once
 # conda create -n hicanu
 # module load mamba/2.0.5
