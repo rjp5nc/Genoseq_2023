@@ -15,7 +15,7 @@ wd="/scratch/rjp5nc/HMW/HMWDNAElvis3"
 cd ${wd}
 
 # Modules
-module load bioconda/py3.10 mamba/2.0.5
+module load bioconda/py3.10 mamba
 conda init
 conda activate hicanu
 
