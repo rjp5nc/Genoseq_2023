@@ -5,9 +5,9 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 3-00:00 # 3 days
 #SBATCH --mem 100G
-#SBATCH -o /scratch/csm6hg/err/run_hiCanu1.out # Standard output
-#SBATCH -e /scratch/csm6hg/err/run_hiCanu1.err # Standard error
-#SBATCH -p largemem
+#SBATCH -o /scratch/rjp5nc/run_hiCanu1.out # Standard output
+#SBATCH -e /scratch/rjp5nc/run_hiCanu1.err # Standard error
+#SBATCH -p standard
 #SBATCH --account berglandlab
 
 # Working directory
