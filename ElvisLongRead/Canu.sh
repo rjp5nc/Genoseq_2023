@@ -16,10 +16,13 @@ cd ${wd}
 
 # Modules
 module load bioconda/py3.10 
-conda init
+conda create --prefix ~/my_conda_env -c bioconda canu
+conda activate ~/my_conda_env
 conda activate hicanu
 conda install mamba -c conda-forge
 module load mamba
+mamba install -c bioconda canu
+
 # Install canu once
 # conda create -n hicanu
 # module load mamba/2.0.5
