@@ -1,4 +1,4 @@
-!/usr/bin/env bash
+#!/usr/bin/env bash
 #
 #SBATCH -J run_hicanu # A single job name for the array
 #SBATCH --ntasks-per-node=20 # multi core
