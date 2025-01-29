@@ -16,12 +16,10 @@ cd ${wd}
 
 # Modules
 module load bioconda/py3.10 
+bash Miniconda3-latest-Linux-x86_64.sh
+source ~/.bashrc
 conda create --prefix ~/my_conda_env -c bioconda canu
 conda activate ~/my_conda_env
-conda activate hicanu
-conda install mamba -c conda-forge
-module load mamba
-mamba install -c bioconda canu
 
 # Install canu once
 # conda create -n hicanu
