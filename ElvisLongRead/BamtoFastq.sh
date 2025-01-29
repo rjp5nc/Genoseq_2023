@@ -18,4 +18,4 @@
 
 module load samtools
 
-samtools fastq /project/berglandlab/Robert/HMWDNAElvis3/m84128_250121_222443_s2.hifi_reads.bc2104.bam > /project/berglandlab/Robert/HMWDNAElvis3/fastq/Elvis3.fastq
+samtools fastq -@ 8 m84128_250121_222443_s2.hifi_reads.bc2104.bam | gzip > m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
