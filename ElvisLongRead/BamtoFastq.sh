@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 #
 #SBATCH -J toFastq # A single job name for the array
@@ -11,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-# sbatch ~/Genoseq_2023/basicStats.sh
+# sbatch ~/Genoseq_2023/ElvisLongRead/BamtoFastq.sh
 ### sacct -j 45333345
 
 ### Daphnia reference mitochondrial genome
