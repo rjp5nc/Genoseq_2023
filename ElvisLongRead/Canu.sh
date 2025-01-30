@@ -39,6 +39,7 @@ canu \
  maxMemory=100g \
  useGrid=false \
  genomeSize=150m \
+ gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
  -pacbio-raw m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
 
 # Finish
