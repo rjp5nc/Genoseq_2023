@@ -39,8 +39,7 @@ canu \
  maxMemory=100g \
  useGrid=false \
  genomeSize=150m \
- corErrorRate=0.025 \
- -pacbio-raw m84104_240208_174910_s1.hifi_reads.bc2040.fq.gz
+ -pacbio-raw m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
 
 # Finish
 echo "Finish HiCanu"
