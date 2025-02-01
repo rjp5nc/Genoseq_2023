@@ -36,7 +36,7 @@ canu \
 -p dap \
  -d dap_hifi_trim \
  maxThreads=30 \
- maxMemory=100g \
+ maxMemory=150g \
  useGrid=false \
  genomeSize=150m \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
