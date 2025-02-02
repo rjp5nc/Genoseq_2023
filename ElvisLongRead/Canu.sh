@@ -38,6 +38,14 @@ canu \
  maxThreads=30 \
  maxMemory=150g \
  useGrid=true \
+ gridOptionsArray="--array=1-88" \
+ gridOptions="--partition=standard --account=berglandlab --time=1-00:00 --mem=100G --cpus-per-task=20" \
+ gridOptionsBogart="--mem=60G --cpus-per-task=16" \
+ gridOptionsMhap="--mem=20G --cpus-per-task=8" \
+ gridOptionsOvl="--mem=15G --cpus-per-task=4" \
+ gridOptionsMinimap="--mem=10G --cpus-per-task=4" \
+ gridOptionsCor="--mem=30G --cpus-per-task=8" \
+ gridOptionsCns="--mem=25G --cpus-per-task=8" \ 
  genomeSize=150m \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
  -pacbio-raw m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
