@@ -38,7 +38,7 @@ canu \
  maxThreads=30 \
  maxMemory=150g \
  useGrid=true \
- gridOptionsJobName="dap_job_{%TASKID}_stage" \
+ gridOptionsJobName="dap_job_%a_stage" \
  gridOptions="--partition=standard --account=berglandlab --time=2-00:00"\
  genomeSize=150m \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
