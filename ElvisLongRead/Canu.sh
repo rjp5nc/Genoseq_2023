@@ -37,13 +37,14 @@ canu \
  -d dap_hifi_trim \
  maxThreads=30 \
  maxMemory=150g \
- useGrid=true \
- gridOptions="--partition=standard --account=berglandlab --time=2-00:00"\
- gridOptionsJobName="dap_job_{%TASKID}" \
- gridEngineArrayOption="--array=1-5" \
+ useGrid=false \
+ concurrency=5 \
  genomeSize=150m \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
  -pacbio-raw m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
+
+### gridOptions="--partition=standard --account=berglandlab --time=2-00:00"\
+
 
 # Finish
 echo "Finish HiCanu"
