@@ -38,8 +38,8 @@ canu \
  maxThreads=30 \
  maxMemory=150g \
  useGrid=true \
- gridOptions="--partition=standard --account=berglandlab --time=2-00:00\
-  genomeSize=150m \
+ gridOptions="--partition=standard --account=berglandlab --time=2-00:00"\
+ genomeSize=150m \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
  -pacbio-raw m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
 
