@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J run_hicanu # A single job name for the array
-#SBATCH --ntasks-per-node=30 # multi core
+#SBATCH --ntasks-per-node=20 # multi core
 #SBATCH -N 1 # on one node
-#SBATCH -t 5-00:00 # 5 days
-#SBATCH --mem 150G
+#SBATCH -t 3-00:00 # 5 days
+#SBATCH --mem 100G
 #SBATCH -o /scratch/rjp5nc/run_hiCanu1.out # Standard output
 #SBATCH -e /scratch/rjp5nc/run_hiCanu1.err # Standard error
 #SBATCH -p standard
@@ -37,7 +37,7 @@ canu \
  -d dap_hifi_trim \
  maxThreads=30 \
  maxMemory=150g \
- useGrid=false \
+ useGrid=true \
  genomeSize=150m \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
  -pacbio-raw m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
