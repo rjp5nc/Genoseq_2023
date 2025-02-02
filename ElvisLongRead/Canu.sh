@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 4-00:00 # 5 days
 #SBATCH --mem 150G
-#SBATCH -o /scratch/rjp5nc/run_hiCanu1.out # Standard output
-#SBATCH -e /scratch/rjp5nc/run_hiCanu1.err # Standard error
+#SBATCH -o /scratch/rjp5nc/Canu_error/run_hiCanu1%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/Canu_error/run_hiCanu1%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
