@@ -3,7 +3,7 @@
 #SBATCH -J run_hicanu # A single job name for the array
 #SBATCH --ntasks-per-node=30 # multi core
 #SBATCH -N 1 # on one node
-#SBATCH -t 4-00:00 # 5 days
+#SBATCH -t 7-00:00 # 5 days
 #SBATCH --mem 150G
 #SBATCH -o /scratch/rjp5nc/Canu_error/run_hiCanu1%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/Canu_error/run_hiCanu1%A_%a.err # Standard error
