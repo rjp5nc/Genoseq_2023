@@ -3,13 +3,14 @@
 #SBATCH -J run_hicanu2 # A single job name for the array
 #SBATCH --ntasks-per-node=20 # multi core
 #SBATCH -N 1 # on one node
-#SBATCH -t 14-00:00 # 5 days
+#SBATCH -t 6-00:00 # 5 days
 #SBATCH --mem 100G
 #SBATCH -o /scratch/rjp5nc/Canu_error/run_hiCanu1%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/Canu_error/run_hiCanu1%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
+### sbatch ~/Genoseq_2023/ElvisLongRead/Canu.sh
 # Working directory
 wd="/scratch/rjp5nc/HMW/HMWDNAElvis3"
 cd ${wd}
