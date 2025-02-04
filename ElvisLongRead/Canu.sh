@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=40 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 7-00:00 # 5 days
-#SBATCH --mem 120G
+#SBATCH --mem 150G
 #SBATCH -o /scratch/rjp5nc/Canu_error/run_hiCanu1%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/Canu_error/run_hiCanu1%A_%a.err # Standard error
 #SBATCH -p standard
@@ -35,7 +35,7 @@ canu \
 -assemble \
 -p dap \
  -d dap_hifi_trim \
- maxThreads=30 \
+ maxThreads=40 \
  maxMemory=150g \
  useGrid=false \
  genomeSize=150m \
