@@ -16,11 +16,21 @@ wd="/scratch/rjp5nc/HMW/HMWDNAElvis3"
 cd ${wd}
 
 # Modules
-module load bioconda/py3.10 
-bash Miniconda3-latest-Linux-x86_64.sh
-source ~/.bashrc
-conda create --prefix ~/my_conda_env -c bioconda canu
-conda activate ~/my_conda_env
+module load bioconda/py3.10
+conda activate hicanu
+# Install canu once
+# conda create -n hicanu
+# module load mamba
+# mamba install canu
+
+
+
+# Modules
+#module load bioconda/py3.10 
+#bash Miniconda3-latest-Linux-x86_64.sh
+#source ~/.bashrc
+#conda create --prefix ~/my_conda_env -c bioconda canu
+#conda activate ~/my_conda_env
 
 # Install canu once
 # conda create -n hicanu
@@ -35,7 +45,7 @@ date
 canu \
 -assemble \
 -p dap \
- -d dap_hifi_trim2 \
+ -d dap_hifi_trim4 \
  maxThreads=20 \
  maxMemory=100g \
  useGrid=false \
@@ -44,7 +54,7 @@ canu \
  -pacbio-raw m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
 
 ### gridOptions="--partition=standard --account=berglandlab --time=2-00:00"\
-### gridEngineArrayMaxJobs=2 \
+### gridEngineArrayMaxJobs=5 \
 
 # Finish
 echo "Finish HiCanu"
