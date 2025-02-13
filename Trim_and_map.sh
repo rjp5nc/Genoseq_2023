@@ -94,16 +94,18 @@ ${L4_1}.trimmed1.fq.gz ${L4_2}.trimmed2.fq.gz |
 samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${sample_name}.L4.bam
 
 
-
-
+java -jar $EBROOTPICARD/picard.jar MergeSamFiles \
+    -I ${dir}/${sample_name}.L3.bam \
+    -I ${dir}/${sample_name}.L4.bam \
+    -I ${dir}/${sample_name}.L6.bam \
+    -O /scratch/rjp5nc/UK2022_2024/allshortreads/mergedbams/${sample_name}.merged.bam \
+    --SORT_ORDER unsorted
 
 
 java -jar $EBROOTPICARD/picard.jar SortSam \
--I ${dir}/${sample_name}.L3.bam \
--I ${dir}/${sample_name}.L4.bam \
--I ${dir}/${sample_name}.L6.bam \
--O /scratch/rjp5nc/UK2022_2024/allshortreads/sortedbams/${sample_name}.sorted.bam \
--SORT_ORDER coordinate
+    -I /scratch/rjp5nc/UK2022_2024/allshortreads/mergedbams/${sample_name}.merged.bam \
+    -O /scratch/rjp5nc/UK2022_2024/allshortreads/sortedbams/${sample_name}.sorted.bam \
+    -SORT_ORDER coordinate
 
 ### PCR duplicate removal
 java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
