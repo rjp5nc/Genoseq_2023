@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 #
 #SBATCH -J trimloop # A single job name for the array
