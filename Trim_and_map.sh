@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 16:00:00 ### 8 hours
 #SBATCH --mem 60G
-#SBATCH -o /scratch/rjp5nc/download_%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/download_%A_%a.err # Standard error
+#SBATCH -o /scratch/rjp5nc/outputerrors/download_%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/outputerrors/download_%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
