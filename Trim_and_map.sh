@@ -27,6 +27,14 @@ echo ${dir}
 
 L6_1=$( ls ${dir}/*L6_1.fq.gz )
 L6_2=$( ls ${dir}/*L6_2.fq.gz )
+L3_1=$( ls ${dir}/*L3_1.fq.gz )
+L3_2=$( ls ${dir}/*L3_2.fq.gz )
+L4_1=$( ls ${dir}/*L4_1.fq.gz )
+L4_2=$( ls ${dir}/*L4_2.fq.gz )
+
+
+sample_name=$(basename ${dir})
+
 
 ## adapter removal
 
@@ -46,21 +54,61 @@ bwa mem \
 -t 10 \
 -R "@RG\tID:${dir}_L6\tSM:sample_name\tPL:illumina\tLB:lib1" \
 /project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa \
-${L6_1} ${L6_2} |
-samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}.L6.bam
-### samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${dir}.L6.bam
+${L6_1}.trimmed1.fq.gz ${L6_2}.trimmed2.fq.gz |
+samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${sample_name}.L6.bam
+
+
+cutadapt \
+-q 18 \
+--minimum-length 75 \
+-o ${L3_1}.trimmed1.fq.gz \
+-p ${L3_2}.trimmed2.fq.gz \
+-O 15 \
+-n 3 \
+--cores=10 \
+${L3_1} ${L3_2}
+
+bwa mem \
+-t 10 \
+-R "@RG\tID:${dir}_L3\tSM:sample_name\tPL:illumina\tLB:lib1" \
+/project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa \
+${L3_1}.trimmed1.fq.gz ${L3_2}.trimmed2.fq.gz |
+samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${sample_name}.L3.bam
+
+### run for L4
+cutadapt \
+-q 18 \
+--minimum-length 75 \
+-o ${L4_1}.trimmed1.fq.gz \
+-p ${L4_2}.trimmed2.fq.gz \
+-O 15 \
+-n 3 \
+--cores=10 \
+${L4_1} ${L4_2}
+
+bwa mem \
+-t 10 \
+-R "@RG\tID:${dir}_L4\tSM:sample_name\tPL:illumina\tLB:lib1" \
+/project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa \
+${L4_1}.trimmed1.fq.gz ${L4_2}.trimmed2.fq.gz |
+samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${dir}/${sample_name}.L4.bam
+
+
+
 
 
 
 java -jar $EBROOTPICARD/picard.jar SortSam \
--I ${dir}.L6.bam \
--O ${dir}.L6.sorted.bam \
+-I ${dir}/${sample_name}.L3.bam \
+-I ${dir}/${sample_name}.L4.bam \
+-I ${dir}/${sample_name}.L6.bam \
+-O /scratch/rjp5nc/UK2022_2024/allshortreads/sortedbams/${sample_name}.sorted.bam \
 -SORT_ORDER coordinate
 
 ### PCR duplicate removal
 java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
 -REMOVE_DUPLICATES true \
--I ${dir}.L6.sorted.bam \
--O ${dir}.sort.dedup.bam \
--M ${dir}.mark_duplicates_report.txt \
+-I /scratch/rjp5nc/UK2022_2024/allshortreads/sortedbams/${sample_name}.sorted.bam \
+-O /scratch/rjp5nc/UK2022_2024/allshortreads/sortedbamsdedup/${sample_name}.sort.dedup.bam \
+-M /scratch/rjp5nc/UK2022_2024/allshortreads/sortedbamsreport/${sample_name}.mark_duplicates_report.txt \
 -VALIDATION_STRINGENCY SILENT
