@@ -17,6 +17,7 @@ cd ${wd}
 
 # Modules
 module load bioconda/py3.10
+conda init
 conda activate hicanu
 # Install canu once
 # conda create -n hicanu
