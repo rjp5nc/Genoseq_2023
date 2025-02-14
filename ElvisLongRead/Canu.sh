@@ -16,7 +16,7 @@ wd="/scratch/rjp5nc/HMW/HMWDNAElvis3"
 cd ${wd}
 
 # Modules
-module load bioconda/py3.10
+module load bioconda/py3.10 samtools
 source ~/.bashrc
 conda activate hicanu
 # Install canu once
