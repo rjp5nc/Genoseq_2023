@@ -13,7 +13,7 @@
 
 module load samtools varscan bcftools
 
-# sbatch --array=1-12 ~/Genoseq_2023/run_varscan copy.sh
+# sbatch --array=1-12 ~/Genoseq_2023/run_varscan_copy.sh
 # 40646429
 
 # Get the chromosome for the current SLURM task
