@@ -25,14 +25,6 @@ conda activate hicanu
 # mamba install canu
 
 
-
-# Modules
-#module load bioconda/py3.10 
-#bash Miniconda3-latest-Linux-x86_64.sh
-#source ~/.bashrc
-#conda create --prefix ~/my_conda_env -c bioconda canu
-#conda activate ~/my_conda_env
-
 # Start
 echo "Starting HiCanu"
 date
