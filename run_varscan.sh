@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 
 
-module load samtools varscan 
+module load samtools varscan bcftools
 
 # sbatch --array=1-12 ~/Genoseq_2023/run_varscan.sh
 # 40646429
@@ -24,7 +24,7 @@ echo $chr
 samtools mpileup \
 -r ${chr} \
 --fasta-ref /project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa \
-/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Bams/sort.dedup.bam/*.bam | \
+/scratch/rjp5nc/UK2022_2024/allshortreads/sortedbamsdedup/*.bam | \
 
 
 java -jar $EBROOTVARSCAN/VarScan.v2.4.4.jar mpileup2snp \
@@ -32,4 +32,15 @@ java -jar $EBROOTVARSCAN/VarScan.v2.4.4.jar mpileup2snp \
 --min-coverage 4 \
 --min-var-freq 0.001 \
 --output-vcf > \
-/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Bams/2022seq.${chr}.vcf
+/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.${chr}.vcf
+
+
+
+# Rename sample names in the VCF to match the BAM filenames
+#bcftools reheader \
+#--samples <(ls /scratch/rjp5nc/UK2022_2024/allshortreads/sortedbamsdedup/*.bam | sed 's#.*/##; s/.bam//') \
+#/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.${chr}.vcf > \
+#/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.${chr}.renamed.vcf
+
+#mv /scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.${chr}.renamed.vcf \
+#/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.${chr}.vcf
