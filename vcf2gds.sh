@@ -17,4 +17,4 @@
 module load gcc openmpi R/4.3.1
 
 Rscript --vanilla /home/rjp5nc/Genoseq_2023/vcf2gds.R \
-/project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Bams/vcf/2022seq.concat.Removereps.vcf.gz
+/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removereps.renamed.vcf.gz
