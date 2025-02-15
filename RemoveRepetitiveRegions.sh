@@ -10,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-### sbatch ~/Dappupool20182019/QC/RemoveRepetitiveRegions.sh
+### sbatch ~/Genoseq_2023/RemoveRepetitiveRegions.sh
 ### sacct -j 22867938
 ### scancel
 ### cat
@@ -19,5 +19,5 @@ module load gcc/9.2.0 bedtools/2.29.2
 
 bedtools subtract \
 -header \
--a /project/berglandlab/Robert/UKSequencing2022_2024/usftp21.novogene.com/01.RawData/Bams/vcf/2022seq.concat.vcf.gz \
+-a /scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.renamed.vcf.gz \
 -b /project/berglandlab/daphnia_ref/RMoutHiCGMgoodscaff.keep.bed 
