@@ -10,6 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
+module load bcftools
 
 # Define input and output files
 VCF_FILE="/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removereps.renamed.vcf.gz"  # Replace with your actual VCF file path
