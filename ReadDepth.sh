@@ -17,4 +17,4 @@ VCF_FILE="/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removerep
 OUTPUT_CSV="average_read_depth.csv"
 # Extract read depth (DP) for each sample and compute the average
 echo "Sample,Average_Read_Depth" > "$OUTPUT_CSV"
-bcftools query -f '%CHROM\t%POS[\t%DP]\n' -i 'DP>0' /scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removereps.renamed.vcf.gz --threads 10 > /scratch/rjp5nc/UK2022_2024/allshortreads/chr/read_depths.csv
+bcftools query -f '%CHROM\t%POS[\t%DP]\n' -i 'DP>0' /scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removereps.renamed.vcf.gz > /scratch/rjp5nc/UK2022_2024/allshortreads/chr/read_depths.csv
