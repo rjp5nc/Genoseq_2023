@@ -13,8 +13,14 @@
 module load bcftools
 
 # Define input and output files
-VCF_FILE="/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removereps.renamed.vcf.gz"  # Replace with your actual VCF file path
-OUTPUT_CSV="average_read_depth.csv"
-# Extract read depth (DP) for each sample and compute the average
-echo "Sample,Average_Read_Depth" > "$OUTPUT_CSV"
-bcftools query -f '%CHROM\t%POS[\t%DP]\n' -i 'DP>0' /scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removereps.renamed.vcf.gz > /scratch/rjp5nc/UK2022_2024/allshortreads/chr/read_depths.csv
+VCF_FILE="/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removereps.renamed.vcf.gz"
+OUTPUT_CSV="/scratch/rjp5nc/UK2022_2024/allshortreads/chr/read_depths.csv"
+
+# Extract sample names for the header
+SAMPLES=$(bcftools query -l "$VCF_FILE" | tr '\n' '\t')
+
+# Add the header to the output file
+echo -e "CHROM\tPOS\t${SAMPLES}" > "$OUTPUT_CSV"
+
+# Extract read depth (DP) values and append to the file
+bcftools query -f '%CHROM\t%POS[\t%DP]\n' -i 'DP>0' "$VCF_FILE" >> "$OUTPUT_CSV"
