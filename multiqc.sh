@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J Multiqc # A single job name for the array
-#SBATCH --ntasks-per-node=10 # ten cores
+#SBATCH --ntasks-per-node=40 # ten cores
 #SBATCH -N 1 # on one node
 #SBATCH -t 24:00:00 ### 8 hours
-#SBATCH --mem 100G
+#SBATCH --mem 200G
 #SBATCH -o /scratch/rjp5nc/Multiqc.out # Standard output
 #SBATCH -e /scratch/rjp5nc/Multiqc.err # Standard error
 #SBATCH -p standard
