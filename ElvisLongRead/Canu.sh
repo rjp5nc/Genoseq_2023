@@ -41,9 +41,6 @@ canu \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
  -pacbio-raw m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
 
-### gridOptions="--partition=standard --account=berglandlab --time=2-00:00"\
-### gridEngineArrayMaxJobs=5 \
-
 # Finish
 echo "Finish HiCanu"
 date
