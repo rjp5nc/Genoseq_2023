@@ -10,17 +10,12 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-module load bcftools
+module load samtools
 
-# Define input and output files
-VCF_FILE="/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removereps.renamed.vcf.gz"
-OUTPUT_CSV="/scratch/rjp5nc/UK2022_2024/allshortreads/chr/read_depths.csv"
+output_file="/scratch/rjp5nc/bamoutall.txt"
+echo "Filename Average_Depth" > $output_file  # Header for the output file
 
-# Extract sample names for the header
-SAMPLES=$(bcftools query -l "$VCF_FILE" | tr '\n' '\t')
-
-# Add the header to the output file
-echo -e "CHROM\tPOS\t${SAMPLES}" > "$OUTPUT_CSV"
-
-# Extract read depth (DP) values and append to the file
-bcftools query -f '%CHROM\t%POS[\t%DP]\n' -i 'DP>0' "$VCF_FILE" >> "$OUTPUT_CSV"
+for bam in /scratch/rjp5nc/UK2022_2024/allshortreads/sortedbamsdedup/*.bam; do 
+    avg_depth=$(samtools depth -a "$bam" | awk '{sum+=$3} END {if (NR>0) print sum/NR; else print 0}')
+    echo "$(basename "$bam") $avg_depth" >> $output_file
+done
