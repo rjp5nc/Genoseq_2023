@@ -21,7 +21,7 @@ module load multiqc
 INPUT_DIR="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/"
 OUTPUT_DIR="/scratch/rjp5nc/outputdir2lanes"
 
-find "$INPUT_DIR" -type f -name "*L3_1.fq.gz" | while read -r FILE; do
+find "$INPUT_DIR" -type f -name "*L3_2.fq.gz" | while read -r FILE; do
     echo "Running FastQC on $FILE..."
     fastqc -o "$OUTPUT_DIR" "$FILE" --no-graphical
 done
