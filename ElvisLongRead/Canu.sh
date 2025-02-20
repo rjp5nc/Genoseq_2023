@@ -17,7 +17,6 @@ cd ${wd}
 
 # Modules
 module load bioconda/py3.10 samtools
-source ~/.bashrc
 conda activate hicanu
 
 # Install canu once
