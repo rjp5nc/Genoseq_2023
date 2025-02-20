@@ -19,6 +19,7 @@ cd ${wd}
 module load bioconda/py3.10 samtools
 source ~/.bashrc
 conda activate hicanu
+
 # Install canu once
 # conda create -n hicanu
 # module load mamba
