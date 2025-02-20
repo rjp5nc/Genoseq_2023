@@ -34,13 +34,13 @@ date
 canu \
 -assemble \
 -p dap \
- -d dap_hifi_trim5 \
+ -d dap_hifi_trim6 \
  maxThreads=40 \
  maxMemory=200g \
  useGrid=false \
  genomeSize=200m \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
- -pacbio-raw m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
+ -pacbio-hifi m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
 
 # Finish
 echo "Finish HiCanu"
