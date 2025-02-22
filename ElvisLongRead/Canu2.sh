@@ -37,7 +37,8 @@ canu \
  maxThreads=40 \
  maxMemory=200g \
  useGrid=false \
- genomeSize=150m \
+ genomeSize=120m \
+ stopOnLowCoverage=1 \
  minInputCoverage=0.5 \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
  -pacbio-hifi dap.contigs.fasta
