@@ -32,7 +32,6 @@ date
 
 # Run HiCanu
 canu \
--assemble \
 -p asm \
  -d asm_output \
  maxThreads=40 \
