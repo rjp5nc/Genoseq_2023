@@ -10,9 +10,9 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-### sbatch ~/Genoseq_2023/ElvisLongRead/Canu.sh
+### sbatch ~/Genoseq_2023/ElvisLongRead/Canu2.sh
 # Working directory
-wd="/scratch/rjp5nc/HMW/HMWDNAElvis3"
+wd="/scratch/rjp5nc/assemblecontigs"
 cd ${wd}
 
 # Modules
@@ -32,15 +32,14 @@ date
 
 # Run HiCanu
 canu \
--assemble \
--p dap \
- -d dap_hifi_trim6 \
+-p asm \
+ -d asm_output \
  maxThreads=40 \
  maxMemory=200g \
  useGrid=false \
  genomeSize=200m \
  gnuplot=/home/rjp5nc/miniconda3/bin/gnuplot \
- -pacbio-hifi m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
+ -pacbio-hifi dap.contigs.fasta
 
 # Finish
 echo "Finish HiCanu"
