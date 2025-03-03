@@ -13,7 +13,7 @@
 
 # Output file
 output_file="/scratch/rjp5nc/UK2022_2024/allshortreads/unmappedinsortedbam.csv"
-#!/bin/bash
+
 wd=/scratch/rjp5nc/UK2022_2024/allshortreads/sortedbams
 # Output CSV file
 
