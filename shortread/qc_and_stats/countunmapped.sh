@@ -10,6 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
+module load samtools
 
 # Output file
 output_file="/scratch/rjp5nc/UK2022_2024/allshortreads/unmappedinsortedbam.csv"
