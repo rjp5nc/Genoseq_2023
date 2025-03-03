@@ -15,7 +15,7 @@ module load samtools
 # Output file
 output_file="/scratch/rjp5nc/UK2022_2024/allshortreads/unmappedinsortedbam.csv"
 
-wd=/scratch/rjp5nc/UK2022_2024/allshortreads/sortedbams
+wd="/scratch/rjp5nc/UK2022_2024/allshortreads/sortedbams"
 # Output CSV file
 
 # Write header to CSV file
