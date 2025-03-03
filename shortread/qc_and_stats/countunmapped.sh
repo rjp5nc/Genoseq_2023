@@ -3,8 +3,8 @@
 #SBATCH -J countunmapped # A single job name for the array
 #SBATCH --ntasks-per-node=20 # ten core
 #SBATCH -N 1 # on one node
-#SBATCH -t 0-12:00  ### 24 hours
-#SBATCH --mem 100G
+#SBATCH -t 0-24:00  ### 24 hours
+#SBATCH --mem 120G
 #SBATCH -o /scratch/rjp5nc/countunmapped.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/countunmapped.%A_%a.err # Standard error
 #SBATCH -p standard
