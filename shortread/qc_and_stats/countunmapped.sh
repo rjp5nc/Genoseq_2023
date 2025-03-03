@@ -10,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-# sbatch ~/Genoseq_2023/download.sh
+# sbatch ~/Genoseq_2023/shortread/qc_and_stats/countunmapped.sh
 
 
 module load samtools
@@ -21,19 +21,20 @@ output_file="/scratch/rjp5nc/UK2022_2024/allshortreads/unmappedinsortedbam.csv"
 wd="/scratch/rjp5nc/UK2022_2024/allshortreads/sortedbams"
 cd ${wd}
 
+echo "BAM_File,Mapped,Unmapped_Reads" > "$output_file"
 
 # Output CSV file
 
-# Write header to CSV file
-echo "BAM_File,Unmapped_Reads" > "$output_file"
-
-# Loop through all BAM files in the current directory
 for bam in *.bam; do
+    # Count mapped reads
+    mapped=$(samtools view -c -F 4 "$bam")
+
     # Count unmapped reads
-    count=$(samtools view -c -f 4 "$bam")
+    unmapped=$(samtools view -c -f 4 "$bam")
+
+    # Count total reads
+    total=$(samtools view -c "$bam")
 
     # Append results to CSV file
-    echo "$bam,$count" >> "$output_file"
+    echo "$bam,$mapped,$unmapped,$total" >> "$output_file"
 done
-
-echo "Results saved in $output_file"
