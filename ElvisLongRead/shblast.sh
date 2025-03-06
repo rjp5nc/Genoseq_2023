@@ -14,7 +14,7 @@
 module load blast
 
 # Define directories
-INPUT_DIR="/scratch/rjp5nc/HMW/HMWDNAElvis3/blast/trimmed_fasta"
+INPUT_DIR="/scratch/rjp5nc/HMW/HMWDNAElvis3/blast/trimmedfasta"
 OUTPUT_DIR="/scratch/rjp5nc/HMW/HMWDNAElvis3/blast_results2"
 mkdir -p "$OUTPUT_DIR"
 
