@@ -17,6 +17,9 @@
 
 conda activate hifiasm
 
+wd="/scratch/rjp5nc/HMW/HMWDNAElvis3"
+cd ${wd}
+
 # Set variables
 HIFI_READS="/scratch/rjp5nc/HMW/HMWDNAElvis3/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz"  # Change this to your HiFi reads file
 THREADS=40  # Adjust based on your system
