@@ -23,7 +23,7 @@ THREADS=40  # Adjust based on your system
 OUTPUT_PREFIX="assembly"
 
 # Run HiFiasm
-hifiasm -o ${OUTPUT_PREFIX} -t ${THREADS} --hifi ${HIFI_READS}
+hifiasm -o ${OUTPUT_PREFIX} -t ${THREADS} ${HIFI_READS}
 
 # Extract the primary haploid assembly
 awk '/^>/ {if (seen[$1]++) next} {print}' ${OUTPUT_PREFIX}.p_ctg.fa > haploid_assembly.fa
