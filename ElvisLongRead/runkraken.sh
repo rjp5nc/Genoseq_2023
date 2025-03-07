@@ -13,4 +13,9 @@
 
 module load kraken2
 
+echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
+source ~/.bashrc
+
 kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 30 --report /scratch/rjp5nc/krakenDB/report.txt --output /scratch/rjp5nc/krakenDB/kraken_output.txt /scratch/rjp5nc/HMW/HMWDNAElvis3/hifiasm_out/assembly.hap2.p_ctg.fa
+
+#kraken2-build --standard --db /scratch/rjp5nc/krakenDB/test2
