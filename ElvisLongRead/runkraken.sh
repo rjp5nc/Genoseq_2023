@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J run_kraken # A single job name for the array
-#SBATCH --ntasks-per-node=10 # multi core
+#SBATCH --ntasks-per-node=30 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 1-03:00 # 3 hours
-#SBATCH --mem 40G
+#SBATCH --mem 150G
 #SBATCH -o /scratch/rjp5nc/Canu_error/kraken%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/Canu_error/kraken%A_%a.err # Standard error
 #SBATCH -p standard
