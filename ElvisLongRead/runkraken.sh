@@ -13,4 +13,4 @@
 
 module load kraken2
 
-kraken2 --db /scratch/rjp5nc/krakenDB/nt --threads 16 --report report.txt --output kraken_output.txt /scratch/rjp5nc/HMW/HMWDNAElvis3/hifiasm_out/assembly.hap2.p_ctg.fa
+kraken2 --db /scratch/rjp5nc/krakenDB/nt --threads 16 --report /scratch/rjp5nc/krakenDB/report.txt --output /scratch/rjp5nc/krakenDB/kraken_output.txt /scratch/rjp5nc/HMW/HMWDNAElvis3/hifiasm_out/assembly.hap2.p_ctg.fa
