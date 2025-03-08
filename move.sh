@@ -10,4 +10,4 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-cp -r /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData /project/berglandlab/Robert/shortread_data/data
+rsync -a --prune-empty-dirs --include "*/" --include "*_1.fq.gz" --include "*_2.fq.gz" --exclude "*" /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData /project/berglandlab/Robert/shortread_data/data
