@@ -22,9 +22,9 @@ cd /scratch/rjp5nc/HMW/HMWDNAElvis3/
 # Run Busco
 apptainer run /home/csm6hg/sifs/busco_v5.4.7_cv1.sif \
 busco \
--i /scratch/rjp5nc/HMW/HMWDNAElvis3/hifiasm_out/assembly.hap2.p_ctg.fa \
--c 6 \
+-i /scratch/rjp5nc/HMW/HMWDNAElvis3/hifiasm_out/assembly.p_ctg.fa \
+-c 10 \
 --out_path /scratch/rjp5nc/HMW/HMWDNAElvis3/ \
 -l arthropoda_odb10 \
--o dap_busco \
+-o dap_busco_hap1 \
 -m genome
