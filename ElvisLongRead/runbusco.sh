@@ -22,7 +22,7 @@ cd /scratch/rjp5nc/HMW/HMWDNAElvis3/
 # Run Busco
 apptainer run /home/csm6hg/sifs/busco_v5.4.7_cv1.sif \
 busco \
--i /scratch/rjp5nc/HMW/HMWDNAElvis3/assembly.hap2_onlydaps.fasta \
+-i /scratch/rjp5nc/HMW/HMWDNAElvis3/hifiasm_out/assembly.hap2.p_ctg.fa \
 -c 6 \
 --out_path /scratch/rjp5nc/HMW/HMWDNAElvis3/ \
 -l arthropoda_odb10 \
