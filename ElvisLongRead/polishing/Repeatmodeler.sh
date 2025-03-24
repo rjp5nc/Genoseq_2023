@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J run_modeler # A single job name for the array
-#SBATCH --ntasks-per-node=20 # multi core
+#SBATCH --ntasks-per-node=10 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 5-00:00 # 1 days
 #SBATCH --mem 150G
@@ -28,4 +28,4 @@ cd ${wd}
 #makeblastdb -in cleaned_dap.contigs.fasta -out my_db -dbtype nucl -title my_db -parse_seqids
 #BuildDatabase -name my_db assembly.hap2_onlydaps.fasta
 
-RepeatModeler -database my_db -pa 20
+RepeatModeler -database my_db -pa 10
