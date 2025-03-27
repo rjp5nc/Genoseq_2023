@@ -18,9 +18,9 @@ KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
 source ~/.bashrc
 
-kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 30 --report /scratch/rjp5nc/krakenDB/US_pulex/report.txt --classified-out /scratch/rjp5nc/krakenDB/US_pulex/kraken_classified_output.txt --output /scratch/rjp5nc/krakenDB/US_pulex/kraken_output.txt --use-names /scratch/rjp5nc/Reference_genomes/orig_ref/GCA_900092285.2_PA42_4.1_genomic.fna
+kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 30 --report /scratch/rjp5nc/krakenDB/US_ambigua/report.txt --classified-out /scratch/rjp5nc/krakenDB/US_ambigua/kraken_classified_output.txt --output /scratch/rjp5nc/krakenDB/US_ambigua/kraken_output.txt --use-names /scratch/rjp5nc/Reference_genomes/orig_ref/Daphnia_ambigua_Q001_genome.fa
 
-grep '^>' /scratch/rjp5nc/krakenDB/US_pulex/kraken_classified_output.txt > /scratch/rjp5nc/krakenDB/US_pulex/classified_headers.txt
+grep '^>' /scratch/rjp5nc/krakenDB/US_ambigua/kraken_classified_output.txt > /scratch/rjp5nc/krakenDB/US_ambigua/classified_headers.txt
 
 
 #kraken2-build --standard --db /scratch/rjp5nc/krakenDB/test2
