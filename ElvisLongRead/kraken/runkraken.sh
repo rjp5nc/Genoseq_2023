@@ -18,9 +18,9 @@ KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
 source ~/.bashrc
 
-kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 30 --report /scratch/rjp5nc/krakenDB/Eu_pulex/report.txt --classified-out /scratch/rjp5nc/krakenDB/Eu_pulex/kraken_classified_output.txt --output /scratch/rjp5nc/krakenDB/Eu_pulex/kraken_output.txt --use-names /scratch/rjp5nc/Reference_genomes/orig_ref/totalHiCwithallbestgapclosed.clean.fa
+kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 30 --report /scratch/rjp5nc/krakenDB/US_obtusa/report.txt --classified-out /scratch/rjp5nc/krakenDB/US_obtusa/kraken_classified_output.txt --output /scratch/rjp5nc/krakenDB/US_obtusa/kraken_output.txt --use-names /scratch/rjp5nc/Reference_genomes/orig_ref/JAACYE01.1.fasta
 
-grep '^>' /scratch/rjp5nc/krakenDB/Eu_pulex/kraken_classified_output.txt > /scratch/rjp5nc/krakenDB/Eu_pulex/classified_headers.txt
+grep '^>' /scratch/rjp5nc/krakenDB/US_obtusa/kraken_classified_output.txt > /scratch/rjp5nc/krakenDB/US_obtusa/classified_headers.txt
 
 
 #kraken2-build --standard --db /scratch/rjp5nc/krakenDB/test2
