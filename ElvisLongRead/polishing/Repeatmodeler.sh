@@ -21,11 +21,15 @@
 #conda create -n repeatmodeler_env -c bioconda -c conda-forge repeatmodeler perl=5.22.0
 conda activate repeatmodeler_new
 
-wd="/scratch/rjp5nc/removedups/eu_dobtusa/"
+wd="/scratch/rjp5nc/removedups/us_dobtusa/"
 cd ${wd}
 
-#seqtk seq assembly.hap2_onlydaps.fasta > cleaned_dap.contigs.fasta
-#makeblastdb -in cleaned_dap.contigs.fasta -out my_db -dbtype nucl -title my_db -parse_seqids
-#BuildDatabase -name my_db assembly.hap2_onlydaps.fasta
+
+#ref="/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa"
+#cleaned="/scratch/rjp5nc/removedups/us_dobtusa/cleaned_US_obtusa.fasta"
+
+#seqtk seq $ref > $cleaned
+#makeblastdb -in $cleaned -out my_db -dbtype nucl -title my_db -parse_seqids
+#BuildDatabase -name my_db $cleaned
 
 RepeatModeler -database my_db -pa 10
