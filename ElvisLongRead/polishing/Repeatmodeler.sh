@@ -21,16 +21,17 @@
 #conda create -n repeatmodeler_env -c bioconda -c conda-forge repeatmodeler perl=5.22.0
 conda activate repeatmodeler_new
 
-wd="/scratch/rjp5nc/removedups/us_dambigua/"
+wd="/scratch/rjp5nc/removedups/us_dpulex/"
 cd ${wd}
 
 #US obtusa
 #EU obtusa
 #EU pulex
 #ambigua
+#us_pulex
 
-#ref="/scratch/rjp5nc/Reference_genomes/orig_ref/Daphnia_ambigua_Q001_genome.fa"
-#cleaned="/scratch/rjp5nc/removedups/us_dambigua/cleaned_ambigua.fasta"
+#ref="/scratch/rjp5nc/Reference_genomes/orig_ref/us_pulex_ref_GCF_021134715.1_ASM2113471v1_genomic.fna"
+#cleaned="/scratch/rjp5nc/removedups/us_dpulex/cleaned_US_pulex.fasta"
 
 #seqtk seq $ref > $cleaned
 #makeblastdb -in $cleaned -out my_db -dbtype nucl -title my_db -parse_seqids
