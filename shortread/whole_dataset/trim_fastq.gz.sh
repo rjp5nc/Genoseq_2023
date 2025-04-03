@@ -3,13 +3,13 @@
 #SBATCH -J trimSRA # A single job name for the array
 #SBATCH --ntasks-per-node=10 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 0-10:00 # 10 hours
+#SBATCH -t 3-10:00 # 10 hours
 #SBATCH --mem 100G
 #SBATCH -o /scratch/rjp5nc/outputerrors/down.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-576%20   # Adjust the range based on the number of folders
+#SBATCH --array=1-576%25   # Adjust the range based on the number of folders
 
 #mv /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SR* /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR/
 
