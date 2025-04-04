@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/erroroutputs/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
-#SBATCH --array=1-79%10   # Adjust based on the number of samples
+#SBATCH --array=1-21   # Adjust based on the number of samples
 
 # Load necessary modules
 module load sratoolkit/2.10.5
