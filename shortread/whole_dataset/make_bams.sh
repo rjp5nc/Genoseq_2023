@@ -46,6 +46,8 @@ fi
 
 echo "Processing sample: ${samp} with reference: ${ref_path}"
 
+chmod u+w /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR/${samp}/${samp}.*.fastq
+
 # Map to reference genome (assembled reads)
 bwa mem -t 10 -K 100000000 -Y ${ref_path} ${outfq}/${samp}/${samp}.assembled.fastq | \
 samtools view -Suh -q 20 -F 0x100 | \
