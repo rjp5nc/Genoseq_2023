@@ -55,7 +55,7 @@ samtools sort --threads 10 -o ${outfq}/${samp}.sort.bam
 samtools index ${outfq}/${samp}.sort.bam
 
 # Map unassembled reads
-bwa mem -t 10 -K 100000000 -Y ${ref_path} | \
+bwa mem -t 10 -K 100000000 -Y ${ref_path} \
 ${outfq}/${samp}/${samp}.unassembled.forward.fastq  \
 ${outfq}/${samp}/${samp}.unassembled.reverse.fastq | \
 samtools view -Suh -q 20 -F 0x100 | \
