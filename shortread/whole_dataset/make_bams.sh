@@ -12,8 +12,8 @@
 #SBATCH --array=1-21   # Adjust based on the number of samples
 
 # Load necessary modules
-module load sratoolkit
 module load gcc htslib
+module load sratoolkit/3.1.1
 module load trimmomatic
 module load bwa
 module load samtools
