@@ -28,11 +28,11 @@ mkdir -p "${outfq}" "${outbam}"
 
 # Read sample ID and reference path from CSV
 CSV_FILE="/scratch/rjp5nc/UK2022_2024/forref2.csv"
-line=$(sed -n "${SLURM_ARRAY_TASK_ID}p" ${CSV_FILE})
+line=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" ${CSV_FILE})
 
 # Extract fields (assuming CSV format: sample_id,reference_path)
-samp=$(echo "$line" | tail -n +2 | cut -d',' -f4)
-ref_path=$(echo "$line" | tail -n +2 | cut -d',' -f5)
+samp=$(echo "$line" | cut -d',' -f4)
+ref_path=$(echo "$line" | cut -d',' -f5)
 ref_path=$(echo "${ref_path}" | tr -d '\r')
 
 #samp=SRR14370492
