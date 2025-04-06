@@ -12,9 +12,9 @@
 #SBATCH --array=1-21   # Adjust based on the number of samples
 
 # Load necessary modules
-module load sratoolkit/2.10.5
-module load gcc/9.2.0 htslib/1.10.2
-module load trimmomatic/0.36
+module load sratoolkit
+module load gcc htslib
+module load trimmomatic
 module load bwa
 module load samtools
 module load picard
@@ -31,9 +31,12 @@ CSV_FILE="/scratch/rjp5nc/UK2022_2024/forref2.csv"
 line=$(sed -n "${SLURM_ARRAY_TASK_ID}p" ${CSV_FILE})
 
 # Extract fields (assuming CSV format: sample_id,reference_path)
-samp=$(echo "$line" | cut -d',' -f4)
-ref_path=$(echo "$line" | cut -d',' -f5)
+samp=$(echo "$line" | tail -n +2 | cut -d',' -f4)
+ref_path=$(echo "$line" | tail -n +2 | cut -d',' -f5)
 ref_path=$(echo "${ref_path}" | tr -d '\r')
+
+#samp=SRR14370492
+#ref_path=/scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.fasta
 
 # Ensure sample and reference path are valid
 if [[ -z "$samp" || -z "$ref_path" ]]; then
@@ -50,12 +53,11 @@ samtools sort --threads 10 -o ${outfq}/${samp}.sort.bam
 samtools index ${outfq}/${samp}.sort.bam
 
 # Map unassembled reads
-bwa mem -t 10 -K 100000000 -Y \
-    ${ref_path} \
-    ${outfq}/${samp}.unassembled.forward.fastq \
-    ${outfq}/${samp}.unassembled.reverse.fastq | \
-    samtools view -Suh -q 20 -F 0x100 | \
-    samtools sort --threads 10 -o ${outfq}/${samp}.filt.unassembled.sort.bam
+bwa mem -t 10 -K 100000000 -Y ${ref_path} |
+${outfq}/${samp}/${samp}.unassembled.forward.fastq | \
+${outfq}/${samp}/${samp}.unassembled.reverse.fastq | \
+samtools view -Suh -q 20 -F 0x100 | \
+samtools sort --threads 10 -o ${outfq}/${samp}.filt.unassembled.sort.bam
 samtools index ${outfq}/${samp}.filt.unassembled.sort.bam
 
 # Merge assembled and unassembled BAM files
