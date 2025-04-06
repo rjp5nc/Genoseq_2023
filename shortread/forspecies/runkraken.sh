@@ -23,8 +23,8 @@ kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt \
 --classified-out /scratch/rjp5nc/krakenDB/shortread/kraken_classified_output.txt \
 --output /scratch/rjp5nc/krakenDB/shortread/kraken_output.txt \
 --use-names \
-/scratch/rjp5nc/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged1.fq.gz \
-/scratch/rjp5nc/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged2.fq.gz
+/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged1.fq.gz \
+/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged2.fq.gz
 
 grep '^>' /scratch/rjp5nc/krakenDB/shortread/kraken_classified_output.txt > /scratch/rjp5nc/krakenDB/shortread/classified_headers.txt
 
