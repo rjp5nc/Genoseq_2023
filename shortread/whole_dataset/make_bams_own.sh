@@ -31,8 +31,8 @@ CSV_FILE="/scratch/rjp5nc/UK2022_2024/myclonestoref.csv"
 line=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" ${CSV_FILE})
 
 # Extract fields (assuming CSV format: sample_id,reference_path)
-samp=$(echo "$line" | cut -d',' -f4)
-ref_path=$(echo "$line" | cut -d',' -f5)
+samp=$(echo "$line" | cut -d',' -f1)
+ref_path=$(echo "$line" | cut -d',' -f4)
 ref_path=$(echo "${ref_path}" | tr -d '\r')
 
 #samp=SRR14370492
