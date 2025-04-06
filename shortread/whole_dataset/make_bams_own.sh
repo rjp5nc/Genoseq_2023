@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH -J DownloadMap    # Job name
+#SBATCH -J makebams    # Job name
 #SBATCH --ntasks=1        # Single task per job
 #SBATCH --cpus-per-task=10 # Number of CPU cores per task
 #SBATCH -N 1              # Run on one node
@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/erroroutputs/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
-#SBATCH --array=1-576   # Adjust based on the number of samples
+#SBATCH --array=1-576%30   # Adjust based on the number of samples
 
 # Load necessary modules
 module load gcc htslib
@@ -46,7 +46,7 @@ fi
 
 echo "Processing sample: ${samp} with reference: ${ref_path}"
 
-chmod u+w /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR/${samp}/${samp}.*.fastq
+chmod u+w /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/${samp}/${samp}.*.fastq
 
 # Map to reference genome (assembled reads)
 bwa mem -t 10 -K 100000000 -Y ${ref_path} ${outfq}/${samp}/${samp}.assembled.fastq | \
