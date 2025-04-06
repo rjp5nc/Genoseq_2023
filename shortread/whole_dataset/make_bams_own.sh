@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/erroroutputs/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
-#SBATCH --array=1-576%30   # Adjust based on the number of samples
+#SBATCH --array=1-576%40   # Adjust based on the number of samples
 
 # Load necessary modules
 module load gcc htslib
