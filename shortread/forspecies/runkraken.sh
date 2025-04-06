@@ -18,15 +18,27 @@ export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 #echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
 #source ~/.bashrc
 
-kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt \
---threads 30 --report /scratch/rjp5nc/krakenDB/shortread/report.txt \
---classified-out /scratch/rjp5nc/krakenDB/shortread/kraken_classified_output.txt \
---output /scratch/rjp5nc/krakenDB/shortread/kraken_output.txt \
---use-names \
-/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged1.fq.gz \
-/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged2.fq.gz
+seqtk sample -s100 \
+/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged1.fq.gz 10000 > /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/sub_1.fq
 
-grep '^>' /scratch/rjp5nc/krakenDB/shortread/kraken_classified_output.txt > /scratch/rjp5nc/krakenDB/shortread/classified_headers.txt
+seqtk sample -s100 \
+/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged2.fq.gz 10000 > /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/sub_2.fq
+
+
+
+
+
+kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt \
+--threads 30 --report /scratch/rjp5nc/krakenDB/shortread/reportsub.txt \
+--classified-out /scratch/rjp5nc/krakenDB/shortread/kraken_classified_outputsub.txt \
+--output /scratch/rjp5nc/krakenDB/shortread/kraken_outputsub.txt \
+--use-names \
+/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/sub_1.fq /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/sub_2.fq
+
+#/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged1.fq.gz \
+#/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged2.fq.gz
+
+grep '^>' /scratch/rjp5nc/krakenDB/shortread/kraken_classified_outputsub.txt > /scratch/rjp5nc/krakenDB/shortread/classified_headerssub.txt
 
 
 #kraken2-build --standard --db /scratch/rjp5nc/krakenDB/test2
