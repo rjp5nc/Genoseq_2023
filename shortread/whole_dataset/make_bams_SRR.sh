@@ -3,10 +3,10 @@
 #SBATCH --ntasks=1        # Single task per job
 #SBATCH --cpus-per-task=10 # Number of CPU cores per task
 #SBATCH -N 1              # Run on one node
-#SBATCH -t 0-10:00        # 10 hours runtime
+#SBATCH -t 1-10:00        # 10 hours runtime
 #SBATCH --mem=100G        # Memory per node
-#SBATCH -o /scratch/rjp5nc/erroroutputs/down.%A_%a.out  # Standard output
-#SBATCH -e /scratch/rjp5nc/erroroutputs/down.%A_%a.err  # Standard error
+#SBATCH -o /scratch/rjp5nc/outputerrors/down.%A_%a.out  # Standard output
+#SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
 #SBATCH --array=1-21   # Adjust based on the number of samples
@@ -18,6 +18,10 @@ module load trimmomatic
 module load bwa
 module load samtools
 module load picard
+
+
+# 3387565_18
+# 3387565_19 
 
 # Define working directories
 outfq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR"

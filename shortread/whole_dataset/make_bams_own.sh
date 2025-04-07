@@ -5,8 +5,8 @@
 #SBATCH -N 1              # Run on one node
 #SBATCH -t 0-10:00        # 10 hours runtime
 #SBATCH --mem=100G        # Memory per node
-#SBATCH -o /scratch/rjp5nc/erroroutputs/down.%A_%a.out  # Standard output
-#SBATCH -e /scratch/rjp5nc/erroroutputs/down.%A_%a.err  # Standard error
+#SBATCH -o /scratch/rjp5nc/outputerrors/down.%A_%a.out  # Standard output
+#SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
 #SBATCH --array=1-576%40   # Adjust based on the number of samples
