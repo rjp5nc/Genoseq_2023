@@ -12,12 +12,9 @@
 
 
 #conda create -n plotsr
-conda init plotsr
 conda activate plotsr
 #conda install numpy=1.21.2 pandas=1.2.4 matplotlib=3.3.4 setuptools
 #conda install syri
-
-
 
 #syri -c A_B.bam -r A.fa -q B.fa -F B --prefix A_B &
 
