@@ -5,13 +5,14 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 2-10:00 # 10 hours
 #SBATCH --mem 100G
-#SBATCH -o /scratch/rjp5nc/outputerrors/lift.%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/outputerrors/lift.%A_%a.err # Standard error
+#SBATCH -o /scratch/rjp5nc/erroroutputs/lift.%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/erroroutputs/lift.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
 
 #conda create -n plotsr
+conda init plotsr
 conda activate plotsr
 #conda install numpy=1.21.2 pandas=1.2.4 matplotlib=3.3.4 setuptools
 #conda install syri
