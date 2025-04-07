@@ -12,7 +12,7 @@
 
 
 #conda create -n plotsr
-source ~/miniconda3/etc/profile.d/conda.sh
+conda deactivate
 conda activate plotsr
 #conda install numpy=1.21.2 pandas=1.2.4 matplotlib=3.3.4 setuptools
 #conda install syri
