@@ -12,7 +12,6 @@
 
 
 #conda create -n plotsr
-source ~/.bashrc
 conda activate plotsr
 #conda install numpy=1.21.2 pandas=1.2.4 matplotlib=3.3.4 setuptools
 #conda install syri
@@ -24,7 +23,7 @@ QUERY="assembly.hap2_onlydaps.fasta"
 
 cd /scratch/rjp5nc/Reference_genomes/liftover/
 
-syri -c /scratch/rjp5nc/Reference_genomes/liftover/ribbon/euobtusa_v_eupulex.bam \
+/home/rjp5nc/miniconda3/envs/plotsr/bin/syri -c /scratch/rjp5nc/Reference_genomes/liftover/ribbon/euobtusa_v_eupulex.bam \
  -r /scratch/rjp5nc/Reference_genomes/post_kraken/${REF} \
  -q /scratch/rjp5nc/Reference_genomes/post_kraken/${QUERY} \
  -F B --prefix \
