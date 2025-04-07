@@ -20,8 +20,6 @@ conda activate plotsr
 
 #syri -c A_B.bam -r A.fa -q B.fa -F B --prefix A_B &
 
-
-
 REF="eu_pulex_totalHiCwithallbestgapclosed.clean.fa"
 QUERY="assembly.hap2_onlydaps.fasta"
 
