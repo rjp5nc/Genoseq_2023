@@ -20,15 +20,15 @@ module load apptainer/1.3.4
 ### test container
   #nextflow run evotools/nf-LO -profile test,singularity -with-singularity ${PWD}/nflo.sif
 
-#mkdir -p /scratch/rjp5nc/lastz/us_obtusa
+#mkdir -p /scratch/rjp5nc/lastz/us_ambigua
 
 
   nextflow run evotools/nf-LO \
-  --source /scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa \
+  --source /scratch/rjp5nc/Reference_genomes/post_kraken/Daphnia_ambigua_Q001_genome.fa \
   --target /scratch/rjp5nc/Reference_genomes/post_kraken/eu_pulex_totalHiCwithallbestgapclosed.clean.fa \
   --distance medium \
   --aligner lastz \
-  --outdir /scratch/rjp5nc/lastz/us_obtusa \
+  --outdir /scratch/rjp5nc/lastz/us_ambigua \
   -profile singularity \
   --max_memory '60.GB' \
   --max_cpus 40 \
