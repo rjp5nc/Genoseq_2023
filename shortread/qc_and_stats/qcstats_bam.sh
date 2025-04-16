@@ -31,7 +31,7 @@ PCT_MAPPED=$(awk "BEGIN {printf \"%.2f\", ($MAPPED_READS / $TOTAL_READS) * 100}"
 
 # Duplicate rate
 TMP_METRICS=$(mktemp)
-picard MarkDuplicates I="$BAM" O=/dev/null M="$TMP_METRICS" REMOVE_DUPLICATES=false ASSUME_SORTED=true QUIET=true VALIDATION_STRINGENCY=SILENT
+java -jar $EBROOTPICARD/picard.jar MarkDuplicates I="$BAM" O=/dev/null M="$TMP_METRICS" REMOVE_DUPLICATES=false ASSUME_SORTED=true QUIET=true VALIDATION_STRINGENCY=SILENT
 DUP_LINE=$(grep -m1 'Unknown Library' "$TMP_METRICS")
 DUP_RATE=$(echo "$DUP_LINE" | awk '{if ($10 > 0) printf "%.4f", $9 / $10; else print "NA"}')
 rm "$TMP_METRICS"
