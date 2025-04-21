@@ -40,7 +40,7 @@ wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 
 #dos2unix "$parameterFile"
 
-SLURM_ARRAY_TASK_ID=2
+#SLURM_ARRAY_TASK_ID=2
 
 # Extract sample name
 id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id + 1 {print $7}' "$parameterFile")
