@@ -3,7 +3,7 @@
 #SBATCH -J gatk_chrom # A single job name for the array
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 3-00:00:00 # 3 days
+#SBATCH -t 0-8:00:00 # 8 hours
 #SBATCH --mem 25G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.err # Standard error
@@ -35,7 +35,10 @@ module load tabix/0.2.6
 
 
 #parameterFile=/scratch/rjp5nc/UK2022_2024/robert_paramfile.txt
-parameterFile=/scratch/rjp5nc/UK2022_2024/param100.txt
+
+#sed -n '1,9900p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param1_9990.txt
+
+parameterFile=/scratch/rjp5nc/UK2022_2024/param1_9990.txt
 wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 
 #dos2unix "$parameterFile"
@@ -43,10 +46,10 @@ wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 #SLURM_ARRAY_TASK_ID=2
 
 # Extract sample name
-id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id + 1 {print $7}' "$parameterFile")
-samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id + 1 {print $2}' "$parameterFile")
-chrom=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id + 1 {print $6}' "$parameterFile")
-ref=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id + 1 {print $5}' "$parameterFile")
+id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $7}' "$parameterFile")
+samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $2}' "$parameterFile")
+chrom=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $6}' "$parameterFile")
+ref=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $5}' "$parameterFile")
 
 
 echo "Haplotype calling -" "Sample:" $SLURM_ARRAY_TASK_ID
