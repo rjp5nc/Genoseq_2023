@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 3-00:00:00 # 3 days
 #SBATCH --mem 25G
-#SBATCH -o /scratch/csm6hg/daphnia_phylo/err/gatk.chrom.%A_%a.out # Standard output
-#SBATCH -e /scratch/csm6hg/daphnia_phylo/err/gatk.chrom.%A_%a.err # Standard error
+#SBATCH -o /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 #SBATCH --array=1-100%40
