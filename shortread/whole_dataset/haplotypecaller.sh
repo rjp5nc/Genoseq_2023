@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-9999%40
+#SBATCH --array=1-9999%20
 
 
 # grep '^>' your_file.fasta | sed 's/^>//'
@@ -35,11 +35,14 @@ module load tabix/0.2.6
 
 
 #parameterFile=/scratch/rjp5nc/UK2022_2024/robert_paramfile.txt
+# wc -l /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt
+# total lines : 101136
+
 
 #sed -n '1,9999p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param1_9999.txt
-#sed -n '9901,1799' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param1_9990.txt
+#sed -n '10000,19998p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10000_19998.txt
 
-parameterFile=/scratch/rjp5nc/UK2022_2024/param1_9999.txt
+parameterFile=/scratch/rjp5nc/UK2022_2024/param10000_19998.txt
 wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 
 #dos2unix "$parameterFile"
