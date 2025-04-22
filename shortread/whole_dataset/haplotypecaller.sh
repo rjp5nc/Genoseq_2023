@@ -25,6 +25,7 @@
 #gatk CreateSequenceDictionary -R assembly.hap2_onlydaps.fasta
 #gatk CreateSequenceDictionary -R us_pulex_ref_kap4.fa
 
+
 #grep "^>h2tg000002l" assembly.hap2_onlydaps.fasta
 
 # Load modules
