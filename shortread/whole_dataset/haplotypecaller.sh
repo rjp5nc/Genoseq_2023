@@ -57,7 +57,7 @@ parameterFile=/scratch/rjp5nc/UK2022_2024/param5.txt
 wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 
 #dos2unix "$parameterFile"
-
+  
 #SLURM_ARRAY_TASK_ID=2
 
 # Extract sample name
