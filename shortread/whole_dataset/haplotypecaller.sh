@@ -3,7 +3,7 @@
 #SBATCH -J gatk_chrom # A single job name for the array
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 2-0:00:00 # 8 hours
+#SBATCH -t 0-12:00:00 # 8 hours
 #SBATCH --mem 25G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.err # Standard error
@@ -49,7 +49,7 @@ module load tabix/0.2.6
 #sed -n '89992,99990p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10.txt
 #sed -n '99991,101136p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param11.txt
 
-parameterFile=/scratch/rjp5nc/UK2022_2024/param10000_19998.txt
+parameterFile=/scratch/rjp5nc/UK2022_2024/param3.txt
 wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 
 #dos2unix "$parameterFile"
