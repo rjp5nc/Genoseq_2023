@@ -3,13 +3,13 @@
 #SBATCH -J gatk_chrom # A single job name for the array
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 0-8:00:00 # 8 hours
+#SBATCH -t 2-0:00:00 # 8 hours
 #SBATCH --mem 25G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-9999%20
+#SBATCH --array=1-9999%55
 
 
 # grep '^>' your_file.fasta | sed 's/^>//'
@@ -33,14 +33,21 @@ module load tabix/0.2.6
 
 # Parameters     find /project/berglandlab/connor -type f -name "SRA_paramList_1"
 
-
 #parameterFile=/scratch/rjp5nc/UK2022_2024/robert_paramfile.txt
 # wc -l /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt
 # total lines : 101136
 
-
 #sed -n '1,9999p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param1_9999.txt
 #sed -n '10000,19998p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10000_19998.txt
+#sed -n '19999,29997p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param3.txt
+#sed -n '29998,39996p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param4.txt
+#sed -n '39997,49995p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param5.txt
+#sed -n '49996,59994p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param6.txt
+#sed -n '59995,69993p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param7.txt
+#sed -n '69994,79992p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param8.txt
+#sed -n '79993,89991p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param9.txt
+#sed -n '89992,99990p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10.txt
+#sed -n '99991,101136p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param11.txt
 
 parameterFile=/scratch/rjp5nc/UK2022_2024/param10000_19998.txt
 wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
