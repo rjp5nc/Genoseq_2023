@@ -53,9 +53,9 @@ module load tabix/0.2.6
 #sed -n '89992,99990p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10.txt
 #sed -n '99991,101136p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param11.txt
 
-#need to run 8
+#need to run 9
 
-parameterFile=/scratch/rjp5nc/UK2022_2024/param8.txt
+parameterFile=/scratch/rjp5nc/UK2022_2024/param9.txt
 wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 
 #dos2unix "$parameterFile"
