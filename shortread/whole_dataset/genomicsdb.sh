@@ -9,6 +9,8 @@
 #SBATCH -e /scratch/rjp5nc/err/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
+#SBATCH --array=1-256%50
+
 
 # This script will merge gVCFs into a unified database for genotype calling.
 # This will be done using a per chromosome approach
