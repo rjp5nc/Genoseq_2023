@@ -15,43 +15,43 @@
 FASTA_FILE="/scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.fasta"
 OUTPUT_FILE="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_euobtusa.txt"
 
-# Set window size (1000000)
+
 WINDOW_SIZE=1000000
 
-# Write header to output file
-echo "id,seqnames,start,end,width" > $OUTPUT_FILE
-
-# Initialize variables
+echo "id,seqnames,start,end,width" > "$OUTPUT_FILE"
 id=1
+seqname=""
+seq=""
 
-# Read the FASTA file line by line
-while IFS= read -r line; do
-    # Check if the line is a FASTA header (starts with '>')
-    if [[ ${line} == ">"* ]]; then
-        # Extract the sequence name from the header (remove the '>' character)
-        seqname=${line:1}
+while read -r line; do
+    if [[ $line == ">"* ]]; then
+        # Process previous scaffold if present
+        if [[ -n $seq ]]; then
+            len=${#seq}
+            for ((start=1; start<=len; start+=WINDOW_SIZE)); do
+                end=$((start + WINDOW_SIZE - 1))
+                (( end > len )) && end=$len
+                width=$((end - start + 1))
+                echo "$id,$seqname,$start,$end,$width" >> "$OUTPUT_FILE"
+                ((id++))
+            done
+        fi
+        # Start new scaffold
+        seqname=${line#>}
         seq=""
     else
-        # Append the sequence to a variable (the entire sequence for this scaffold)
         seq+=$line
     fi
 done < "$FASTA_FILE"
 
-# Now process the sequence for the scaffold
-len=${#seq}
-for ((start=1; start<=len; start+=WINDOW_SIZE)); do
-    end=$((start + WINDOW_SIZE - 1))
-    # If the end position is beyond the sequence length, adjust it
-    if ((end > len)); then
-        end=$len
-    fi
-
-    # Calculate the width (this is just the size of the window, unless it's the last segment)
-    width=$((end - start + 1))
-
-    # Output the result to the CSV file
-    echo "$id,$seqname,$start,$end,$width" >> $OUTPUT_FILE
-
-    # Increment the ID counter
-    ((id++))
-done
+# Final scaffold processing
+if [[ -n $seq ]]; then
+    len=${#seq}
+    for ((start=1; start<=len; start+=WINDOW_SIZE)); do
+        end=$((start + WINDOW_SIZE - 1))
+        (( end > len )) && end=$len
+        width=$((end - start + 1))
+        echo "$id,$seqname,$start,$end,$width" >> "$OUTPUT_FILE"
+        ((id++))
+    done
+fi
