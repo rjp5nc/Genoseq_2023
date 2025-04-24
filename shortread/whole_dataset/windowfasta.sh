@@ -12,46 +12,35 @@
 
 
 # Input FASTA file
-FASTA_FILE="/scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.fasta"
-OUTPUT_FILE="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_euobtusa.txt"
 
-
-WINDOW_SIZE=1000000
-
-echo "id,seqnames,start,end,width" > "$OUTPUT_FILE"
-id=1
-seqname=""
-seq=""
-
-while read -r line; do
-    if [[ $line == ">"* ]]; then
-        # Process previous scaffold if present
-        if [[ -n $seq ]]; then
-            len=${#seq}
-            for ((start=1; start<=len; start+=WINDOW_SIZE)); do
-                end=$((start + WINDOW_SIZE - 1))
-                (( end > len )) && end=$len
-                width=$((end - start + 1))
-                echo "$id,$seqname,$start,$end,$width" >> "$OUTPUT_FILE"
-                ((id++))
-            done
-        fi
-        # Start new scaffold
-        seqname=${line#>}
-        seq=""
-    else
-        seq+=$line
-    fi
-done < "$FASTA_FILE"
-
-# Final scaffold processing
-if [[ -n $seq ]]; then
-    len=${#seq}
-    for ((start=1; start<=len; start+=WINDOW_SIZE)); do
-        end=$((start + WINDOW_SIZE - 1))
-        (( end > len )) && end=$len
-        width=$((end - start + 1))
-        echo "$id,$seqname,$start,$end,$width" >> "$OUTPUT_FILE"
-        ((id++))
-    done
-fi
+awk -v window=1000000 'BEGIN {
+    print "id,seqnames,start,end,width";
+}
+$0 ~ /^>/ {
+    if (seqname != "") {
+        len = length(seq);
+        for (start = 1; start <= len; start += window) {
+            end = start + window - 1;
+            if (end > len) end = len;
+            width = end - start + 1;
+            print id++ "," seqname "," start "," end "," width;
+        }
+    }
+    seqname = substr($0, 2);
+    seq = "";
+    next;
+}
+{
+    seq = seq $0;
+}
+END {
+    if (seqname != "") {
+        len = length(seq);
+        for (start = 1; start <= len; start += window) {
+            end = start + window - 1;
+            if (end > len) end = len;
+            width = end - start + 1;
+            print id++ "," seqname "," start "," end "," width;
+        }
+    }
+}' /scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.fasta > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_euobtusa.txt
