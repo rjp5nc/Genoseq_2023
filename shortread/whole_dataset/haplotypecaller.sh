@@ -22,11 +22,17 @@
 
 #gatk CreateSequenceDictionary -R Daphnia_ambigua_Q001_genome.fa
 #gatk CreateSequenceDictionary -R totalHiCwithallbestgapclosed.fa
-#need it to be .clean file? 
 
 #gatk CreateSequenceDictionary -R assembly.hap2_onlydaps.fasta
 #gatk CreateSequenceDictionary -R us_pulex_ref_kap4.fa
 
+#cut -f1,2 eu_pulex_totalHiCwithallbestgapclosed.clean.fai | awk '{print $1"\t0\t"$2}' > your.bed
+
+#while read -r line; do
+#    chrom=$(echo "$line" | cut -f1)
+#    length=$(echo "$line" | cut -f2)
+#    echo -e "${chrom}\t0\t${length}" > "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/bed/${chrom}.bed"
+#done < "eu_pulex_totalHiCwithallbestgapclosed.clean.fa.fai"
 
 #grep "^>h2tg000002l" assembly.hap2_onlydaps.fasta
 
@@ -66,7 +72,6 @@ wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 # Extract sample name
 
 #changed these for pulex file
-#A USER ERROR has occurred: Couldn't read file. Error was: /scratch/rjp5nc/UK2022_2024/final_bam_rg/Gilmer5_H10finalmap_RG.bamfinalmap_RG.bam with exception: Cannot read non-existent file: file:///scratch/rjp5nc/UK2022_2024/final_bam_rg/Gilmer5_H10finalmap_RG.bamfinalmap_RG.bam
 id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $8}' "$parameterFile")
 samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $3}' "$parameterFile")
 chrom=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $7}' "$parameterFile")
