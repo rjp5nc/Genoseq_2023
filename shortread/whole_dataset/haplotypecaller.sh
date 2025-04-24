@@ -66,8 +66,9 @@ wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 # Extract sample name
 
 #changed these for pulex file
+#A USER ERROR has occurred: Couldn't read file. Error was: /scratch/rjp5nc/UK2022_2024/final_bam_rg/Gilmer5_H10finalmap_RG.bamfinalmap_RG.bam with exception: Cannot read non-existent file: file:///scratch/rjp5nc/UK2022_2024/final_bam_rg/Gilmer5_H10finalmap_RG.bamfinalmap_RG.bam
 id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $8}' "$parameterFile")
-samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $2}' "$parameterFile")
+samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $3}' "$parameterFile")
 chrom=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $7}' "$parameterFile")
 ref=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $6}' "$parameterFile")
 
