@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-12:00:00 # 8 hours
 #SBATCH --mem 25G
-#SBATCH -o /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/erroroutputs/gatk.chrom.%A_%a.err # Standard error
+#SBATCH -o /scratch/rjp5nc/err/gatk.chrom.%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/err/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 #SBATCH --array=1-672%50
@@ -40,6 +40,8 @@ module load tabix/0.2.6
 # wc -l /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt
 # total lines : 101136
 
+#THE EU PULEX ONES HAVE AN ADDED LINE. IF WE GO THROUGH THIS AGAIN, THIS NEEDS TO BE PARSED OUT
+
 #sed -n '1,9999p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param1_9999.txt
 #sed -n '10000,19998p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10000_19998.txt
 #sed -n '19999,29997p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param3.txt
@@ -62,6 +64,8 @@ wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 #SLURM_ARRAY_TASK_ID=2
 
 # Extract sample name
+
+#changed these for pulex file
 id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $8}' "$parameterFile")
 samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $2}' "$parameterFile")
 chrom=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $7}' "$parameterFile")
