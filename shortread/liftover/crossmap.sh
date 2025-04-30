@@ -19,16 +19,20 @@ module load python/3.11.4
 
 #pip install --user .
 
-#species=us_obtusa
+
+#species=us_pulex
+species=us_obtusa
 #species=us_ambigua
 #species=eu_obtusa
-species=us_pulex
 
-bed=us_pulex_ref_kap4.allbases.cleaned.slimmed.bed
+#bed=us_pulex_ref_kap4.allbases.cleaned.slimmed.bed
+bed=US_obtusa_onlydaps.allbases.cleaned.slimmed.bed
+#bed=Daphnia_ambigua_Q001_genome.allbases.slimmed.bed
+#bed=assembly.hap2_onlydaps.allbases.slimmed.bed
 
 /home/rjp5nc/.local/bin/CrossMap bed --chromid a \
 /scratch/rjp5nc/lastz/$species/chainnet/liftover.chain \
 /scratch/rjp5nc/Reference_genomes/$bed \
-/scratch/rjp5nc/liftover/uspulex_to_eupulex.bed
+/scratch/rjp5nc/liftover/usobtusa_to_eupulex.bed
 
 #cd /home/rjp5nc/Genoseq_2023/shortread/liftover
