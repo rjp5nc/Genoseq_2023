@@ -22,6 +22,6 @@ module load python/3.11.4
 species=us_obtusa
 
 /home/rjp5nc/.local/bin/CrossMap bed --chromid a \
-/scratch/rjp5nc/lastz/$species/chainnet/swappedliftover.chain \
-/scratch/rjp5nc/Reference_genomes/eu_pulex_totalHiCwithallbestgapclosed.clean.allbases.bed \
+/scratch/rjp5nc/lastz/$species/chainnet/liftover.chain \
+/scratch/rjp5nc/Reference_genomes/US_obtusa_onlydaps.allbases.cleaned.slimmed.bed \
 /scratch/rjp5nc/liftover/usobtusa_to_eupulex.bed
