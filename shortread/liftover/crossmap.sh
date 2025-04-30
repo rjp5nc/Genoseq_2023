@@ -10,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 #SBATCH --mail-type=END               # Send email at job completion
-#SBATCH --mail-user=myu5wx@virginia.edu    # Email address for notifications
+#SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 #Load necessary modules (if needed)
 module load gcc/11.4.0
@@ -22,6 +22,6 @@ module load python/3.11.4
 species=us_obtusa
 
 /home/rjp5nc/.local/bin/CrossMap bed --chromid a \
-/scratch/rjp5nc/lastz/$species/chainnet/liftover.chain \
+/scratch/rjp5nc/lastz/$species/chainnet/swappedliftover.chain \
 /scratch/rjp5nc/Reference_genomes/eu_pulex_totalHiCwithallbestgapclosed.clean.allbases.bed \
 /scratch/rjp5nc/liftover/usobtusa_to_eupulex.bed
