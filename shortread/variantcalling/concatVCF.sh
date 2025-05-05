@@ -3,7 +3,7 @@
 #SBATCH -J concatVCF # A single job name for the array
 #SBATCH --ntasks-per-node=10 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 0-4:00  ### 1 hours
+#SBATCH -t 0-4:00  ### 4 hours
 #SBATCH --mem 24G
 #SBATCH -o /scratch/rjp5nc/download_%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/download_%A_%a.err # Standard error

@@ -26,4 +26,4 @@ find "$INPUT_DIR" -type f -name "*L3_2.fq.gz" | while read -r FILE; do
     fastqc -o "$OUTPUT_DIR" "$FILE" --no-graphical
 done
 
-#multiqc -o /scratch/rjp5nc/multiqc2lanes /scratch/rjp5nc/outputdir2lanes
+#multiqc -o /scratch/rjp5nc/multiqc2lanes/nound /scratch/rjp5nc/outputdir2lanes

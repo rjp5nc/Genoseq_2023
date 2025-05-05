@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/error_out/forspecies.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-
+ 
 module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5
 
 dir=$1
@@ -66,4 +66,4 @@ java -jar $EBROOTPICARD/picard.jar SortSam \
     -O /scratch/rjp5nc/UK2022_2024/allshortreads/mitosortedbams/${sample_name}.sorted.bam \
     -SORT_ORDER coordinate
 
-samtools view /scratch/rjp5nc/UK2022_2024/allshortreads/mitosortedbams/${sample_name}.sorted.bam | awk '{count[$3]++} END {for (val in count) print val, count[val]}' | sort -k2,2nr >> /scratch/rjp5nc/UK2022_2024/allshortreads/counts/${sample_name}.counts.txt
+samtools view /scratch/rjp5nc/UK2022_2024/allshortreads/P2_2.bam | awk '{count[$3]++} END {for (val in count) print val, count[val]}' | sort -k2,2nr >> /scratch/rjp5nc/UK2022_2024/allshortreads/P2_2counts.txt

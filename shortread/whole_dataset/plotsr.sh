@@ -18,14 +18,42 @@ conda activate plotsr
 
 #syri -c A_B.bam -r A.fa -q B.fa -F B --prefix A_B &
 
+module load samtools
+
+
 REF="eu_pulex_totalHiCwithallbestgapclosed.clean.fa"
 QUERY="assembly.hap2_onlydaps.fasta"
 
 cd /scratch/rjp5nc/Reference_genomes/liftover/
 
-/home/rjp5nc/miniconda3/envs/plotsr/bin/syri -c /scratch/rjp5nc/Reference_genomes/liftover/ribbon/euobtusa_v_eupulex.bam \
- -r /scratch/rjp5nc/Reference_genomes/post_kraken/${REF} \
- -q /scratch/rjp5nc/Reference_genomes/post_kraken/${QUERY} \
- -F B --prefix \
- euonbtusa_v_eupulex &
+module load gcc/11.4.0
+module load minimap2/2.28
 
+
+
+
+minimap2 -x asm5 reference_genome1.fasta query_genome2.fasta > alignments.paf
+
+paf2chain /scratch/rjp5nc/Reference_genomes/liftover/ribbon/euobtusa_vs_eupulex.paf /scratch/rjp5nc/Reference_genomes/post_kraken/${REF} /scratch/rjp5nc/Reference_genomes/post_kraken/${QUERY} /scratch/rjp5nc/Reference_genomes/chain_output.chain
+
+chainProcessor /scratch/rjp5nc/Reference_genomes/liftover/ribbon/euobtusa_vs_eupulex.paf /scratch/rjp5nc/Reference_genomes/post_kraken/${REF} /scratch/rjp5nc/Reference_genomes/post_kraken/${QUERY} /scratch/rjp5nc/Reference_genomes/chain_output.chain
+
+lastz /scratch/rjp5nc/Reference_genomes/post_kraken/${REF} /scratch/rjp5nc/Reference_genomes/post_kraken/${QUERY} --output=/scratch/rjp5nc/Reference_genomes/output_alignment.mfa
+
+
+
+
+
+
+
+module load bedtools
+
+minimap2 -ax asm5 -t 24 --eqx /scratch/rjp5nc/Reference_genomes/post_kraken/${REF} /scratch/rjp5nc/Reference_genomes/post_kraken/${QUERY} > /scratch/rjp5nc/Reference_genomes/out.sam
+module load gcc/11.4.0 samtools/1.17 
+samtools view -b /scratch/rjp5nc/Reference_genomes/out.sam > /scratch/rjp5nc/Reference_genomes/out.bam
+
+samtools view -b /scratch/rjp5nc/Reference_genomes/out.bam | bedtools bamtobed > /scratch/rjp5nc/Reference_genomes/out.bed
+
+samtools view input.bam | bam2paf > output.paf
+
+liftOver /scratch/rjp5nc/Reference_genomes/out.bed hg19ToHg38.over.chain.gz /scratch/rjp5nc/Reference_genomes/output.bed /scratch/rjp5nc/Reference_genomes/unlifted.bed

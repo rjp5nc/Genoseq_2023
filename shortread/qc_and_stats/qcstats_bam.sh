@@ -16,6 +16,7 @@ module load picard
 
 cd /scratch/rjp5nc/UK2022_2024/mapped_bam
 
+
 # Get BAM file for this task
 BAM=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" bam_files.txt)
 SAMPLE=$(basename "$BAM" .bam)
@@ -45,3 +46,28 @@ echo "$SAMPLE,$TOTAL_READS,$MAPPED_READS,$PCT_MAPPED,$DUP_RATE,$COVERAGE" > "$OU
 
 echo "Sample,Total_Reads,Mapped_Reads,Percent_Mapped,Duplicate_Rate,Average_Coverage" > bam_qc_summary.csv
 cat qc_results/*_qc.csv >> bam_qc_summary.csv
+
+
+
+
+
+
+
+
+echo "sample,total_reads,mapped_reads,percent_duplication" > picard_summary.csv
+
+for file in *.metrics; do
+  sample=$(basename "$file" .metrics)
+
+  # Extract relevant fields
+  metrics_line=$(grep -A 1 "## METRICS CLASS" "$file" | tail -n 1)
+
+  IFS=$'\t' read -r LIB UNPAIRED READPAIRED SECONDARY UNMAPPED UNPAIRED_DUP READPAIR_DUP OPTICAL_DUP PERCENT_DUP LIBSIZE <<< "$metrics_line"
+
+  # Calculate total and mapped reads
+  total_reads=$((UNPAIRED + 2 * READPAIRED))
+  mapped_reads=$((total_reads - UNMAPPED))
+
+  # Output to CSV
+  echo "$sample,$total_reads,$mapped_reads,$PERCENT_DUP" >> picard_summary.csv
+done

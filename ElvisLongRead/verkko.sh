@@ -11,6 +11,7 @@
 #SBATCH --account berglandlab
 
 #conda create -n verkko -c conda-forge -c bioconda -c defaults verkko
-
+#NEED CONDA INIT
 conda activate verkko
+
 verkko -d /scratch/rjp5nc/HMW/HMWDNAElvis3/verkko --hifi /scratch/rjp5nc/HMW/HMWDNAElvis3/verkko/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz

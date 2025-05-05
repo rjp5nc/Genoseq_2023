@@ -10,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-# sbatch ~/Dappupool20182019/QC/basicStats.sh
+# sbatch ~/Genoseq_2023/basicStats.sh
 ### sacct -j 45333345
 
 

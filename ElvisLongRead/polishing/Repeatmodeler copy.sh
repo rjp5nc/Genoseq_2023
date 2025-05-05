@@ -28,4 +28,4 @@ cd ${wd}
 #makeblastdb -in cleaned_dap.contigs.fasta -out my_db -dbtype nucl -title my_db -parse_seqids
 #BuildDatabase -name my_db assembly.hap2_onlydaps.fasta
 
-RepeatModeler -database my_db -pa 10
+RepeatModeler -database my_db -pa 10 -engine ncbi

@@ -10,10 +10,10 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-# sbatch ~/Genoseq_2023/vcf_headers.sh
+# sbatch ~/Genoseq_2023/tree_building.sh
 ### sacct -j 45333345
 
 
-module load gcc/7.1.0  openmpi/3.1.4 R/4.1.1
+module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
 
-Rscript --vanilla /home/rjp5nc/Genoseq_2023/vcf_headers.r
+Rscript --vanilla /home/rjp5nc/Genoseq_2023/tree_building.r

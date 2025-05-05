@@ -37,7 +37,7 @@ module load gatk/4.6.0.0
 PIPELINE="GenomicsDBImport"
 
 # Working folder is core folder where this pipeline is being run.
-WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_euobtusa"
+WORKING_FOLDER="/scratch/rjp5nc/gvcftest"
 
 #cat -A /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt
 #sed 's/\r$//' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt | sed 's/\s*$//' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.clean.txt
@@ -46,7 +46,7 @@ WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_euobtusa"
 #sed 's/ *$//' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist2.txt
 
 # Chromosomes to analyze
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_euobtusa.txt"
+intervals="/scratch/rjp5nc/gvcftest/interval_DBI_paramList"
 
 # Parameters
 JAVAMEM=40G
@@ -55,7 +55,7 @@ CPU=20
 # Move to working directory
 cd $WORKING_FOLDER
 
-SLURM_ARRAY_TASK_ID=186
+SLURM_ARRAY_TASK_ID=2
 
 # Chromosome
 i=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )
@@ -92,19 +92,13 @@ echo ${i}:${start}-${stop} "is being processed" $(date)
 
 # Merge VCFs using GenomicsDBImport
 
-#zcat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/h2tg000002l/Gilmer5_H9.h2tg000002l.1018082.g.vcf.gz | head -n 500
-
 gatk --java-options "-Xmx${JAVAMEM}" GenomicsDBImport \
 --genomicsdb-workspace-path $WORKING_FOLDER/Daphnia_DBI_${i}_${start}_${stop} \
 --tmp-dir $WORKING_FOLDER/TEMP_Daphnia_DBI_${i}_${start}_${stop} \
 --batch-size 50 \
---sample-name-map /scratch/rjp5nc/UK2022_2024/daphnia_phylo/samplemapnames/${i}_2.txt \
+--sample-name-map /scratch/rjp5nc/gvcftest/params.txt \
 --reader-threads $CPU \
 -L ${i}:${start}-${stop}
-
-#sample name from g.vcf.gz 
-
-/scratch/rjp5nc/UK2022_2024/mapped_bam/
 
 # Remove temp workspace
 rm -rf $WORKING_FOLDER/TEMP_Daphnia_DBI_${i}_${start}_${stop}

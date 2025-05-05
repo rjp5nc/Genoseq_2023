@@ -9,7 +9,7 @@ args = commandArgs(trailingOnly=TRUE)
 vcf.fn=args[[1]]
 gds.fn=gsub(".vcf", ".gds", vcf.fn)
 
-output_dir = "/scratch/rjp5nc/UK2022_2024/allshortreads/chr/"
+output_dir = "/scratch/rjp5nc/UK2022_2024/allshortreads/"
 gds.fn = paste(output_dir, basename(gds.fn), sep="")
 
 #vcf.fn=paste(vcf.fn, ".gz", sep="")

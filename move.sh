@@ -10,4 +10,11 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-rsync -a --prune-empty-dirs --include "*/" --include "*_1.fq.gz" --include "*_2.fq.gz" --exclude "*" /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData /project/berglandlab/Robert/shortread_data/data
+
+##find /project/berglandlab/connor -type f -name "genomedb"
+##/project/berglandlab/connor/backup_project/BACKUP_scratch/DBI/
+
+##rsync -a --prune-empty-dirs --include "*/" --include "*_1.fq.gz" --include "*_2.fq.gz" --exclude "*" /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData /project/berglandlab/Robert/shortread_data/data
+
+
+cp /project/berglandlab/connor/backup_project/BACKUP_scratch/DBI /scratch/rjp5nc

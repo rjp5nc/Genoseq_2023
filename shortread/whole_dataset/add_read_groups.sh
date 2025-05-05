@@ -18,6 +18,8 @@ module load picard
 parameterFile="/scratch/rjp5nc/UK2022_2024/mapped_bam/bam_files.txt"
 wd="/scratch/rjp5nc/UK2022_2024/final_bam_rg"
 
+SLURM_ARRAY_TASK_ID=1
+
 # Extract sample name
 samp=`sed -n ${SLURM_ARRAY_TASK_ID}p $parameterFile`
 out2=`echo $samp | sed 's/_finalmap.bam//'`

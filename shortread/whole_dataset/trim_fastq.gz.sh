@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-10:00 # 10 hours
 #SBATCH --mem 100G
-#SBATCH -o /scratch/rjp5nc/outputerrors/down.%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err # Standard error
+#SBATCH -o /scratch/rjp5nc/erroroutputs/down.%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/erroroutputs/down.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 #SBATCH --array=1-21%10   # Adjust the range based on the number of folders

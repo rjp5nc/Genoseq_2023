@@ -18,8 +18,9 @@ module load samtools varscan
 
 
 #SLURM_ARRAY_TASK_ID=11
-chr=$( sed -n ${SLURM_ARRAY_TASK_ID}p /project/berglandlab/Karen/genomefiles/ChrScaffoldList )
-echo $chr
+
+chr=Scaffold_7757_HRSCAF_8726
+
 
 samtools mpileup \
 -r ${chr} \

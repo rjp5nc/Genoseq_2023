@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 12:00:00 
-#SBATCH --mem 200G
+#SBATCH --mem 20G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/crossmap.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/crossmap.err # Standard error
 #SBATCH -p standard

@@ -19,7 +19,6 @@
 #/project/berglandlab/daphnia_genus/short_read/murray_data/all_gvcf/Euro_gvcfs
 
 
-# Extract SRA IDs (skip header)
 cd /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/
 
 #need to remove "" from file first
@@ -64,3 +63,6 @@ fasterq-dump --split-files --threads 10 --progress -O "$OUTPUT_DIR" "$OUTPUT_DIR
 echo "Compressing FASTQ files..."
 gzip "$OUTPUT_DIR/${SRA_ACCESSION}_1.fastq"
 gzip "$OUTPUT_DIR/${SRA_ACCESSION}_2.fastq"
+
+
+

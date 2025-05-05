@@ -11,7 +11,8 @@
 #SBATCH --account berglandlab
 
 # sbatch ~/Genoseq_2023/download.sh
-### sacct -j 45333345
+### sacct -j 45333345 
+
 
 
 module load lftp

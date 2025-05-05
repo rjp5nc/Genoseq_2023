@@ -33,3 +33,8 @@ awk '/^>/ {if (seen[$1]++) next} {print}' ${OUTPUT_PREFIX}.p_ctg.fa > haploid_as
 
 # Done
 echo "Hifiasm assembly complete! Primary contigs saved as haploid_assembly.fa"
+
+
+
+#gfatools gfa2fa assembly.bp.hap1.p_ctg.gfa > assembly.p_ctg.fa
+
