@@ -16,9 +16,7 @@ module load picard
 
 # Parameters
 parameterFile="/scratch/rjp5nc/UK2022_2024/mapped_bam/bam_files.txt"
-wd="/scratch/rjp5nc/UK2022_2024/final_bam_rg"
-
-SLURM_ARRAY_TASK_ID=1
+wd="/scratch/rjp5nc/UK2022_2024/final_bam_rg2"
 
 # Extract sample name
 samp=`sed -n ${SLURM_ARRAY_TASK_ID}p $parameterFile`
@@ -37,7 +35,7 @@ java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
 -LB "library" \
 -PL "ILLumina" \
 -PU "platunit" \
--SM ${samp} 
+-SM ${out} 
 
 # Index Bam files
 java -jar $EBROOTPICARD/picard.jar BuildBamIndex \
