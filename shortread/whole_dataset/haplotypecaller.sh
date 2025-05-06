@@ -106,7 +106,7 @@ fi
 gatk HaplotypeCaller \
 -R $ref \
 -I /scratch/rjp5nc/UK2022_2024/final_bam_rg2/${samp}finalmap_RG.bam \
--O ${wd}/gvcf3/${chrom}/${samp}.${chrom}.${id}.g.vcf \
+-O ${wd}/gvcf/${chrom}/${samp}.${chrom}.${id}.g.vcf \
 -L ${wd}/bed/${chrom}.bed \
 -ERC GVCF
 
@@ -114,8 +114,8 @@ gatk HaplotypeCaller \
 module load gcc/14.2.0 htslib/1.17
 
 # Compress and index with Tabix
-bgzip ${wd}/gvcf3/${chrom}/${samp}.${chrom}.${id}.g.vcf
-tabix -p vcf ${wd}/gvcf3/${chrom}/${samp}.${chrom}.${id}.g.vcf.gz
+bgzip ${wd}/gvcf/${chrom}/${samp}.${chrom}.${id}.g.vcf
+tabix -p vcf ${wd}/gvcf/${chrom}/${samp}.${chrom}.${id}.g.vcf.gz
 
 # Finish
 echo "Complete -" "Sample:" $SLURM_ARRAY_TASK_ID
