@@ -58,20 +58,18 @@ module load tabix/0.2.6
 #sed -n '89992,99990p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10.txt
 #sed -n '99991,101136p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param11.txt
 
-parameterFile=/scratch/rjp5nc/UK2022_2024/robert_pulexparamfile.txt
+parameterFile=/scratch/rjp5nc/UK2022_2024/param1_9999.txt
 wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 
 #dos2unix "$parameterFile"
   
-SLURM_ARRAY_TASK_ID=3
-
 # Extract sample name
 
 #changed these for pulex file
-id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $8}' "$parameterFile")
-samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $3}' "$parameterFile")
-chrom=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $7}' "$parameterFile")
-ref=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $6}' "$parameterFile")
+id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $7}' "$parameterFile")
+samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $2}' "$parameterFile")
+chrom=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $6}' "$parameterFile")
+ref=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $5}' "$parameterFile")
 
 
 wd=$(echo $wd | tr -d '\r')
@@ -86,14 +84,14 @@ echo "Haplotype calling -" "Sample:" $SLURM_ARRAY_TASK_ID
 echo "Chromosome:" ${chrom}
 
 # Create folder for chromosome
-if [[ -d "${wd}/gvcf2/${chrom}" ]]
+if [[ -d "${wd}/gvcf/${chrom}" ]]
 then
 	echo "Working chromosome folder exist"
 	echo "lets move on"
 	date
 else
 	echo "folder doesnt exist. lets fix that"
-	mkdir ${wd}/gvcf2/${chrom}
+	mkdir ${wd}/gvcf/${chrom}
 	date
 fi
 
@@ -105,19 +103,17 @@ fi
 # Haplotype Calling
 gatk HaplotypeCaller \
 -R $ref \
--I /scratch/rjp5nc/UK2022_2024/final_bam_rg/${samp}finalmap_RG.bam \
--O ${wd}/gvcf2/${chrom}/${samp}.${chrom}.${id}.g.vcf \
+-I /scratch/rjp5nc/UK2022_2024/final_bam_rg2/${samp}finalmap_RG.bam \
+-O ${wd}/gvcf3/${chrom}/${samp}.${chrom}.${id}.g.vcf \
 -L ${wd}/bed/${chrom}.bed \
 -ERC GVCF
-
-
 
 # Bgzip
 module load gcc/14.2.0 htslib/1.17
 
 # Compress and index with Tabix
-bgzip ${wd}/gvcf2/${chrom}/${samp}.${chrom}.${id}.g.vcf
-tabix -p vcf ${wd}/gvcf2/${chrom}/${samp}.${chrom}.${id}.g.vcf.gz
+bgzip ${wd}/gvcf3/${chrom}/${samp}.${chrom}.${id}.g.vcf
+tabix -p vcf ${wd}/gvcf3/${chrom}/${samp}.${chrom}.${id}.g.vcf.gz
 
 # Finish
 echo "Complete -" "Sample:" $SLURM_ARRAY_TASK_ID
