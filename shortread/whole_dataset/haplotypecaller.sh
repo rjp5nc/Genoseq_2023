@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-9999%100
+#SBATCH --array=1-9999%150
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
@@ -59,9 +59,9 @@ module load tabix/0.2.6
 #sed -n '89992,99990p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10.txt
 #sed -n '99991,101136p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param11.txt
 
-#finished param4
+#finished param5
 
-parameterFile=/scratch/rjp5nc/UK2022_2024/param4.txt
+parameterFile=/scratch/rjp5nc/UK2022_2024/param5.txt
 wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 
 #dos2unix "$parameterFile"
