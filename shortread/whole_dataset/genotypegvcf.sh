@@ -73,6 +73,6 @@ gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
 -L ${i}:${start}-${stop}
 
 # Remove temp folder
-rm -rf $WORKING_FOLDER/vcf/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
+rm -rf $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
 
 echo ${i} "done" $(date)
