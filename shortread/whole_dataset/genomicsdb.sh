@@ -40,8 +40,6 @@ CPU=10
 # Move to working directory
 cd $WORKING_FOLDER
 
-SLURM_ARRAY_TASK_ID=186
-
 # Chromosome
 i=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )
 
