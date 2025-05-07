@@ -29,7 +29,7 @@ ls $WORKING_FOLDER/*vcf.gz > $WORKING_FOLDER/interval_paramList.list
 intervals=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/unmerged_eudobtusa_vcf_files.txt
 
 # Combined VCF name
-output="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf/raw_vcf/raw_euobtusa.vcf.gz"
+output="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/raw_vcf/raw_euobtusa.vcf.gz"
 
 # Gatk parameters
 JAVAMEM=100G
