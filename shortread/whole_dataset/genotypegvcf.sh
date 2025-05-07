@@ -9,6 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/genotypegvcf.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
+#SBATCH --array=1-254%50
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
@@ -68,7 +69,7 @@ gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
 -V gendb://$GenomeDB_path \
 --tmp-dir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
 -O $WORKING_FOLDER/${i}.${start}.${stop}.vcf.gz \
---genomicsdb-use-vcf-codec \
+#--genomicsdb-use-vcf-codec \
 -L ${i}:${start}-${stop}
 
 # Remove temp folder
