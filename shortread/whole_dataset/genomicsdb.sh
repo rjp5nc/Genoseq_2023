@@ -15,21 +15,6 @@
 # This script will merge gVCFs into a unified database for genotype calling.
 # This will be done using a per chromosome approach
 
-
-target_dir="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr"
-
-# Find and rename files with carriage returns in their names
-find "$target_dir" -type f | while IFS= read -r file; do
-  if [[ "$file" == *$'\r'* ]]; then
-    clean_file="$(echo "$file" | tr -d '\r')"
-    echo "Renaming: $file -> $clean_file"
-    mv "$file" "$clean_file"
-  fi
-done
-
-zcat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/h2tg000002l_2/Gilmer5_H9.h2tg000002l.1018082.g.vcf.gz | head -n 20
-zcat /project/berglandlab/daphnia_genus/short_read/murray_data/all_gvcf/gvcf/Scaffold_9201_HRSCAF_10758/SRR7592021.Scaffold_9201_HRSCAF_10758.19168.g.vcf.gz
-
 # Load modules
 module load gatk/4.6.0.0
 
@@ -49,8 +34,8 @@ WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_euobtusa"
 intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_euobtusa.txt"
 
 # Parameters
-JAVAMEM=40G
-CPU=20
+JAVAMEM=80G
+CPU=10
 
 # Move to working directory
 cd $WORKING_FOLDER
@@ -89,7 +74,6 @@ echo ${i}:${start}-${stop} "is being processed" $(date)
 #  echo "$line" >> "${chr}.txt"
 #done < "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusapathsfixed.txt"
 
-
 # Merge VCFs using GenomicsDBImport
 
 #zcat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/h2tg000002l/Gilmer5_H9.h2tg000002l.1018082.g.vcf.gz | head -n 500
@@ -98,13 +82,11 @@ gatk --java-options "-Xmx${JAVAMEM}" GenomicsDBImport \
 --genomicsdb-workspace-path $WORKING_FOLDER/Daphnia_DBI_${i}_${start}_${stop} \
 --tmp-dir $WORKING_FOLDER/TEMP_Daphnia_DBI_${i}_${start}_${stop} \
 --batch-size 50 \
---sample-name-map /scratch/rjp5nc/UK2022_2024/daphnia_phylo/samplemapnames/${i}_2.txt \
+--sample-name-map /scratch/rjp5nc/UK2022_2024/daphnia_phylo/samplemapnames/${i}.txt \
 --reader-threads $CPU \
 -L ${i}:${start}-${stop}
 
 #sample name from g.vcf.gz 
-
-/scratch/rjp5nc/UK2022_2024/mapped_bam/
 
 # Remove temp workspace
 rm -rf $WORKING_FOLDER/TEMP_Daphnia_DBI_${i}_${start}_${stop}
