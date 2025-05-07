@@ -30,6 +30,7 @@ REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.f
 # Intervals to analyze
 intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_euobtusa.txt"
 
+species="DBI_euobtusa"
 # This part of the pipeline will generate log files to record warnings and completion status
 
 # Move to working directory
@@ -59,7 +60,7 @@ fi
 echo ${i}_${start}_${stop} "is being processed" $(date)
 
 # Identify the Genome database to genotyoe
-GenomeDB_path=`echo /scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI/Daphnia_DBI_${i}_${start}_${stop}`
+GenomeDB_path=`echo /scratch/rjp5nc/UK2022_2024/daphnia_phylo/${species}/Daphnia_DBI_${i}_${start}_${stop}`
 
 # Genotype call the samples in the DBI merged set
 gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
