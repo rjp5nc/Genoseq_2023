@@ -66,7 +66,7 @@ GenomeDB_path=`echo /scratch/rjp5nc/UK2022_2024/daphnia_phylo/$species/Daphnia_D
 gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
 -R $REFERENCE \
 -V gendb://$GenomeDB_path \
---tmp-dir=$WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
+--tmp-dir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
 -O $WORKING_FOLDER/${i}.${start}.${stop}.vcf.gz \
 --genomicsdb-use-vcf-codec \
 -L ${i}:${start}-${stop}
