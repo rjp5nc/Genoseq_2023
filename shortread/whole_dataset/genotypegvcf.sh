@@ -60,7 +60,7 @@ fi
 echo ${i}_${start}_${stop} "is being processed" $(date)
 
 # Identify the Genome database to genotyoe
-GenomeDB_path=`echo /scratch/rjp5nc/UK2022_2024/daphnia_phylo/${species}/Daphnia_DBI_${i}_${start}_${stop}`
+GenomeDB_path=`echo /scratch/rjp5nc/UK2022_2024/daphnia_phylo/$species/Daphnia_DBI_${i}_${start}_${stop}`
 
 # Genotype call the samples in the DBI merged set
 gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
