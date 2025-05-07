@@ -61,7 +61,7 @@ module load tabix/0.2.6
 
 #finished param6
 
-parameterFile=/scratch/rjp5nc/UK2022_2024/param6.txt
+parameterFile=/scratch/rjp5nc/UK2022_2024/param7.txt
 wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
 
 #dos2unix "$parameterFile"
