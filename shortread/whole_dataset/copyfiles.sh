@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J merge # A single job name for the array
-#SBATCH --ntasks-per-node=10 # one core
+#SBATCH --ntasks-per-node=2 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 2-10:00 # 10 hours
-#SBATCH --mem 100G
+#SBATCH --mem 20G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/down.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/down.%A_%a.err # Standard error
 #SBATCH -p standard
