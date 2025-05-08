@@ -12,15 +12,15 @@
 
 
 # Configuration
-csv_file_old="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/uspulexsampsmove.txt"
-csv_file="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/uspulexsampsmove_amended.txt"
-target_dir="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/uspulex_chr"
-column_name="Library_Name"
+csv_file_old="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulexsampsmove.txt"
+csv_file="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulexsampsmove_amended.txt"
+target_dir="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/eupulex_chr"
+column_name="Sample"
 # Get the column index for the sample_id
 
 sed 's/\r/\n/g' "$csv_file_old" > "$csv_file"
 
-cd /project/berglandlab/connor/mapping_pulex_nam/mapping/gvcf/pulex
+cd /project/berglandlab/daphnia_genus/short_read/murray_data/all_gvcf/gvcf/
 
 col_num=$(awk -F',' -v col="$column_name" '
 NR==1 {
