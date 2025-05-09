@@ -12,15 +12,15 @@
 
 
 # Configuration
-csv_file_old="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulexsampsmove.txt"
-csv_file="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulexsampsmove_amended.txt"
-target_dir="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/eupulex_chr"
-column_name="Sample"
+csv_file_old="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/uspulexsampsmove.txt"
+csv_file="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/uspulexsampsmove_amended.txt"
+target_dir="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/uspulex_chr"
+column_name="Library_Name"
 # Get the column index for the sample_id
 
 sed 's/\r/\n/g' "$csv_file_old" > "$csv_file"
 
-cd /project/berglandlab/daphnia_genus/short_read/murray_data/all_gvcf/gvcf/
+cd /project/berglandlab/connor/mapping_pulex_nam/mapping/gvcf/pulex
 
 col_num=$(awk -F',' -v col="$column_name" '
 NR==1 {
@@ -38,10 +38,22 @@ if [ -z "$col_num" ]; then
   exit 1
 fi
 
-# Loop over each sample ID
-tail -n +2 "$csv_file" | awk -F',' -v col="$col_num" '{gsub(/^"|"$/, "", $col); print $col}' | while read -r sample_id; do
-  find . -type f -name "*$sample_id*" | while read -r file; do
-    rel_path="${file#./}"  # remove leading ./ from path
+tail -n +2 "$csv_file" | awk -F',' -v col="$col_num" '
+  {
+    gsub(/^"|"$/, "", $col)
+    if ($col != "") print $col
+  }' | while read -r sample_id; do
+
+  # Find files more precisely
+  matches=$(find . -type f -name "*${sample_id}*")
+
+  if [ -z "$matches" ]; then
+    echo "No files found for sample ID: $sample_id"
+    continue
+  fi
+
+  echo "$matches" | while read -r file; do
+    rel_path="${file#./}"
     dest_path="$target_dir/$rel_path"
     mkdir -p "$(dirname "$dest_path")"
     cp "$file" "$dest_path"
