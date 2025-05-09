@@ -15,6 +15,9 @@
 # This script will merge gVCFs into a unified database for genotype calling.
 # This will be done using a per chromosome approach
 
+
+#NEED TO DO AMBIGUA
+
 # Load modules
 module load gatk/4.6.0.0
 
@@ -22,7 +25,7 @@ module load gatk/4.6.0.0
 PIPELINE="GenomicsDBImport"
 
 # Working folder is core folder where this pipeline is being run.
-WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_uspulex"
+WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_usambigua"
 
 #cat -A /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt
 #sed 's/\r$//' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt | sed 's/\s*$//' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.clean.txt
@@ -31,7 +34,7 @@ WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_uspulex"
 #sed 's/ *$//' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist2.txt
 
 # Chromosomes to analyze
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_uspulex.txt"
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usambigua.txt"
 
 # Parameters
 JAVAMEM=80G
