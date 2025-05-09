@@ -76,3 +76,7 @@ gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
 rm -rf $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
 
 echo ${i} "done" $(date)
+
+
+#find . -type f -name "*.vcf.gz" | sed 's|^\./||' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/unmerged_eudobtusa_vcf_files.txt
+
