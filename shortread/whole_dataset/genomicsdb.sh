@@ -22,7 +22,7 @@ module load gatk/4.6.0.0
 PIPELINE="GenomicsDBImport"
 
 # Working folder is core folder where this pipeline is being run.
-WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_usambigua"
+WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_usobtusa"
 
 #cat -A /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt
 #sed 's/\r$//' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt | sed 's/\s*$//' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.clean.txt
@@ -31,7 +31,7 @@ WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_usambigua"
 #sed 's/ *$//' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist2.txt
 
 # Chromosomes to analyze
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usambigua.txt"
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usobtusa.txt"
 
 # Parameters
 JAVAMEM=80G
