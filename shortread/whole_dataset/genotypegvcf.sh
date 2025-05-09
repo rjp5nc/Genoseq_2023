@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/genotypegvcf.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-254%50
+#SBATCH --array=1-133%50
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
@@ -26,12 +26,12 @@ CPU=10
 WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf
 
 # Reference genome
-REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.fasta
+REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/eu_pulex_totalHiCwithallbestgapclosed.clean.fa
 
 # Intervals to analyze
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_euobtusa.txt"
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_eupulex.txt"
 
-species="DBI_euobtusa"
+species="DBI_eupulex"
 # This part of the pipeline will generate log files to record warnings and completion status
 
 # Move to working directory
