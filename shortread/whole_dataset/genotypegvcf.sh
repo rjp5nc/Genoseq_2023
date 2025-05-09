@@ -26,7 +26,7 @@ CPU=10
 WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf
 
 # Reference genome
-REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/eu_pulex_totalHiCwithallbestgapclosed.clean.fa
+REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/totalHiCwithallbestgapclosed.fa
 
 # Intervals to analyze
 intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_eupulex.txt"
