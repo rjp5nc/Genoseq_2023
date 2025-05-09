@@ -29,12 +29,12 @@ CPU=10
 WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf
 
 # Reference genome
-REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/us_pulex_ref_kap4.fa
+REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/Daphnia_ambigua_Q001_genome.fa
 
 # Intervals to analyze
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_uspulex.txt"
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usambigua.txt"
 
-species="DBI_uspulex"
+species="DBI_usambigua"
 # This part of the pipeline will generate log files to record warnings and completion status
 
 # Move to working directory
