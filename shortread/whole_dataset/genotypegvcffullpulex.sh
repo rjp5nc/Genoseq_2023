@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/genotypegvcf.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-112%50
+#SBATCH --array=1-133%50
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
@@ -26,15 +26,15 @@ CPU=10
 #NEED TO DO USPULEX/AMBIGUA
 
 # Working folder is core folder where this pipeline is being run.
-WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf
+WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf2
 
 # Reference genome
-REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/Daphnia_ambigua_Q001_genome.fa
+REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/totalHiCwithallbestgapclosed.fa
 
 # Intervals to analyze
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usambigua.txt"
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_eupulex.txt"
 
-species="DBI_usambigua"
+species="DBI_eupulex2"
 # This part of the pipeline will generate log files to record warnings and completion status
 
 # Move to working directory
@@ -72,7 +72,6 @@ gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
 -V gendb://$GenomeDB_path \
 --tmp-dir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
 -O $WORKING_FOLDER/${i}.${start}.${stop}.vcf.gz \
-#--genomicsdb-use-vcf-codec \
 -L ${i}:${start}-${stop}
 
 # Remove temp folder
@@ -81,5 +80,5 @@ rm -rf $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
 echo ${i} "done" $(date)
 
 
-#find . -type f -name "*.vcf.gz" | sed 's|^\./||' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/unmerged_eudobtusa_vcf_files.txt
+#find . -type f -name "*.vcf.gz" | sed 's|^\./||' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/unmerged_eudpulex2_vcf_files.txt
 
