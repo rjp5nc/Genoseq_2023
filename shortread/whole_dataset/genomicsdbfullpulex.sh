@@ -24,7 +24,7 @@ module load gatk/4.6.0.0
 PIPELINE="GenomicsDBImport"
 
 # Working folder is core folder where this pipeline is being run.
-WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_eupulex"
+WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_eupulex2"
 
 #cat -A /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt
 #sed 's/\r$//' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt | sed 's/\s*$//' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.clean.txt
