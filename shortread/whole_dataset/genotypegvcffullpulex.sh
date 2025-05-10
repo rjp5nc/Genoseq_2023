@@ -72,6 +72,7 @@ gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
 -V gendb://$GenomeDB_path \
 --tmp-dir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
 -O $WORKING_FOLDER/${i}.${start}.${stop}.vcf.gz \
+--allow-old-rms-mapping-quality-annotation-data \
 -L ${i}:${start}-${stop}
 
 # Remove temp folder
