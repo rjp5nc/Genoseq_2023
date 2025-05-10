@@ -77,7 +77,7 @@ echo ${i}:${start}-${stop} "is being processed" $(date)
 # Merge VCFs using GenomicsDBImport
 
 #zcat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/h2tg000002l/Gilmer5_H9.h2tg000002l.1018082.g.vcf.gz | head -n 500
-
+cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo
 gatk --java-options "-Xmx${JAVAMEM}" GenomicsDBImport \
 --genomicsdb-workspace-path $WORKING_FOLDER/Daphnia_DBI_${i}_${start}_${stop} \
 --tmp-dir $WORKING_FOLDER/TEMP_Daphnia_DBI_${i}_${start}_${stop} \
