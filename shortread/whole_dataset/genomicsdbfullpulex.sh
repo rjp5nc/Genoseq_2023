@@ -24,7 +24,7 @@ module load gatk/4.6.0.0
 PIPELINE="GenomicsDBImport"
 
 # Working folder is core folder where this pipeline is being run.
-WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_uspulex"
+WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_eupulex"
 
 #cat -A /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt
 #sed 's/\r$//' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.txt | sed 's/\s*$//' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/euobtusa_gvcflist.clean.txt
@@ -77,7 +77,7 @@ echo ${i}:${start}-${stop} "is being processed" $(date)
 # Merge VCFs using GenomicsDBImport
 
 #zcat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/h2tg000002l/Gilmer5_H9.h2tg000002l.1018082.g.vcf.gz | head -n 500
-cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/eupulex_chr/other_files
+
 gatk --java-options "-Xmx${JAVAMEM}" GenomicsDBImport \
 --genomicsdb-workspace-path $WORKING_FOLDER/Daphnia_DBI_${i}_${start}_${stop} \
 --tmp-dir $WORKING_FOLDER/TEMP_Daphnia_DBI_${i}_${start}_${stop} \
