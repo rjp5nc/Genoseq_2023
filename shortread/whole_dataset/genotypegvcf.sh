@@ -26,15 +26,15 @@ CPU=10
 #NEED TO DO USPULEX/AMBIGUA
 
 # Working folder is core folder where this pipeline is being run.
-WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf
+WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf3
 
 # Reference genome
-REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/Daphnia_ambigua_Q001_genome.fa
+REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
 
 # Intervals to analyze
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usambigua.txt"
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usobtusa.txt"
 
-species="DBI_usambigua"
+species="DBI_usobtusa"
 # This part of the pipeline will generate log files to record warnings and completion status
 
 # Move to working directory
@@ -82,4 +82,5 @@ echo ${i} "done" $(date)
 
 
 #find . -type f -name "*.vcf.gz" | sed 's|^\./||' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/unmerged_eudobtusa_vcf_files.txt
+
 

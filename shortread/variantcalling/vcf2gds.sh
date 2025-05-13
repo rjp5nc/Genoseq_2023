@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-48:00  ### 48 hours
 #SBATCH --mem 60G
-#SBATCH -o /scratch/rjp5nc/vcf2gds.%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/vcf2gds.%A_%a.err # Standard error
+#SBATCH -o /scratch/rjp5nc/err/vcf2gds.%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/err/vcf2gds.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
@@ -16,5 +16,5 @@
 
 module load gcc openmpi R/4.3.1
 
-Rscript --vanilla /home/rjp5nc/Genoseq_2023/vcf2gds.R \
-/scratch/rjp5nc/UK2022_2024/allshortreads/chr/2022seq.concat.Removereps.renamed.vcf.gz
+Rscript --vanilla /home/rjp5nc/Genoseq_2023/shortread/variantcalling/vcf2gds.R \
+/scratch/rjp5nc/UK2022_2024/daphnia_phylo/raw_vcf/raw_usobtusa_vcf.vcf.gz
