@@ -83,8 +83,6 @@ write.csv(data.frame(Sample = pca$sample.id,
                      PC2 = pca$eigenvect[,2]),
           file.path(output_dir, "seqarray_pca.csv"), row.names = FALSE)
 
-write.csv(ibd_sel, file.path(output_dir, "seqarray_ibd.csv"), row.names = FALSE)
-
 # Optionally save tree object
 save(tree, file = file.path(output_dir, "nj_tree.RData"))
 
