@@ -19,6 +19,8 @@ seqSummary(genofile)
 # Load metadata
 metadata <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv", header = TRUE)
 
+Gilmersamps <- subset(metadata, accuratelocation == "Gilmer")
+
 # Identify sample IDs to remove (based on clone == "BLANK" or "Blank")
 samples_to_remove <- subset(metadata, clone == "BLANK" | clone == "Blank")$Well
 
@@ -29,9 +31,12 @@ all_samples <- seqGetData(genofile, "sample.id")
 
 # Identify samples to keep
 samples_to_keep <- setdiff(all_samples, samples_to_remove)
+samples_to_keep2 <- intersect(all_samples, Gilmersamps$Well)
+
+
 
 # Subset genofile to only include good samples
-seqSetFilter(genofile, sample.id = samples_to_keep, verbose = TRUE)
+seqSetFilter(genofile, sample.id = samples_to_keep2, verbose = TRUE)
 
 
 
@@ -39,7 +44,7 @@ seqSetFilter(genofile, sample.id = samples_to_keep, verbose = TRUE)
 miss_sample <- seqMissing(genofile, per.variant=FALSE)
 
 
-png(file.path(output_dir, "missing_rate_per_sample.png"), width=800, height=600)
+png(file.path(output_dir, "missing_rate_per_sample_gilmer.png"), width=800, height=600)
 hist(miss_sample, breaks=40, main="Missing Rate per Sample", xlab="Missing Rate")
 abline(v=0.1, col="red", lty=2)
 dev.off()
@@ -47,7 +52,7 @@ dev.off()
 # ===== Missing Rate per Variant =====
 miss_variant <- seqMissing(genofile, per.variant=TRUE)
 
-png(file.path(output_dir, "missing_rate_per_variant.png"), width=800, height=600)
+png(file.path(output_dir, "missing_rate_per_variant_gilmer.png"), width=800, height=600)
 hist(miss_variant, breaks=40, main="Missing Rate per Variant", xlab="Missing Rate")
 abline(v=0.1, col="red", lty=2)
 dev.off()
@@ -64,7 +69,7 @@ pca <- snpgdsPCA(genofile, autosome.only = FALSE)
 pc.percent <- pca$varprop * 100
 
 # Save PCA plot
-png(file.path(output_dir, "pca_plot.png"), width=800, height=600)
+png(file.path(output_dir, "pca_plot_gilmer.png"), width=800, height=600)
 plot(pca$eigenvect[,1], pca$eigenvect[,2],
      col = "blue", pch = 19,
      xlab = paste0("PC1 (", round(pc.percent[1], 2), "%)"),
@@ -95,14 +100,14 @@ tree <- nj(as.dist(ibs_matrix))
 tree$tip.label <- sample_ids
 
 # Plot and save tree
-png(file.path(output_dir, "nj_tree.png"), width=800, height=600)
+png(file.path(output_dir, "nj_tree_gilmer.png"), width=800, height=600)
 plot(tree, main = "Neighbor-Joining Tree with Sample Names")
 dev.off()
 
 # Save tree object and sample names
-save(tree, file = file.path(output_dir, "nj_tree.RData"))
+save(tree, file = file.path(output_dir, "nj_tree_gilmer.RData"))
 write.csv(data.frame(Sample = tree$tip.label),
-          file.path(output_dir, "nj_tree_sample_names.csv"),
+          file.path(output_dir, "nj_tree_sample_names_gilmer.csv"),
           row.names = FALSE)
 
 
@@ -111,7 +116,7 @@ write.csv(data.frame(Sample = tree$tip.label),
 write.csv(data.frame(Sample = pca$sample.id,
                      PC1 = pca$eigenvect[,1],
                      PC2 = pca$eigenvect[,2]),
-          file.path(output_dir, "seqarray_pca.csv"), row.names = FALSE)
+          file.path(output_dir, "seqarray_pca_gilmer.csv"), row.names = FALSE)
 
 
 
@@ -119,7 +124,7 @@ ibs <- snpgdsIBS(genofile, autosome.only = FALSE)
 ibs_matrix <- ibs$ibs  # this is the numeric similarity matrix
 rownames(ibs_matrix) <- colnames(ibs_matrix) <- ibs$sample.id
 
-write.csv(ibs_matrix, file.path(output_dir, "ibs_matrix.csv"))
+write.csv(ibs_matrix, file.path(output_dir, "ibs_matrix_gilmer.csv"))
 
 # Reset filter to full variant set (if needed later)
 seqResetFilter(genofile, verbose = FALSE)
