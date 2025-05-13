@@ -16,6 +16,28 @@ genofile <- seqOpen(gds_file)
 # ===== Basic Summary =====
 seqSummary(genofile)
 
+library(SeqArray)
+
+# Load metadata
+metadata <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv", header = TRUE)
+
+# Identify sample IDs to remove (based on clone == "BLANK" or "Blank")
+samples_to_remove <- subset(metadata, clone == "BLANK" | clone == "Blank")$Well
+
+# Open the GDS file
+genofile <- seqOpen(gds_file)
+
+# Get all sample IDs from the GDS
+all_samples <- seqGetData(genofile, "sample.id")
+
+# Identify samples to keep
+samples_to_keep <- setdiff(all_samples, samples_to_remove)
+
+# Subset genofile to only include good samples
+seqSetFilter(genofile, sample.id = samples_to_keep, verbose = TRUE)
+
+
+
 # ===== Missing Rate per Sample =====
 miss_sample <- seqMissing(genofile, per.variant=FALSE)
 
@@ -63,18 +85,29 @@ subset_snp_ids <- sample(snp_ids, size = min(10000, length(snp_ids)))
 # Temporarily apply filter
 seqSetFilter(genofile, variant.id = subset_snp_ids, verbose = FALSE)
 
-# Compute IBS and build tree
+sample_ids <- seqGetData(genofile, "sample.id")  # Extract sample IDs
+
+# Compute IBS matrix on a SNP subset (you already did this)
 ibd_dist <- snpgdsIBS(genofile, autosome.only = FALSE, verbose = TRUE)
 ibs_matrix <- 1 - ibd_dist$ibs  # Convert similarity to distance
+
+# Build tree
 tree <- nj(as.dist(ibs_matrix))
 
-# Plot and save NJ tree
+# Assign sample names to tip labels
+tree$tip.label <- sample_ids
+
+# Plot and save tree
 png(file.path(output_dir, "nj_tree.png"), width=800, height=600)
-plot(tree, main = "Neighbor-Joining Tree from IBS Distance (10K SNPs)")
+plot(tree, main = "Neighbor-Joining Tree with Sample Names")
 dev.off()
 
-# Reset filter to full variant set (if needed later)
-seqResetFilter(genofile, verbose = FALSE)
+# Save tree object and sample names
+save(tree, file = file.path(output_dir, "nj_tree.RData"))
+write.csv(data.frame(Sample = tree$tip.label),
+          file.path(output_dir, "nj_tree_sample_names.csv"),
+          row.names = FALSE)
+
 
 
 # ===== Export Data =====
@@ -83,9 +116,20 @@ write.csv(data.frame(Sample = pca$sample.id,
                      PC2 = pca$eigenvect[,2]),
           file.path(output_dir, "seqarray_pca.csv"), row.names = FALSE)
 
-# Optionally save tree object
-save(tree, file = file.path(output_dir, "nj_tree.RData"))
 
+
+
+
+
+ibs <- snpgdsIBS(genofile, autosome.only = FALSE)
+ibs_matrix <- ibs$ibs  # this is the numeric similarity matrix
+rownames(ibs_matrix) <- colnames(ibs_matrix) <- ibs$sample.id
+
+write.csv(ibs_matrix, file.path(output_dir, "ibs_matrix.csv"))
+
+# Reset filter to full variant set (if needed later)
+seqResetFilter(genofile, verbose = FALSE)
+# Save IBD data
 
 seqClose(genofile)
 
