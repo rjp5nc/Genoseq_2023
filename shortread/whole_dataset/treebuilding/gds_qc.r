@@ -19,25 +19,17 @@ seqSummary(genofile)
 # Load metadata
 metadata <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv", header = TRUE)
 
-Gilmersamps <- subset(metadata, accuratelocation == "Gilmer")
-
-# Identify sample IDs to remove (based on clone == "BLANK" or "Blank")
-samples_to_remove <- subset(metadata, clone == "BLANK" | clone == "Blank")$Well
-
-# Open the GDS file
+gilmer_good_samples <- subset(metadata, 
+                              accuratelocation == "Gilmer" & !(clone %in% c("BLANK", "Blank")))$Well
 
 # Get all sample IDs from the GDS
 all_samples <- seqGetData(genofile, "sample.id")
 
-# Identify samples to keep
-samples_to_keep <- setdiff(all_samples, samples_to_remove)
-samples_to_keep2 <- intersect(all_samples, Gilmersamps$Well)
+# Intersect with GDS sample IDs to avoid mismatches
+final_samples <- intersect(all_samples, gilmer_good_samples)
 
-
-
-# Subset genofile to only include good samples
-seqSetFilter(genofile, sample.id = samples_to_keep2, verbose = TRUE)
-
+# Apply sample filter to GDS
+seqSetFilter(genofile, sample.id = final_samples, verbose = TRUE)
 
 
 # ===== Missing Rate per Sample =====
