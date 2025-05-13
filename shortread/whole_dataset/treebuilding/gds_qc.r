@@ -53,25 +53,29 @@ plot(pca$eigenvect[,1], pca$eigenvect[,2],
      main = "PCA of Sequenced Samples")
 dev.off()
 
-# ===== IBD =====
-ibd <- snpgdsIBDMLE(genofile, autosome.only = FALSE)
-ibd_sel <- snpgdsIBDSelection(ibd)
+# ===== Random SNP Subset for IBS and Tree =====
 
-png(file.path(output_dir, "ibd_plot.png"), width=800, height=600)
-plot(ibd_sel$k0, ibd_sel$k1,
-     xlab = "k0", ylab = "k1",
-     main = "IBD Estimates",
-     col = rgb(0.3, 0.6, 0.9, 0.5), pch = 19)
-dev.off()
+# Select a random subset of 10,000 SNPs that passed previous filters
+set.seed(123)  # for reproducibility
+snp_ids <- seqGetData(genofile, "variant.id")
+subset_snp_ids <- sample(snp_ids, size = min(10000, length(snp_ids)))
 
+# Temporarily apply filter
+seqSetFilter(genofile, variant.id = subset_snp_ids, verbose = FALSE)
 
-# ===== Tree Construction =====
-ibd_dist <- snpgdsIBS(genofile, autosome.only = FALSE)
+# Compute IBS and build tree
+ibd_dist <- snpgdsIBS(genofile, autosome.only = FALSE, verbose = TRUE)
 ibs_matrix <- 1 - ibd_dist$ibs  # Convert similarity to distance
 tree <- nj(as.dist(ibs_matrix))
+
+# Plot and save NJ tree
 png(file.path(output_dir, "nj_tree.png"), width=800, height=600)
-plot(tree, main = "Neighbor-Joining Tree from IBS Distance")
+plot(tree, main = "Neighbor-Joining Tree from IBS Distance (10K SNPs)")
 dev.off()
+
+# Reset filter to full variant set (if needed later)
+seqResetFilter(genofile, verbose = FALSE)
+
 
 # ===== Export Data =====
 write.csv(data.frame(Sample = pca$sample.id,
