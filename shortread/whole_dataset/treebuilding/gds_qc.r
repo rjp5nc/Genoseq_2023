@@ -16,8 +16,6 @@ genofile <- seqOpen(gds_file)
 # ===== Basic Summary =====
 seqSummary(genofile)
 
-library(SeqArray)
-
 # Load metadata
 metadata <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv", header = TRUE)
 
@@ -25,7 +23,6 @@ metadata <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuf
 samples_to_remove <- subset(metadata, clone == "BLANK" | clone == "Blank")$Well
 
 # Open the GDS file
-genofile <- seqOpen(gds_file)
 
 # Get all sample IDs from the GDS
 all_samples <- seqGetData(genofile, "sample.id")
@@ -115,9 +112,6 @@ write.csv(data.frame(Sample = pca$sample.id,
                      PC1 = pca$eigenvect[,1],
                      PC2 = pca$eigenvect[,2]),
           file.path(output_dir, "seqarray_pca.csv"), row.names = FALSE)
-
-
-
 
 
 
