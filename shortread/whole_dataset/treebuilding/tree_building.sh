@@ -15,4 +15,4 @@
 
 module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
 
-Rscript --vanilla /home/rjp5nc/Genoseq_2023/shortread/whole_dataset/treebuilding/tree_building.r
+Rscript --vanilla /home/rjp5nc/Genoseq_2023/shortread/whole_dataset/treebuilding/tree_building_2.r
