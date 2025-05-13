@@ -54,7 +54,7 @@ maf <- seqAlleleFreq(genofile)
 maf_filter <- (maf >= 0.05 & maf <= 0.95)
 miss_filter <- (miss_variant <= 0.10)
 var_filter <- which(maf_filter & miss_filter)
-seqSetFilter(genofile, variant.id = var_filter)
+seqSetFilter(genofile, sample.id = final_samples, variant.id = var_filter)
 
 # ===== PCA =====
 pca <- snpgdsPCA(genofile, autosome.only = FALSE)
@@ -77,7 +77,7 @@ snp_ids <- seqGetData(genofile, "variant.id")
 subset_snp_ids <- sample(snp_ids, size = min(10000, length(snp_ids)))
 
 # Temporarily apply filter
-seqSetFilter(genofile, variant.id = subset_snp_ids, verbose = FALSE)
+seqSetFilter(genofile, sample.id = final_samples, variant.id = subset_snp_ids, verbose = FALSE)
 
 sample_ids <- seqGetData(genofile, "sample.id")  # Extract sample IDs
 
