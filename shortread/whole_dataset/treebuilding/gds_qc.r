@@ -20,7 +20,7 @@ seqSummary(genofile)
 metadata <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv", header = TRUE)
 
 gilmer_good_samples <- subset(metadata, 
-                              accuratelocation == "Gilmer" & !(clone %in% c("BLANK", "Blank")))$Well
+                              accuratelocation != "Gilmer" & !(clone %in% c("BLANK", "Blank")))$Well
 
 # Get all sample IDs from the GDS
 all_samples <- seqGetData(genofile, "sample.id")
@@ -57,11 +57,11 @@ var_filter <- which(maf_filter & miss_filter)
 seqSetFilter(genofile, sample.id = final_samples, variant.id = var_filter)
 
 # ===== PCA =====
-pca <- snpgdsPCA(genofile, autosome.only = FALSE)
+pca <- snpgdsPCA(genofile, sample.id = final_samples, autosome.only = FALSE)
 pc.percent <- pca$varprop * 100
 
 # Save PCA plot
-png(file.path(output_dir, "pca_plot_gilmer.png"), width=800, height=600)
+png(file.path(output_dir, "pca_plot_not_gilmer.png"), width=800, height=600)
 plot(pca$eigenvect[,1], pca$eigenvect[,2],
      col = "blue", pch = 19,
      xlab = paste0("PC1 (", round(pc.percent[1], 2), "%)"),
@@ -82,7 +82,7 @@ seqSetFilter(genofile, sample.id = final_samples, variant.id = subset_snp_ids, v
 sample_ids <- seqGetData(genofile, "sample.id")  # Extract sample IDs
 
 # Compute IBS matrix on a SNP subset (you already did this)
-ibd_dist <- snpgdsIBS(genofile, autosome.only = FALSE, verbose = TRUE)
+ibd_dist <- snpgdsIBS(genofile, sample.id = final_samples, autosome.only = FALSE, verbose = TRUE)
 ibs_matrix <- 1 - ibd_dist$ibs  # Convert similarity to distance
 
 # Build tree
@@ -92,14 +92,14 @@ tree <- nj(as.dist(ibs_matrix))
 tree$tip.label <- sample_ids
 
 # Plot and save tree
-png(file.path(output_dir, "nj_tree_gilmer.png"), width=800, height=600)
+png(file.path(output_dir, "nj_tree_not_gilmer.png"), width=800, height=600)
 plot(tree, main = "Neighbor-Joining Tree with Sample Names")
 dev.off()
 
 # Save tree object and sample names
-save(tree, file = file.path(output_dir, "nj_tree_gilmer.RData"))
+save(tree, file = file.path(output_dir, "nj_tree_not_gilmer.RData"))
 write.csv(data.frame(Sample = tree$tip.label),
-          file.path(output_dir, "nj_tree_sample_names_gilmer.csv"),
+          file.path(output_dir, "nj_tree_sample_names_not_gilmer.csv"),
           row.names = FALSE)
 
 
@@ -108,15 +108,23 @@ write.csv(data.frame(Sample = tree$tip.label),
 write.csv(data.frame(Sample = pca$sample.id,
                      PC1 = pca$eigenvect[,1],
                      PC2 = pca$eigenvect[,2]),
-          file.path(output_dir, "seqarray_pca_gilmer.csv"), row.names = FALSE)
+          file.path(output_dir, "seqarray_pca_not_gilmer.csv"), row.names = FALSE)
 
 
 
-ibs <- snpgdsIBS(genofile, autosome.only = FALSE)
+ibs <- snpgdsIBS(genofile, sample.id = final_samples, autosome.only = FALSE)
 ibs_matrix <- ibs$ibs  # this is the numeric similarity matrix
 rownames(ibs_matrix) <- colnames(ibs_matrix) <- ibs$sample.id
 
 write.csv(ibs_matrix, file.path(output_dir, "ibs_matrix_gilmer.csv"))
+
+
+
+ibd <- snpgdsIBDMLE(genofile,
+                    autosome.only = FALSE)
+
+relatedness <- snpgdsIBDSelection(ibd)
+write.csv(relatedness, file.path(output_dir, "estimated_relatedness_not_gilmer.csv"), row.names = FALSE)
 
 # Reset filter to full variant set (if needed later)
 seqResetFilter(genofile, verbose = FALSE)
@@ -125,3 +133,8 @@ seqResetFilter(genofile, verbose = FALSE)
 seqClose(genofile)
 
 cat("✅ QC complete. Plots and results saved in:", output_dir, "\n")
+
+
+
+
+
