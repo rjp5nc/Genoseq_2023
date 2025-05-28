@@ -21,8 +21,8 @@ module load gatk/4.6.0.0
 # Working folder is core folder where this pipeline is being run.
 
 #euobtusa_vcf  eupulex_vcf  eupulex_vcf_old  usambigua_vcf  usobtusa_vcf  uspulex_vcf
-#    usambigua_vcf  usobtusa_vcf  uspulex_vcf
-species=eupulex_vcf
+#      usobtusa_vcf  uspulex_vcf
+species=usambigua_vcf
 
 WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/10bp_vcf/$species/${species}_snps
 
