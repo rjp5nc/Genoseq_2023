@@ -34,8 +34,6 @@ WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf/$species
 # Intervals to analyze
 intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usobtusa.txt"
 
-SLURM_ARRAY_TASK_ID=1
-
 # Parameters
 JAVAMEM=10G
 CPU=4
