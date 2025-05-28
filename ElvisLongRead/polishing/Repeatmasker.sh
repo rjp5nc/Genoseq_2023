@@ -10,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-conda init
+source ~/miniconda3/etc/profile.d/conda.sh
 conda activate repeatmodeler_new
 
 path=/scratch/rjp5nc/removedups/finalfiles/usobtusa
