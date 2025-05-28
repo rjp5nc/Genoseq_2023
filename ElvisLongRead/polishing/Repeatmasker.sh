@@ -22,6 +22,7 @@ cd $path
 ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
 classified=/scratch/rjp5nc/removedups/us_dobtusa/RM_653473.SunMar301757312025/consensi.fa.classified
 
+export REPEATMASKER_NO_IS=1
 export REPEATMASKER_NO_GENLIB=1
 export REPEATMASKER_NO_TAXONOMY=1
 
