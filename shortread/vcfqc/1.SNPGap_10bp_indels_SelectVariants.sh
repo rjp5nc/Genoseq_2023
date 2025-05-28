@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/FilterVCFs.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-254%50
+#SBATCH --array=1-142%50
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
@@ -25,9 +25,9 @@ module load gatk/4.6.0.0
 
 #need to do us pulex, us ambigua
 
-species=eupulex_vcf
-ref=/scratch/rjp5nc/Reference_genomes/post_kraken/totalHiCwithallbestgapclosed.fa
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_eupulex.txt"
+species=uspulex_vcf
+ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_uspulex.txt"
 
 wd=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/10bp_vcf/$species
 
