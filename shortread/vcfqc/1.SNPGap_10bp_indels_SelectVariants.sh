@@ -26,7 +26,7 @@ module load gatk/4.6.0.0
 #need to do us pulex, us ambigua
 
 species=uspulex_vcf
-ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
+ref=/scratch/rjp5nc/Reference_genomes/post_kraken/us_pulex_ref_kap4.fa
 intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_uspulex.txt"
 
 wd=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/10bp_vcf/$species
