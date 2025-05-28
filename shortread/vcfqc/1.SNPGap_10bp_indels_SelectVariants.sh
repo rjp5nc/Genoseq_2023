@@ -23,9 +23,11 @@ module load gatk/4.6.0.0
 
 # Working directory
 
-species=euobtusa_vcf
-ref=/scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.fasta
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_euobtusa.txt"
+#need to do us pulex, us ambigua
+
+species=eupulex_vcf
+ref=/scratch/rjp5nc/Reference_genomes/post_kraken/totalHiCwithallbestgapclosed.fa
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_eupulex.txt"
 
 wd=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/10bp_vcf/$species
 
