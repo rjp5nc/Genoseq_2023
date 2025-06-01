@@ -19,4 +19,3 @@ OUTPUT_DIR="/scratch/rjp5nc/microbiota"
 # Compress FASTQ files
 echo "Compressing FASTQ files..."
 gzip "$OUTPUT_DIR/${SRA_ACCESSION}_1.fastq"
-gzip "$OUTPUT_DIR/${SRA_ACCESSION}_2.fastq"
