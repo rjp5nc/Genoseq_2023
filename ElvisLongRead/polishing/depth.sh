@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-#SBATCH -J basicStats # A single job name for the array
+#SBATCH -J depth # A single job name for the array
 #SBATCH --ntasks-per-node=10 # ten core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-10:00  ### 48 hours

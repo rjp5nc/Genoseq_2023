@@ -17,4 +17,5 @@ dp_matrix <- extract.gt(vcf, element = "DP", as.numeric = TRUE)
 # Calculate average depth per variant (row-wise mean)
 avg_depth_per_sample <- colMeans(dp_matrix, na.rm = TRUE)
 
-write.csv(avg_depth_per_sample, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/usobtusa_dp.csv")
+write.csv(avg_depth_df, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/usobtusa_dp.csv",
+          row.names = FALSE)
