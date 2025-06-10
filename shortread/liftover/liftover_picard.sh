@@ -18,7 +18,7 @@ module load picard
 #species=uspulex
 #species=usobtusa
 #species=usambigua
-species=eupulex
+species=eupulex_2
 speciescrossmap=eu_pulex
 vcffile=trimmed10bp_masked_${species}.vcf.gz
 sourcegenome=totalHiCwithallbestgapclosed.fa
