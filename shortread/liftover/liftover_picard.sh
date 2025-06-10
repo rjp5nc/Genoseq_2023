@@ -18,8 +18,8 @@ module load picard
 #species=uspulex
 #species=usobtusa
 #species=usambigua
-species=eupulex_2
-speciescrossmap=eu_pulex
+species=uspulex
+speciescrossmap=us_pulex
 vcffile=trimmed10bp_masked_${species}.vcf.gz
 sourcegenome=totalHiCwithallbestgapclosed.fa
 #Daphnia_ambigua_Q001_genome.fa
