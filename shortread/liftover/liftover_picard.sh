@@ -34,7 +34,7 @@ java "-Xmx${JAVAMEM}" -jar $EBROOTPICARD/picard.jar  LiftoverVcf \
 I=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/$vcffile \
 O=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}.vcf.gz \
 CHAIN=/scratch/rjp5nc/lastz/$speciescrossmap/chainnet/liftover.chain \
-REJECT=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}_rejected.vcf \
+REJECT=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}_rejected.vcf.gz \
 R=/scratch/rjp5nc/Reference_genomes/post_kraken/$sourcegenome \
 MAX_RECORDS_IN_RAM=50000000 \
 WARN_ON_MISSING_CONTIG=true \
