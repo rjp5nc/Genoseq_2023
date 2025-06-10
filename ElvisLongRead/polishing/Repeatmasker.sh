@@ -15,7 +15,7 @@ conda activate repeatmodeler_new
 
 #us pulex, us ambigua, eu obtusa, eu pulex
 
-path=/scratch/rjp5nc/removedups/finalfiles/uspulex
+path=/scratch/rjp5nc/removedups/finalfiles/usambigua
 
 mkdir -p $path
 
@@ -24,10 +24,12 @@ cd $path
 ##US_obtusa_onlydaps.fa
 ##us_pulex_ref_kap4.fa
 #assembly.hap2_onlydaps.fasta
-#Daphnia_ambigua_Q001_genome.fa
+##Daphnia_ambigua_Q001_genome.fa
 #totalHiCwithallbestgapclosed.fa
 
-ref=/scratch/rjp5nc/Reference_genomes/post_kraken/us_pulex_ref_kap4.fa
-classified=/scratch/rjp5nc/removedups/us_dpulex/RM_821914.SunMar301808152025/consensi.fa.classified
+ref=/scratch/rjp5nc/Reference_genomes/post_kraken/Daphnia_ambigua_Q001_genome.fa
+classified=/scratch/rjp5nc/removedups/us_dambigua/RM_229818.SunMar301804372025/consensi.fa.classified
 
 RepeatMasker -lib $classified -dir . $ref
+
+#cd /home/rjp5nc/Genoseq_2023/ElvisLongRead/polishing
