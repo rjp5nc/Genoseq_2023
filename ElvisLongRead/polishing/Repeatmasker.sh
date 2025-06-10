@@ -13,17 +13,21 @@
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate repeatmodeler_new
 
-path=/scratch/rjp5nc/removedups/finalfiles/usobtusa
+#us pulex, us ambigua, eu obtusa, eu pulex
+
+path=/scratch/rjp5nc/removedups/finalfiles/uspulex
 
 mkdir -p $path
 
 cd $path 
 
-ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
-classified=/scratch/rjp5nc/removedups/us_dobtusa/RM_653473.SunMar301757312025/consensi.fa.classified
+##US_obtusa_onlydaps.fa
+##us_pulex_ref_kap4.fa
+#assembly.hap2_onlydaps.fasta
+#Daphnia_ambigua_Q001_genome.fa
+#totalHiCwithallbestgapclosed.fa
 
-export REPEATMASKER_NO_IS=1
-export REPEATMASKER_NO_GENLIB=1
-export REPEATMASKER_NO_TAXONOMY=1
+ref=/scratch/rjp5nc/Reference_genomes/post_kraken/us_pulex_ref_kap4.fa
+classified=/scratch/rjp5nc/removedups/us_dpulex/RM_821914.SunMar301808152025/consensi.fa.classified
 
 RepeatMasker -lib $classified -dir . $ref
