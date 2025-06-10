@@ -13,13 +13,13 @@
 module load tabix
 module load picard
 
-#finished eu_obtusa, ambigua, 
+#finished eu_obtusa, ambigua, usobtusa
 
 #species=uspulex
 #species=usobtusa
 #species=usambigua
-species=usobtusa
-speciescrossmap=us_obtusa
+species=eupulex
+speciescrossmap=eu_pulex
 vcffile=trimmed10bp_masked_${species}.vcf.gz
 sourcegenome=totalHiCwithallbestgapclosed.fa
 #Daphnia_ambigua_Q001_genome.fa
