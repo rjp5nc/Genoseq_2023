@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 24:00:00 ### 15 seconds
-#SBATCH --mem 100G
+#SBATCH --mem 110G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/nFlo_1.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/nFlo_1.%A_%a.err # Standard error
 #SBATCH -p standard
@@ -37,7 +37,7 @@ O=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted
 CHAIN=/scratch/rjp5nc/lastz/$speciescrossmap/chainnet/liftover.chain \
 REJECT=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}_rejected.vcf.gz \
 R=/scratch/rjp5nc/Reference_genomes/post_kraken/$sourcegenome \
-MAX_RECORDS_IN_RAM=50000000 \
+MAX_RECORDS_IN_RAM=10000000 \
 WARN_ON_MISSING_CONTIG=true \
 RECOVER_SWAPPED_REF_ALT=true 
 
