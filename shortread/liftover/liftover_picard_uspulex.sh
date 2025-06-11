@@ -9,6 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/erroroutputs/nFlo_1.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
+#SBATCH --array=1-13
 
 module load tabix
 module load picard
