@@ -10,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-module load gatk/4.2.6.1  # adjust version as needed
+module load gatk/4.6.0.0  # adjust version as needed
 
 species=uspulex
 speciescrossmap=us_pulex
