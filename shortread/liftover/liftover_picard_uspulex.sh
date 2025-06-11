@@ -15,30 +15,33 @@ module load picard
 
 #finished eu_obtusa, ambigua, usobtusa
 
-#species=uspulex
-#species=usobtusa
-#species=usambigua
-species=usobtusa
-speciescrossmap=us_obtusa
+species=uspulex
+speciescrossmap=us_pulex
 vcffile=trimmed10bp_masked_${species}.vcf.gz
 sourcegenome=totalHiCwithallbestgapclosed.fa
-#Daphnia_ambigua_Q001_genome.fa
-#US_obtusa_onlydaps.fa
-#us_pulex_ref_kap4.fa
 
 # Parameters
 JAVAMEM=100G
 CPU=1
 
-# Liftover using picard
-java "-Xmx${JAVAMEM}" -jar $EBROOTPICARD/picard.jar  LiftoverVcf \
-I=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/$vcffile \
-O=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}.vcf.gz \
-CHAIN=/scratch/rjp5nc/lastz/$speciescrossmap/chainnet/liftover.chain \
-REJECT=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}_rejected.vcf.gz \
-R=/scratch/rjp5nc/Reference_genomes/post_kraken/$sourcegenome \
-MAX_RECORDS_IN_RAM=10000000 \
-WARN_ON_MISSING_CONTIG=true \
-RECOVER_SWAPPED_REF_ALT=true 
+#!/bin/bash
+set -e
 
-tabix -p vcf /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}.vcf.gz
+contig=$1
+input_vcf="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/uspulex/trimmed10bp_masked_uspulex.$contig.vcf.gz"
+output_vcf="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/uspulex/lifted_uspulex.$contig.vcf.gz"
+reject_vcf="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/uspulex/rejected_uspulex.$contig.vcf.gz"
+
+cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/uspulex/
+
+java "-Xmx${JAVAMEM}" -jar $EBROOTPICARD/picard.jar LiftoverVcf \
+  I=$input_vcf \
+  O=$output_vcf \
+  CHAIN=/scratch/rjp5nc/lastz/$speciescrossmap/chainnet/liftover.chain \
+  REJECT=$reject_vcf \
+  R=/scratch/rjp5nc/Reference_genomes/post_kraken/$sourcegenome \
+  MAX_RECORDS_IN_RAM=10000000 \
+  WARN_ON_MISSING_CONTIG=true \
+  RECOVER_SWAPPED_REF_ALT=true
+
+tabix -p vcf $output_vcf
