@@ -17,7 +17,7 @@ cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf
 
 VCF=trimmed10bp_masked_uspulex.vcf.gz
 OUTDIR=uspulex
-CONTIG=$(sed -n "${SLURM_ARRAY_TASK_ID}p" contigs.txt)
+CONTIG=$(sed -n "${SLURM_ARRAY_TASK_ID}p" ${OUTDIR}/contigs.txt)
 
 mkdir -p "$OUTDIR"
 
