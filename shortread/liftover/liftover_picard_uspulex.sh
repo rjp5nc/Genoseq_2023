@@ -25,14 +25,14 @@ JAVAMEM=100G
 CPU=1
 
 #!/bin/bash
-set -e
 
-contig=$1
+cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/uspulex/
+
+contig=$(sed -n "${SLURM_ARRAY_TASK_ID}p" contigs.txt)
 input_vcf="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/uspulex/trimmed10bp_masked_uspulex.$contig.vcf.gz"
 output_vcf="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/uspulex/lifted_uspulex.$contig.vcf.gz"
 reject_vcf="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/uspulex/rejected_uspulex.$contig.vcf.gz"
 
-cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/uspulex/
 
 java "-Xmx${JAVAMEM}" -jar $EBROOTPICARD/picard.jar LiftoverVcf \
   I=$input_vcf \
@@ -45,3 +45,7 @@ java "-Xmx${JAVAMEM}" -jar $EBROOTPICARD/picard.jar LiftoverVcf \
   RECOVER_SWAPPED_REF_ALT=true
 
 tabix -p vcf $output_vcf
+
+
+#bcftools concat -Oz -o ../lifted_${species}.vcf.gz lifted_${species}.*.vcf.gz
+#tabix -p vcf ../lifted_${species}.vcf.gz
