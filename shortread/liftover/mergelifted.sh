@@ -10,7 +10,6 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-module load gatk/4.6.0.0  # adjust version as needed
 module load bcftools 
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf
