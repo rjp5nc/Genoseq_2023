@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-#SBATCH -J split_pulex
+#SBATCH -J vcfstats
 #SBATCH --ntasks-per-node=4 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-72:00 # hours
