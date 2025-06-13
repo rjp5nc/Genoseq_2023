@@ -4,7 +4,7 @@ library(SeqArray)
 vcf.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/lifted_12major.vcf.gz"          # path to your VCF file
 gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/lifted_12major.gds"             # output GDS file
 
-seqVCF2GDS(vcf.fn, gds.fn, storage.option = "LZMA")
+seqVCF2GDS(vcf.fn, gds.fn, storage.option="ZIP_RA", parallel=10, verbose=T, optimize=T)
 
 
 genofile <- seqOpen(gds.fn)
