@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=10 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-48:00  ### 48 hours
-#SBATCH --mem 120G
+#SBATCH --mem 150G
 #SBATCH -o /scratch/rjp5nc/err/vcf2gds.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/vcf2gds.%A_%a.err # Standard error
 #SBATCH -p standard
