@@ -8,7 +8,7 @@ seqVCF2GDS(vcf.fn, gds.fn, storage.option="ZIP_RA", parallel=10, verbose=T, opti
 
 
 
-genofile <- seqOpen(gds.fn)
+#genofile <- seqOpen(gds.fn)
 
 
 geno <- seqGetData(genofile, "genotype")  # 3D array: SNP x sample x ploidy
