@@ -13,6 +13,8 @@ genofile <- seqOpen(gds.fn)
 # Get variant-level missing rates (returns proportions)
 miss_rates_all <- seqMissing(genofile, per.variant=TRUE)  
 
+summary(miss_rates_all)
+
 # Filter out fully missing variants
 keep_variants <- which(miss_rates_all < 1)
 
@@ -30,6 +32,8 @@ seqSetFilter(genofile, variant.id = subset_variants, verbose = TRUE)
 
 # Get genotype array (SNP x Sample x Ploidy)
 geno <- seqGetData(genofile, "genotype")
+
+table(is.na(geno))
 
 # Missingness logic (any NA across ploidy)
 geno_miss <- apply(is.na(geno), c(1, 2), any)
