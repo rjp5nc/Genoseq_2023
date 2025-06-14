@@ -28,8 +28,6 @@ seqSetFilter(genofile, variant.id = subset_variants, verbose = TRUE)
 # Get genotype array (SNP x Sample x Ploidy)
 geno <- seqGetData(genofile, "genotype", variant.id = subset_variants, verbose = TRUE)
 
-table(is.na(geno))
-
 # Missingness logic (any NA across ploidy)
 geno_miss <- apply(is.na(geno), c(1, 2), any)
 
