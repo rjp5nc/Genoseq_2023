@@ -6,59 +6,58 @@ library(SeqArray)
 #seqVCF2GDS(vcf.fn, gds.fn, storage.option="ZIP_RA", parallel=10, verbose=T, optimize=T)
 #genofile <- seqOpen(gds.fn)
 
-# Paths
 gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/lifted_12major_missingasref.gds"
+
+# Open GDS
 genofile <- seqOpen(gds.fn)
 
 # Total number of variants
-n_variants <- length(seqGetData(genofile, "variant.id"))
+#total_variants <- seqSummary(genofile)$genotype$dim[1]
 
-# Subset 1 million SNPs randomly (or use head for first 1M if preferred)
-set.seed(123)  # for reproducibility
-subset_variants <- sample(seq_len(n_variants), size = min(1e6, n_variants))
+# Sample 1 million variant IDs
+set.seed(42)  # for reproducibility
 
-# Set variant filter
+
+miss_rates_all <- seqMissing(genofile)  # returns % missing per SNP
+keep_variants <- which(miss_rates_all < 1)
+subset_variants <- sample(keep_variants, size = 1e6)
+
+#subset_variants <- sample(seq_len(total_variants), size = 1e6)
+
+# Apply SNP filter
 seqSetFilter(genofile, variant.id = subset_variants, verbose = TRUE)
 
-# Get genotype data for filtered SNPs
-geno <- seqGetData(genofile, "genotype")  # [SNP x sample x ploidy]
+# Get genotype array (SNP x Sample x Ploidy)
+geno <- seqGetData(genofile, "genotype")
 
-# Missingness matrix
-geno_miss <- apply(is.na(geno), c(1, 2), any)
+# Compute missingness (TRUE if any ploidy is NA)
+geno_miss <- apply(is.na(geno), c(1,2), any)
 
-# Per-sample missing rate
+# Per-sample missing rate and coverage
 sample_missing_rate <- colMeans(geno_miss)
-sample_coverage     <- colSums(!geno_miss)
-sample_ids          <- seqGetData(genofile, "sample.id")
+sample_coverage <- colSums(!geno_miss)
+sample_ids <- seqGetData(genofile, "sample.id")
 
 sample_df <- data.frame(
-  Sample      = sample_ids,
+  Sample = sample_ids,
   MissingRate = sample_missing_rate,
-  Coverage    = sample_coverage
+  Coverage = sample_coverage
 )
 
-write.csv(
-  sample_df,
-  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/per_sample_missing_coverage_1M.csv",
-  row.names = FALSE
-)
+write.csv(sample_df, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/per_sample_missing_coverage_subset.csv", row.names = FALSE)
 
-# Per-SNP stats
+# Per-SNP missing rate and coverage
 snp_missing_rate <- rowMeans(geno_miss)
-snp_coverage     <- rowSums(!geno_miss)
-snp_ids          <- seqGetData(genofile, "variant.id")
+snp_coverage <- rowSums(!geno_miss)
+snp_ids <- seqGetData(genofile, "variant.id")
 
 snp_df <- data.frame(
-  VariantID   = snp_ids,
+  VariantID = snp_ids,
   MissingRate = snp_missing_rate,
-  Coverage    = snp_coverage
+  Coverage = snp_coverage
 )
 
-write.csv(
-  snp_df,
-  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/per_snp_missing_coverage_1M.csv",
-  row.names = FALSE
-)
+write.csv(snp_df, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/per_snp_missing_coverage_subset.csv", row.names = FALSE)
 
-# Close connection
+# Done
 seqClose(genofile)
