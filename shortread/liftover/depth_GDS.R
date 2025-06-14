@@ -18,11 +18,6 @@ summary(miss_rates_all)
 # Filter out fully missing variants
 keep_variants <- which(miss_rates_all < 1)
 
-# Double-check that there are enough variants
-if (length(keep_variants) < 1e6) {
-  stop("Not enough non-missing SNPs to sample 1 million.")
-}
-
 # Randomly sample 1 million SNPs from non-missing
 set.seed(42)
 subset_variants <- sample(keep_variants, size = 1e6)
@@ -31,7 +26,7 @@ subset_variants <- sample(keep_variants, size = 1e6)
 seqSetFilter(genofile, variant.id = subset_variants, verbose = TRUE)
 
 # Get genotype array (SNP x Sample x Ploidy)
-geno <- seqGetData(genofile, "genotype")
+geno <- seqGetData(genofile, "genotype", variant.id = subset_variants, verbose = TRUE)
 
 table(is.na(geno))
 
@@ -49,7 +44,7 @@ sample_df <- data.frame(
   Coverage = sample_coverage
 )
 
-write.csv(sample_df, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/per_sample_missing_coverage_subset.csv", row.names = FALSE)
+write.csv(sample_df, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/per_sample_missing_coverage_subset2.csv", row.names = FALSE)
 
 # Per-SNP stats
 snp_missing_rate <- rowMeans(geno_miss)
@@ -62,7 +57,7 @@ snp_df <- data.frame(
   Coverage = snp_coverage
 )
 
-write.csv(snp_df, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/per_snp_missing_coverage_subset.csv", row.names = FALSE)
+write.csv(snp_df, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/per_snp_missing_coverage_subset2.csv", row.names = FALSE)
 
 seqClose(genofile)
 
