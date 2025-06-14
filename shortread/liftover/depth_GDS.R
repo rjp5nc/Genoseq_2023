@@ -11,7 +11,7 @@ gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_v
 genofile <- seqOpen(gds.fn)
 
 # Total number of variants
-n_variants <- seqSummary(genofile, "variant.id")$n
+n_variants <- length(seqGetData(genofile, "variant.id"))
 
 # Subset 1 million SNPs randomly (or use head for first 1M if preferred)
 set.seed(123)  # for reproducibility
