@@ -12,8 +12,7 @@
 
 ### sbatch ~/Genoseq_2023/shortread/liftover/depth_GDS.sh
 ### sacct -j 22867938
-### cat /scratch/aob2x/dest/slurmOutput/vcf2gds.22867938
 
 module load gcc openmpi R/4.3.1
 
-Rscript --vanilla /home/rjp5nc//Genoseq_2023/shortread/liftover/depth_GDS.R
+Rscript --vanilla /home/rjp5nc/Genoseq_2023/shortread/liftover/depth_GDS.R
