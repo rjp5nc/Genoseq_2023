@@ -2,7 +2,7 @@
 #
 #SBATCH -J stats # A single job name for the array
 #SBATCH --ntasks-per-node=10 # one core
-#SBATCH -N 1 # on one node
+#SBATCH -N 10 # on one node
 #SBATCH -t 0-48:00  ### 48 hours
 #SBATCH --mem 150G
 #SBATCH -o /scratch/rjp5nc/err/stats.%A_%a.out # Standard output
