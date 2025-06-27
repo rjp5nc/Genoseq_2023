@@ -89,7 +89,7 @@ registerDoMC(10)
 sampleStats <- foreach(sample.i=sampleId, .combine = "rbind")%dopar%{
       # samp.i=sampleStats$sampleId[1]
       message(sample.i)
-      seqSetFilter(genofile, variant.sel = variant_sel, sample.id=Species_Id, verbose = TRUE)
+      seqSetFilter(genofile, variant.sel = variant_sel, sample.id=sample.i, verbose = TRUE)
 
     ### get missing data rate
       missingRate <- mean(is.na(seqGetData(genofile, "$dosage")))
