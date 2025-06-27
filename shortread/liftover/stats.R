@@ -86,8 +86,7 @@ registerDoParallel(cl)
   sampleId <- seqGetData(genofile, "sample.id")
 
 ### iterate through each sample to get missing rate & coverage
-  sampleStats <- foreach(sample.i=sampleId, .combine="rbind", 
-                       .packages = c("SeqArray"))%dopar%{
+  sampleStats <- foreach(sample.i=sampleId, .combine="rbind", .packages = c("SeqArray", "data.table"))%dopar%{
     ## sample.i = sampleId[1]
     ### subsample to sample.i
       seqSetFilter(genofile, sample.id=sample.i)
