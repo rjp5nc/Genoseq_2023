@@ -89,7 +89,8 @@ registerDoParallel(cl)
   sampleStats <- foreach(sample.i=sampleId, .combine="rbind", .packages = c("SeqArray", "data.table"))%dopar%{
     ## sample.i = sampleId[1]
     ### subsample to sample.i
-      seqSetFilter(genofile, sample.id=sample.i)
+      genofile <- seqOpen(gds.fn)
+      seqSetFilter(genofile, variant.sel = variant_sel, sample.id=Species_Id, verbose = TRUE)
 
     ### get missing data rate
       missingRate <- mean(is.na(seqGetData(genofile, "$dosage")))
