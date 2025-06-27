@@ -86,7 +86,7 @@ registerDoMC(10)
 
 ### iterate through each sample to get missing rate & coverage
 
-sampleStats <- foreach(sample.i=sampleId)%dopar%{
+sampleStats <- foreach(sample.i=sampleId, .combine = "rbind")%dopar%{
       # samp.i=sampleStats$sampleId[1]
       message(sample.i)
       seqSetFilter(genofile, variant.sel = variant_sel, sample.id=Species_Id, verbose = TRUE)
