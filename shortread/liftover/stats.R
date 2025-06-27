@@ -78,9 +78,8 @@ seqResetFilter(genofile, verbose = TRUE)
 seqSetFilter(genofile, variant.sel = variant_sel, sample.id=Species_Id, verbose = TRUE)
 
 
-numCores <- 10
-cl <- makeCluster(numCores)
-registerDoParallel(cl)
+registerDoMC(10)
+
 
 ### get sample names
   sampleId <- seqGetData(genofile, "sample.id")
@@ -89,7 +88,7 @@ registerDoParallel(cl)
 
 sampleStats <- foreach(sample.i=sampleId)%dopar%{
       # samp.i=sampleStats$sampleId[1]
-      message(samp.i)
+      message(sample.i)
       seqSetFilter(genofile, variant.sel = variant_sel, sample.id=Species_Id, verbose = TRUE)
 
     ### get missing data rate
