@@ -4,7 +4,7 @@
 library(SeqArray)
 library(ggplot2)
 library(tidyverse)
-library(doParallel)
+library(doMC)
 library(foreach)
 library(data.table)
 
