@@ -20,14 +20,15 @@ module load samtools
 module load picard
 
 # Define working directories
-outfq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq"
+infq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq"
+outfq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq_mito"
 outbam="/scratch/rjp5nc/UK2022_2024/mapped_bam"
 
 # Ensure output directories exist
-mkdir -p "${outfq}" "${outbam}"
+mkdir -p "${outfq}" "${outbam}" "${infq}"
 
 # Read sample ID and reference path from CSV
-CSV_FILE="/scratch/rjp5nc/UK2022_2024/myclonestoref.csv"
+CSV_FILE="/scratch/rjp5nc/UK2022_2024/myclonestoref_mito.csv"
 line=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" ${CSV_FILE})
 
 # Extract fields (assuming CSV format: sample_id,reference_path)
@@ -49,15 +50,15 @@ echo "Processing sample: ${samp} with reference: ${ref_path}"
 chmod u+w /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/${samp}/${samp}.*.fastq
 
 # Map to reference genome (assembled reads)
-bwa mem -t 10 -K 100000000 -Y ${ref_path} ${outfq}/${samp}/${samp}.assembled.fastq | \
+bwa mem -t 10 -K 100000000 -Y ${ref_path} ${infq}/${samp}/${samp}.assembled.fastq | \
 samtools view -Suh -q 20 -F 0x100 | \
 samtools sort --threads 10 -o ${outfq}/${samp}.sort.bam
 samtools index ${outfq}/${samp}.sort.bam
 
 # Map unassembled reads
 bwa mem -t 10 -K 100000000 -Y ${ref_path} \
-${outfq}/${samp}/${samp}.unassembled.forward.fastq  \
-${outfq}/${samp}/${samp}.unassembled.reverse.fastq | \
+${infq}/${samp}/${samp}.unassembled.forward.fastq  \
+${infq}/${samp}/${samp}.unassembled.reverse.fastq | \
 samtools view -Suh -q 20 -F 0x100 | \
 samtools sort --threads 10 -o ${outfq}/${samp}.filt.unassembled.sort.bam
 samtools index ${outfq}/${samp}.filt.unassembled.sort.bam
