@@ -1,4 +1,4 @@
-#module load gcc openmpi R
+#module load gcc openmpi R/4.3.1
 #R
 
 library(SeqArray)
@@ -8,12 +8,21 @@ library(doMC)
 library(foreach)
 library(data.table)
 
-gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/lifted_12major_missingasref.gds"
+
+vcf.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usambigua.vcf.gz"          # path to your VCF file
+gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usambigua.gds"             # output GDS file
+seqVCF2GDS(vcf.fn, gds.fn, storage.option="ZIP_RA", parallel=10, verbose=T, optimize=T)
+
+
+
+
+#gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/lifted_12major_missingasref.gds"
+gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usambigua.gds"
 samples <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species_merged_20250627.csv")
 
 genofile <- seqOpen(gds.fn)
 
-Species <- subset(samples, Species == "Daphnia pulex" & Continent =="NorthAmerica")
+Species <- subset(samples, Species == "Daphnia ambigua" & Continent =="NorthAmerica")
 Species_Id <- Species$Sample_ID
 
 seqResetFilter(genofile, verbose = TRUE)
@@ -55,7 +64,7 @@ miss_rates_all_short_plot <- ggplot(miss_rates_all_short_df, aes(x = missing_rat
   xlab("Missing Rate") +
   ylab("Frequency")
 
-ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missrates_variant_USpulex.png", plot = miss_rates_all_short_plot, width = 6, height = 4, dpi = 300)
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missrates_variant_ambigua_raw.png", plot = miss_rates_all_short_plot, width = 6, height = 4, dpi = 300)
 
 
 
@@ -71,7 +80,7 @@ miss_rates_samps_short_plot <- ggplot(miss_rates_samps_short_df, aes(x = missing
 
 # View plot
 
-ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missrates_variant_USpulex_samps.png", plot = miss_rates_samps_short_plot, width = 6, height = 4, dpi = 300)
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missrates_variant_USambigua_raw_samps.png", plot = miss_rates_samps_short_plot, width = 6, height = 4, dpi = 300)
 
 seqResetFilter(genofile, verbose = TRUE)
 
@@ -107,5 +116,5 @@ sampleStats <- foreach(sample.i=sampleId, .combine = "rbind")%dopar%{
   }
 
   
-write.csv(sampleStats, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_US_pulex.csv", row.names = FALSE)
+write.csv(sampleStats, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_ambigua_raw.csv", row.names = FALSE)
 
