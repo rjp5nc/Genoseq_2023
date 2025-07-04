@@ -10,7 +10,7 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-INPUT_FILES=(/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/*)
+INPUT_FILES=(/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR)
 
  chmod -x Trim_and_map.sh
 
