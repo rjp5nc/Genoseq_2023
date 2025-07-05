@@ -13,15 +13,15 @@
 # sbatch /home/rjp5nc/Genoseq_2023/shortread/liftover/lastz.sh
 # sacct -j 761713
 
-module load nextflow/23.04.1
+module load nextflow/24.10.5
 module load apptainer/1.3.4
 
 ### ssdf
 ### test container
   #nextflow run evotools/nf-LO -profile test,singularity -with-singularity ${PWD}/nflo.sif
 
-#ref=dambigua_mito
-ref=eudobtusa_mito
+ref=dambigua_mito
+#ref=eudobtusa_mito
 #ref=kap4Dpulex_mito
 #ref=usdobtusa_mito
 
