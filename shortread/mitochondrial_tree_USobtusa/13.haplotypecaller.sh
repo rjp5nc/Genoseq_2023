@@ -9,23 +9,22 @@
 #SBATCH -e /scratch/rjp5nc/err/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-9999%150
+#SBATCH --array=1-521%100
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 # grep '^>' your_file.fasta | sed 's/^>//'
-# grep '^>' assembly.hap2_onlydaps.fasta | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/assembly.hap2_onlydaps_chr.txt
-# grep '^>' Daphnia_ambigua_Q001_genome.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/ambigua_chr.txt
-# grep '^>' eu_pulex_totalHiCwithallbestgapclosed.clean.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/eu_pulex_chr.txt
-# grep '^>' US_obtusa_onlydaps.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/us_obtusa_chr.txt
-# grep '^>' us_pulex_ref_kap4.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/us_pulex_chr.txt
-# grep '^>' eu_pulex_totalHiCwithallbestgapclosed.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/eu_pulex_all_chr.txt
+# grep '^>' dambigua_mito.fasta | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/dambigua_mito_chr.txt
+# grep '^>' eudpulex_mito.fasta | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/eudpulex_mito_chr.txt
+# grep '^>' eudobtusa_mito.fasta | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/eudobtusa_mito_chr.txt
+# grep '^>' kap4Dpulex_mito.fasta | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/kap4Dpulex_mito_chr.txt
+# grep '^>' usdobtusa_mito.fasta | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/usdobtusa_mito_chr.txt
 
-#gatk CreateSequenceDictionary -R Daphnia_ambigua_Q001_genome.fa
-#gatk CreateSequenceDictionary -R totalHiCwithallbestgapclosed.fa
-
-#gatk CreateSequenceDictionary -R assembly.hap2_onlydaps.fasta
-#gatk CreateSequenceDictionary -R us_pulex_ref_kap4.fa
+#gatk CreateSequenceDictionary -R dambigua_mito.fasta
+#gatk CreateSequenceDictionary -R eudpulex_mito.fasta
+#gatk CreateSequenceDictionary -R eudobtusa_mito.fasta
+#gatk CreateSequenceDictionary -R kap4Dpulex_mito.fasta
+#gatk CreateSequenceDictionary -R usdobtusa_mito.fasta
 
 #cut -f1,2 eu_pulex_totalHiCwithallbestgapclosed.clean.fai | awk '{print $1"\t0\t"$2}' > your.bed
 
@@ -61,40 +60,34 @@ module load tabix/0.2.6
 
 #finished param10
 
-parameterFile=/scratch/rjp5nc/UK2022_2024/param11.txt
-wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
+parameterFile=/scratch/rjp5nc/UK2022_2024/touseforDBI_mito_fullref.csv
+wd="/scratch/rjp5nc/UK2022_2024/mitogvcf"
 
 #dos2unix "$parameterFile"
   
 # Extract sample name
-
+SLURM_ARRAY_TASK_ID=3
 #changed these for pulex file
-id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $7}' "$parameterFile")
-samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $2}' "$parameterFile")
-chrom=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $6}' "$parameterFile")
+samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $1}' "$parameterFile")
 ref=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $5}' "$parameterFile")
+folder=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $6}' "$parameterFile")
 
-
-wd=$(echo $wd | tr -d '\r')
-chrom=$(echo $chrom | tr -d '\r')
 samp=$(echo $samp | tr -d '\r')
-id=$(echo $id | tr -d '\r')
-
-
-
+ref=$(echo $ref | tr -d '\r')
+folder=$(echo $folder | tr -d '\r')
 
 echo "Haplotype calling -" "Sample:" $SLURM_ARRAY_TASK_ID
-echo "Chromosome:" ${chrom}
+echo "Chromosome:" ${folder}
 
 # Create folder for chromosome
-if [[ -d "${wd}/gvcf/${chrom}" ]]
+if [[ -d "${wd}/gvcf/${folder}" ]]
 then
 	echo "Working chromosome folder exist"
 	echo "lets move on"
 	date
 else
 	echo "folder doesnt exist. lets fix that"
-	mkdir ${wd}/gvcf/${chrom}
+	mkdir ${wd}/gvcf/${folder}
 	date
 fi
 
@@ -106,17 +99,17 @@ fi
 # Haplotype Calling
 gatk HaplotypeCaller \
 -R $ref \
--I /scratch/rjp5nc/UK2022_2024/final_bam_rg2/${samp}finalmap_RG.bam \
--O ${wd}/gvcf/${chrom}/${samp}.${chrom}.${id}.g.vcf \
--L ${wd}/bed/${chrom}.bed \
+-I /scratch/rjp5nc/UK2022_2024/final_mitobam_rg2/${samp}finalmap_RG.bam \
+-O ${wd}/gvcf/${folder}/${samp}.g.vcf \
+-L /scratch/rjp5nc/Reference_genomes/mito_reference/${folder}.bed \
 -ERC GVCF
 
 # Bgzip
 module load gcc/14.2.0 htslib/1.17
 
 # Compress and index with Tabix
-bgzip ${wd}/gvcf/${chrom}/${samp}.${chrom}.${id}.g.vcf
-tabix -p vcf ${wd}/gvcf/${chrom}/${samp}.${chrom}.${id}.g.vcf.gz
+bgzip ${wd}/gvcf/${folder}/${samp}.g.vcf
+tabix -p vcf ${wd}/gvcf/${folder}/${samp}.g.vcf
 
 # Finish
 echo "Complete -" "Sample:" $SLURM_ARRAY_TASK_ID
