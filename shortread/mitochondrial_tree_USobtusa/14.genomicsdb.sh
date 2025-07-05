@@ -9,85 +9,34 @@
 #SBATCH -e /scratch/rjp5nc/err/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-521%50
 
+#!/bin/bash
 
-# This script will merge gVCFs into a unified database for genotype calling.
-# This will be done using a per chromosome approach
-
-
-#NEED TO DO AMBIGUA
-
-# Load modules
 module load gatk/4.6.0.0
 
-# Name of pipeline
-PIPELINE="GenomicsDBImport"
+parameterFile=/scratch/rjp5nc/UK2022_2024/touseforDBI_mito_fullref.csv
+wd="/scratch/rjp5nc/UK2022_2024/mitogvcf"
 
-# Working folder is core folder where this pipeline is being run.
-
-#folder=dambigua_mito
-#folder=eudobtusa_mito
-#folder=eudpulex_mito
-#folder=kap4Dpulex_mito
-folder=usdobtusa_mito
-
-# Parameters
-
-# Move to working directory
-cd $WORKING_FOLDER
-
-# Chromosome
-
-WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_mitos/${folder}"
-
-mkdir -p "${WORKING_FOLDER}" 
-mkdir -p "$WORKING_FOLDER/temp"
-# Parameters
-JAVAMEM=40G
-CPU=10
-
-# Move to working directory
-cd $WORKING_FOLDER
-
-#cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/samplemapnames
-
-#while IFS= read -r line; do
-#  # Extract the basename of the directory (e.g., h2tg000008l)
-#  chr=$(echo "$line" | awk -F'/' '{for(i=1;i<=NF;i++) if($i ~ /^h2tg[0-9]+[lc]$/) print $i}')
-
-#  # Write the line to the corresponding .txt file
-#  echo "$line" >> "${chr}.txt"
-#done < "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusapathsfixed.txt"
-
-# Merge VCFs using GenomicsDBImport
-
-#zcat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/euobtusa_chr/h2tg000002l/Gilmer5_H9.h2tg000002l.1018082.g.vcf.gz | head -n 500
+#dos2unix "$parameterFile"
+  
+#awk -F',' 'NR>1 {print $1 "\t/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/" $6 "/" $1 ".g.vcf.gz"}' /scratch/rjp5nc/UK2022_2024/touseforDBI_mito_fullref.csv > /scratch/rjp5nc/UK2022_2024/sample_map.txt
 
 
-sample_list="/scratch/rjp5nc/UK2022_2024/sample_map_fixed.txt"
+# Extract sample name
 
-# Read line and split into two variables
-read -r sample_id gvcf_path < <(awk -F'\t' -v line=${SLURM_ARRAY_TASK_ID} 'NR==line' ${sample_list})
+#changed these for pulex file
 
-echo "Sample ID: $sample_id"
-echo "GVCF Path: $gvcf_path"
+OUTPUT_DIR="/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf"
+GROUP_NAME="eudobtusa_mito"
+REF_FASTA="/scratch/rjp5nc/Reference_genomes/mito_reference/${GROUP_NAME}.fasta"
+GVCF_DIR="/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/${GROUP_NAME}"
+OUT_GVCF="${OUTPUT_DIR}/${GROUP_NAME}_combined.g.vcf.gz"
 
-interval=$(awk '{printf "%s:%d-%d", $1, $2+1, $3}' /scratch/rjp5nc/Reference_genomes/mito_reference/${folder}.bed)
-echo "$interval"
+# Create output directory
+mkdir -p "$OUTPUT_DIR"
 
-mkdir -p "${WORKING_FOLDER}/TEMP_Daphnia_DBI_${species}_${sample_id}"
-
-gatk --java-options "-Xmx${JAVAMEM}" GenomicsDBImport \
---genomicsdb-workspace-path $WORKING_FOLDER/${species}/Daphnia_DBI_${species} \
---tmp-dir $WORKING_FOLDER/TEMP_Daphnia_DBI_${species}_${sample_id} \
---batch-size 50 \
---sample-name-map /scratch/rjp5nc/UK2022_2024/sample_map_fixed.txt \
---reader-threads $CPU \
--L "${interval}"
-
-#sample name from g.vcf.gz 
-# Remove temp workspace
-rm -rf $WORKING_FOLDER/TEMP_Daphnia_DBI_${i}_${start}_${stop}
-
-echo ${i} "done" $(date)
+# Run CombineGVCFs using all .g.vcf.gz files in the folder
+gatk --java-options "-Xmx40G" CombineGVCFs \
+  -R "$REF_FASTA" \
+  $(for f in "$GVCF_DIR"/*.g.vcf.gz; do echo "-V $f"; done) \
+  -O "$OUT_GVCF"
