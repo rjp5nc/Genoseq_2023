@@ -100,12 +100,12 @@ fi
 
 
 # Haplotype Calling
-gatk HaplotypeCaller \
--R $ref \
--I /scratch/rjp5nc/UK2022_2024/final_mitobam_rg2/${samp}finalmap_RG.bam \
--O ${wd}/gvcf/${folder}/${samp}.g.vcf \
--L /scratch/rjp5nc/Reference_genomes/mito_reference/${folder}.bed \
--ERC GVCF
+#gatk HaplotypeCaller \
+#-R $ref \
+#-I /scratch/rjp5nc/UK2022_2024/final_mitobam_rg2/${samp}finalmap_RG.bam \
+#-O ${wd}/gvcf/${folder}/${samp}.g.vcf \
+#-L /scratch/rjp5nc/Reference_genomes/mito_reference/${folder}.bed \
+#-ERC GVCF
 
 # Bgzip
 module load gcc/14.2.0 htslib/1.17
