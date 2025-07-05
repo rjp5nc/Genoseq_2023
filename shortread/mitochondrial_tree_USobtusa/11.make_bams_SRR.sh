@@ -31,8 +31,6 @@ outbam="/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito"
 # Ensure output directories exist
 mkdir -p "${outfq}" "${outbam}" "${infq}"
 
-SLURM_ARRAY_TASK_ID=1
-
 # Read sample ID and reference path from CSV
 CSV_FILE="/scratch/rjp5nc/UK2022_2024/forref2_mito.csv"
 line=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" ${CSV_FILE})
@@ -86,7 +84,7 @@ java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
     CREATE_INDEX=true
 
 # Move final BAM to output directory
-mv ${outfq}/${samp}_finalmap* ${outbam}/
+#mv ${outfq}/${samp}_finalmap* ${outbam}/
 
 # Remove intermediate files
 rm -f ${outfq}/${samp}.*
