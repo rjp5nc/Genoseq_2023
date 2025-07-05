@@ -65,6 +65,9 @@ wd="/scratch/rjp5nc/UK2022_2024/mitogvcf"
 
 #dos2unix "$parameterFile"
   
+#awk -F',' 'NR>1 {print $1 "\t/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/" $6 "/" $1 ".g.vcf.gz"}' /scratch/rjp5nc/UK2022_2024/touseforDBI_mito_fullref.csv > /scratch/rjp5nc/UK2022_2024/sample_map.txt
+
+
 # Extract sample name
 
 #changed these for pulex file
