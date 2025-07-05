@@ -24,8 +24,6 @@ infq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq"
 outfq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq_mito"
 outbam="/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito"
 
-SLURM_ARRAY_TASK_ID=430
-
 # Ensure output directories exist
 mkdir -p "${outfq}" "${outbam}" "${infq}"
 
