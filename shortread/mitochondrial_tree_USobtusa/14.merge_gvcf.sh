@@ -27,7 +27,7 @@ wd="/scratch/rjp5nc/UK2022_2024/mitogvcf"
 #changed these for pulex file
 
 OUTPUT_DIR="/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf"
-GROUP_NAME="eudobtusa_mito"
+GROUP_NAME="eudpulex_mito"
 REF_FASTA="/scratch/rjp5nc/Reference_genomes/mito_reference/${GROUP_NAME}.fasta"
 GVCF_DIR="/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/${GROUP_NAME}"
 OUT_GVCF="${OUTPUT_DIR}/${GROUP_NAME}_combined.g.vcf.gz"
