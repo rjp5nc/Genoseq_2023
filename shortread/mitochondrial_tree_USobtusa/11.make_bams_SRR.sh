@@ -87,6 +87,6 @@ java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
 cp ${outfq}/${samp}_finalmap* ${outbam}/
 
 # Remove intermediate files
-rm -f ${outfq}/${samp}.*
+#rm -f ${outfq}/${samp}.*
 
 echo "Finished processing ${samp}"
