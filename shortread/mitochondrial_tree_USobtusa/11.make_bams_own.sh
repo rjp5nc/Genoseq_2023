@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/erroroutputs/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
-#SBATCH --array=1-576%40   # Adjust based on the number of samples
+#SBATCH --array=1-502%60   # Adjust based on the number of samples
 
 # Load necessary modules
 module load gcc htslib
@@ -22,7 +22,7 @@ module load picard
 # Define working directories
 infq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq"
 outfq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq_mito"
-outbam="/scratch/rjp5nc/UK2022_2024/mapped_bam"
+outbam="/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito"
 
 # Ensure output directories exist
 mkdir -p "${outfq}" "${outbam}" "${infq}"
