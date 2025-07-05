@@ -20,8 +20,8 @@ module load apptainer/1.3.4
 ### test container
   #nextflow run evotools/nf-LO -profile test,singularity -with-singularity ${PWD}/nflo.sif
 
-ref=dambigua_mito
-#ref=eudobtusa_mito
+#ref=dambigua_mito
+ref=eudobtusa_mito
 #ref=kap4Dpulex_mito
 #ref=usdobtusa_mito
 
