@@ -84,7 +84,7 @@ java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
     CREATE_INDEX=true
 
 # Move final BAM to output directory
-#mv ${outfq}/${samp}_finalmap* ${outbam}/
+cp ${outfq}/${samp}_finalmap* ${outbam}/
 
 # Remove intermediate files
 rm -f ${outfq}/${samp}.*
