@@ -66,7 +66,7 @@ wd="/scratch/rjp5nc/UK2022_2024/mitogvcf"
 #dos2unix "$parameterFile"
   
 # Extract sample name
-SLURM_ARRAY_TASK_ID=3
+
 #changed these for pulex file
 samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $1}' "$parameterFile")
 ref=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $5}' "$parameterFile")
