@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-521%100
+#SBATCH --array=1-521%60
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
