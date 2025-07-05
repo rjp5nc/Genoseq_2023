@@ -22,8 +22,8 @@ module load apptainer/1.3.4
 
 #ref=dambigua_mito
 #ref=eudobtusa_mito
-ref=kap4Dpulex_mito
-#ref=usdobtusa_mito
+#ref=kap4Dpulex_mito
+ref=usdobtusa_mito
 
 mkdir -p "/scratch/rjp5nc/Reference_genomes/mito_reference/lastz/$ref"
 
