@@ -20,13 +20,20 @@
 
 #https://www.youtube.com/watch?v=IiorfDHeoLo
 
-module load java/21
-module load bioconda/py3.10
+#module load java/21
+#module load bioconda/py3.10
+
+
+#conda create -n nfcore-mag-env python=3.10 pandas=1.4.3 plotly=5.13 nanoplot=1.41.6 -c conda-forge -c bioconda -y
+#conda install -n nfcore-mag-env multiqc samtools nextflow -c bioconda -c conda-forge
+
+conda activate nfcore-mag-env
 
 /home/rjp5nc/bin/nextflow run /home/rjp5nc/.nextflow/assets/nf-core/mag/ \
 -profile conda \
---bin_min_size 5 \
---bin_max_size 100000000 \
 --input /scratch/rjp5nc/mag/samples.csv \
 --outdir /scratch/rjp5nc/mag 
 
+
+#--bin_min_size 5 \
+#--bin_max_size 100000000 \
