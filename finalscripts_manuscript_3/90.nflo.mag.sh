@@ -23,9 +23,9 @@
 #Elvis3_HiFi,test_group,/project/berglandlab/Robert/HMWDNAElvis3/RawDatafromCDGenomics/fastq/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
 #EOF
 
+module load bioconda/py3.10
 
-/home/rjp5nc/bin/nextflow run /home/rjp5nc/.nextflow/assets/nf-core/mag/ -profile singularity --input /scratch/rjp5nc/mag/samples.csv --outdir /scratch/rjp5nc/mag
-
+/home/rjp5nc/bin/nextflow run /home/rjp5nc/.nextflow/assets/nf-core/mag/ -profile conda --input /scratch/rjp5nc/mag/samples.csv --outdir /scratch/rjp5nc/mag
 
 #/home/rjp5nc/bin/nextflow run nf-core/mag \
 #  -profile singularity \
