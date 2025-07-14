@@ -17,6 +17,13 @@
 #export PATH=~/bin:$PATH
 #nextflow -v
 
+#rm /scratch/rjp5nc/mag/samplesheet.csv
+#cat <<EOF > /scratch/rjp5nc/mag/samplesheet.csv
+#sample,group,long_reads
+#Elvis3_HiFi,test_group,/project/berglandlab/Robert/HMWDNAElvis3/RawDatafromCDGenomics/fastq/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
+#EOF
+
+
 
 /home/rjp5nc/bin/nextflow run nf-core/mag \
   -profile singularity \
