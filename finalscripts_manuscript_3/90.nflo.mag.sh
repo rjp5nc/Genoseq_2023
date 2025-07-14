@@ -26,8 +26,8 @@ module load bioconda/py3.10
 /home/rjp5nc/bin/nextflow run /home/rjp5nc/.nextflow/assets/nf-core/mag/ \
 -profile conda \
 --skip_nanoplot \
---bin_min_size 5000 \
---bin_max_size 10000000 \
+--bin_min_size 5 \
+--bin_max_size 100000000 \
 --input /scratch/rjp5nc/mag/samples.csv \
 --outdir /scratch/rjp5nc/mag 
 
