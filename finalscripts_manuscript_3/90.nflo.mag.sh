@@ -20,6 +20,6 @@
 
 /home/rjp5nc/bin/nextflow run nf-core/mag \
   -profile singularity \
-  --input samplesheet.csv \
+  --input /scratch/rjp5nc/mag/samplesheet.csv \
   --outdir /scratch/rjp5nc/mag \
   -r 4.0.0
