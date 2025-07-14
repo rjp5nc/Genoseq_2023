@@ -18,4 +18,4 @@
 #nextflow -v
 
 
-/home/rjp5nc/bin/nextflow run nf-core/mag -profile singularity --input /project/berglandlab/Robert/HMWDNAElvis3/RawDatafromCDGenomics/fastq/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz --outdir /scratch/rjp5nc/mag
+/home/rjp5nc/bin/nextflow run nf-core/mag -profile singularity --input /scratch/rjp5nc/mag/samplesheet.csv --outdir /scratch/rjp5nc/mag
