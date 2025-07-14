@@ -25,7 +25,7 @@
 
 
 
-/home/rjp5nc/bin/nextflow run nf-core/mag -profile singularity --input '*_R{1,2}.fastq.gz' --outdir /scratch/rjp5nc/mag
+/home/rjp5nc/bin/nextflow run nf-core/mag -profile singularity --input '*_R{1,2}.fastq.gz' --outdir /scratch/rjp5nc/mag -r 4.0.0
 
 
 #/home/rjp5nc/bin/nextflow run nf-core/mag \
