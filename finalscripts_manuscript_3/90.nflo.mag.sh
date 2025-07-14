@@ -24,7 +24,7 @@
 #EOF
 
 
-/home/rjp5nc/bin/nextflow run /home/rjp5nc/.nextflow/assets/nf-core/mag/ -profile singularity --input /scratch/rjp5nc/mag/samples.csv --outdir /scratch/rjp5nc/mag -r 4.0.0
+/home/rjp5nc/bin/nextflow run /home/rjp5nc/.nextflow/assets/nf-core/mag/ -profile singularity --input /scratch/rjp5nc/mag/samples.csv --outdir /scratch/rjp5nc/mag
 
 
 #/home/rjp5nc/bin/nextflow run nf-core/mag \
