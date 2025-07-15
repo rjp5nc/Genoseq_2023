@@ -39,3 +39,10 @@ conda activate nfcore-mag-env
 
 #--bin_min_size 5 \
 #--bin_max_size 100000000 \
+
+
+
+NanoPlot \
+  -p raw_ --title Elvis03_raw -c darkblue \
+  -t 2 \
+  --fastq /project/berglandlab/Robert/HMWDNAElvis3/RawDatafromCDGenomics/fastq/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
