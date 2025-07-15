@@ -44,6 +44,7 @@ cd /scratch/rjp5nc/mag
   -profile conda \
   --input /scratch/rjp5nc/mag/samples.csv \
   --outdir /scratch/rjp5nc/mag \
+  --skip_nanoplot \
   --validate_params false
 
 
