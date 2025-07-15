@@ -31,6 +31,15 @@
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate nfcore-mag-env
 
+
+cd /scratch/rjp5nc/mag
+
+
+NanoPlot \
+  -p raw_ --title Elvis03_raw -c darkblue \
+  -t 2 \
+  --fastq /project/berglandlab/Robert/HMWDNAElvis3/RawDatafromCDGenomics/fastq/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
+
 /home/rjp5nc/bin/nextflow run /home/rjp5nc/.nextflow/assets/nf-core/mag/ \
 -profile conda \
 --input /scratch/rjp5nc/mag/samples.csv \
@@ -41,8 +50,3 @@ conda activate nfcore-mag-env
 #--bin_max_size 100000000 \
 
 
-
-NanoPlot \
-  -p raw_ --title Elvis03_raw -c darkblue \
-  -t 2 \
-  --fastq /project/berglandlab/Robert/HMWDNAElvis3/RawDatafromCDGenomics/fastq/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
