@@ -26,6 +26,8 @@
 
 #conda create -n nfcore-mag-env python=3.10 pandas=1.4.3 plotly=5.13 nanoplot=1.41.6 -c conda-forge -c bioconda -y
 #conda install -n nfcore-mag-env multiqc samtools nextflow -c bioconda -c conda-forge
+#conda install -n nfcore-mag-env nanoplot=1.40.0 -c bioconda -c conda-forge
+
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate nfcore-mag-env
 
