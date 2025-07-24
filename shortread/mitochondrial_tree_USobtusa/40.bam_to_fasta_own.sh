@@ -3,7 +3,7 @@
 #SBATCH -J bamtofasta # A single job name for the array
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 24:00:00 ### 15 seconds
+#SBATCH -t 2:00:00 ### 15 seconds
 #SBATCH --mem 50G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/nFlo_1.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/nFlo_1.%A_%a.err # Standard error
