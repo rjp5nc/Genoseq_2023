@@ -13,11 +13,11 @@
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 #conda create -n clustalo-env -c bioconda -c conda-forge clustalo
+source ~/miniconda3/etc/profile.d/conda.sh
 conda activate clustalo-env
 
 #mkdir -p /scratch/rjp5nc/UK2022_2024/consensusmitoaligned
 #cat /scratch/rjp5nc/UK2022_2024/consensusmito/*.fa > /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_mitosequences.fasta
-
 
 clustalo -i /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_mitosequences.fasta \
 -o /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_aligned.fasta --threads 10 --force
