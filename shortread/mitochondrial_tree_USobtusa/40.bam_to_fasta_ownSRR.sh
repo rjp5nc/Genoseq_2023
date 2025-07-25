@@ -19,7 +19,7 @@ module load htslib
 module load gsl
 module load samtools
 
-#SLURM_ARRAY_TASK_ID=1
+SLURM_ARRAY_TASK_ID=1
 
 cd /scratch/rjp5nc/UK2022_2024/final_mitobam_rg2
 outfq=/scratch/rjp5nc/UK2022_2024/final_mitobam_rg2
@@ -52,8 +52,7 @@ bcftools filter -i 'QUAL>20 && INFO/DP>=20' -Oz -o ${outfq}/${samp}.filt.mito.vc
   echo ${name}
 
   # Extracts chromosome via bed file
-  sed -i "s/^>*"mtdna"/>"mtdna."${name}/g" \
-  ${outfq2}/${samp}.filt.consensus.mito.fa
+sed -i "1s|^>.*$|>mtdna.${name}|" "${outfq2}/${samp}.filt.consensus.mito.fa"
 
 
   # Index fasta

@@ -53,8 +53,8 @@ bcftools filter -i 'QUAL>20 && INFO/DP>=20' -Oz -o ${outfq}/${samp}.filt.mito.vc
   echo ${name}
 
   # Extracts chromosome via bed file
-  sed -i "s/^>*"mtdna"/>"mtdna."${name}/g" \
-  ${outfq2}/${samp}.filt.consensus.mito.fa
+ sed -i "1s|^>.*$|>mtdna.${name}|" "${outfq2}/${samp}.filt.consensus.mito.fa"
+
 
 
   # Index fasta
