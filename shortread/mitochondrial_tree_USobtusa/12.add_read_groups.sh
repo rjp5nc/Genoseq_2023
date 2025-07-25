@@ -9,26 +9,26 @@
 #SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
-#SBATCH --array=1-521%60
+#SBATCH --array=1-21
 
 # Load modules
 module load picard
 
-#find /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito/ -name "*_finalmap.bam" | sort > /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito/bam_files.txt
+#find /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref/ -name "*_finalmap.bam" | sort > /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito/bam_files_newref.txt
 
 # Parameters
-parameterFile="/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito/bam_files.txt"
-wd="/scratch/rjp5nc/UK2022_2024/final_mitobam_rg2"
+parameterFile="/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref/bam_files_newref.txt"
+wd="/scratch/rjp5nc/UK2022_2024/final_mitobam_rg3"
 
 # Extract sample name
 samp=`sed -n ${SLURM_ARRAY_TASK_ID}p $parameterFile`
 out2=`echo $samp | sed 's/_finalmap.bam//'`
-out=$(echo "$out2" | sed 's#/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito/##')
+out=$(echo "$out2" | sed 's#/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref/##')
 
 echo "Adding read groups -" "Sample:" $SLURM_ARRAY_TASK_ID
 
 # Move to directory
-cd /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito
+cd /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref
 
 # Force add read groups
 java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
