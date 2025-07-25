@@ -25,8 +25,8 @@ module load picard
 
 # Define working directories
 infq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR"
-outfq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR_mito"
-outbam="/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito"
+outfq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR_mito2"
+outbam="/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref"
 
 # Ensure output directories exist
 mkdir -p "${outfq}" "${outbam}" "${infq}"
