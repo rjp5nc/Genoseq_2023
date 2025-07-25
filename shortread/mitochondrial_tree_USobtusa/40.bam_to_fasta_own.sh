@@ -3,13 +3,13 @@
 #SBATCH -J bamtofasta # A single job name for the array
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 2:00:00 ### 15 seconds
+#SBATCH -t 1:00:00 ### 15 seconds
 #SBATCH --mem 50G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/nFlo_1.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/nFlo_1.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-501%60
+#SBATCH --array=1-501%100
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
