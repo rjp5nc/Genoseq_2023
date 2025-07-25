@@ -31,5 +31,3 @@ FastTree -nt -gtr /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_aligned_u
 
 #awk 'BEGIN{n=0} /^>/ {n++} n<=100 {print}' /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_mitosequences.fasta > mito_subset.fasta
 
-# Run locally with 4 threads (or adjust to 10)
-#clustalo -i mito_subset.fasta -o mito_subset.aln --threads=4
