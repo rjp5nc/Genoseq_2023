@@ -19,8 +19,6 @@ module load htslib
 module load gsl
 module load samtools
 
-SLURM_ARRAY_TASK_ID=1
-
 cd /scratch/rjp5nc/UK2022_2024/final_mitobam_rg2
 outfq=/scratch/rjp5nc/UK2022_2024/final_mitobam_rg2
 outfq2=/scratch/rjp5nc/UK2022_2024/consensusmito
