@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #SBATCH -J BEAST # A single job name for the array
-#SBATCH --ntasks-per-node=15 # one core
+#SBATCH --ntasks-per-node=30 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-0:00:00 ### 15 seconds
 #SBATCH --mem 120G
