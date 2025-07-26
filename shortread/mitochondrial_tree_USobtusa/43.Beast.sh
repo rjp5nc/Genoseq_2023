@@ -19,6 +19,8 @@ conda activate beast2-277
 #wget https://github.com/CompEvol/beast2/releases/download/v2.7.7/BEAST.v2.7.7.Linux.tgz
 #tar -xzf BEAST.v2.7.7.Linux.tgz
 
+#conda install -c bioconda libbeagle
+
 cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
 #I had to increase the ram usage in the .bat file of Beauti2 to turn the alignment into a .xml file. It wasnt saving otherwise
