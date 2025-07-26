@@ -27,4 +27,4 @@ cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
 #beast -beagle_SSE -threads 30 /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/all_aligned.xml
 
-beast -beagle_SSE -beagle_instances 30 -threads 30 /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/all_aligned.xml
+beast -beagle -threads 30 -instances 30 -beagle_SSE /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/all_aligned.xml
