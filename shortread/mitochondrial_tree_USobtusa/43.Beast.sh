@@ -27,6 +27,4 @@ cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
 #beast -beagle_SSE -threads 30 /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/all_aligned.xml
 
-export BEAGLE_DISABLE_GPU=1
-export BEAGLE_DISABLE_OPENCL=1
-beast -beagle -beagle_CPU -beagle_SSE -threads 30 -instances 30 /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/all_aligned.xml
+beast  -beagle_SSE -threads 30 /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/all_aligned.xml
