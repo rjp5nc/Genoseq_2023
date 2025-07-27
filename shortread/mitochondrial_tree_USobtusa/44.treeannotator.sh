@@ -18,7 +18,7 @@ conda activate beast2-277
 
 cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
-java -cp ~/bin/../lib/BEAST.app/lib/BEAST.jar beast.app.treeannotator.TreeAnnotator \
+/scratch/rjp5nc/beast/beast/bin/treeannotator \
   -burnin 10 \
   -heights mean \
   all_aligned-all_aligned_unique.trees \
