@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-0:00:00 ### 15 seconds
-#SBATCH --mem 80G
+#SBATCH --mem 85G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/beast.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/beast.%A_%a.err # Standard error
 #SBATCH -p standard
