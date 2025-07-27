@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 #SBATCH -J treeannotator # A single job name for the array
-#SBATCH --ntasks-per-node=30 # one core
+#SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-0:00:00 ### 15 seconds
-#SBATCH --mem 120G
+#SBATCH --mem 80G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/beast.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/beast.%A_%a.err # Standard error
 #SBATCH -p standard
@@ -18,7 +18,7 @@ conda activate beast2-277
 
 cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
-/scratch/rjp5nc/beast/beast/bin/treeannotator \
+/scratch/rjp5nc/beast/beast/bin/treeannotator -Xmx80g \
   -burnin 10 \
   -height mean \
   all_aligned-all_aligned_unique.trees \
