@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH -J BEAST # A single job name for the array
+#SBATCH -J treeannotator # A single job name for the array
 #SBATCH --ntasks-per-node=30 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-0:00:00 ### 15 seconds
@@ -18,4 +18,8 @@ conda activate beast2-277
 
 cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
-treeannotator -burnin 10 -heights mean all_aligned-all_aligned_unique.trees annotated_MCC.tree
+java -cp ~/bin/../lib/BEAST.app/lib/BEAST.jar beast.app.treeannotator.TreeAnnotator \
+  -burnin 10 \
+  -heights mean \
+  all_aligned-all_aligned_unique.trees \
+  annotated_MCC.tree
