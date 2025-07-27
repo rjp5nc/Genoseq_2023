@@ -20,6 +20,6 @@ cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
 /scratch/rjp5nc/beast/beast/bin/treeannotator \
   -burnin 10 \
-  -heights mean \
+  -height mean \
   all_aligned-all_aligned_unique.trees \
   annotated_MCC.tree
