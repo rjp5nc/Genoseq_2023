@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-0:00:00 ### 15 seconds
 #SBATCH --mem 85G
-#SBATCH -o /scratch/rjp5nc/erroroutputs/beast.%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/erroroutputs/beast.%A_%a.err # Standard error
+#SBATCH -o /scratch/rjp5nc/erroroutputs/beast.%A.out # Standard output
+#SBATCH -e /scratch/rjp5nc/erroroutputs/beast.%A.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 #SBATCH --mail-type=END               # Send email at job completion
@@ -18,10 +18,11 @@ conda activate beast2-277
 
 cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
-java -Xmx16g -cp /scratch/rjp5nc/beast/beast/lib/packages/BEAST.app.jar:/scratch/rjp5nc/beast/beast/lib/packages/BEAST.base.jar beastfx.app.treeannotator.TreeAnnotator \
+java -Xss256M -Xmx70G -jar /scratch/rjp5nc/beast/beast/lib/launcher.jar TreeAnnotator \
   -burnin 10 \
   -height mean \
   all_aligned-all_aligned_unique.trees \
   annotated_MCC.tree
 
 #beastfx.app.treeannotator.TreeAnnotator
+
