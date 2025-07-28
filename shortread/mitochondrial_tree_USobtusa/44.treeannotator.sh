@@ -18,11 +18,9 @@ conda activate beast2-277
 
 cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
-java -Xss256M -Xmx70G -jar /scratch/rjp5nc/beast/beast/lib/launcher.jar beastfx.app.treeannotator.TreeAnnotator \
-  -burnin 10 \
-  -height mean \
-  all_aligned-all_aligned_unique.trees \
-  annotated_MCC.tree
+export BEAST_JAVA_OPTS="-Xmx70G"
+beast -treeannotator -burnin 10 -heights mean all_aligned-all_aligned_unique.trees annotated_MCC.tree
+
 
 #beastfx.app.treeannotator.TreeAnnotator
 
