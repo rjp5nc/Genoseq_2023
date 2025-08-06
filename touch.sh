@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-#SBATCH -J move # A single job name for the array
+#SBATCH -J touch # A single job name for the array
 #SBATCH --ntasks-per-node=2 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-48:00  ### 48 hours
