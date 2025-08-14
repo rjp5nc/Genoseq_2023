@@ -19,8 +19,8 @@ module load apptainer
 
 #Ref=US_obtusa_onlydaps.fa
 #Ref=totalHiCwithallbestgapclosed.fa
-#Ref=Daphnia_ambigua_Q001_genome.fa
-Ref=assembly.hap2_onlydaps.fasta
+Ref=Daphnia_ambigua_Q001_genome.fa
+#Ref=assembly.hap2_onlydaps.fasta
 #Ref=us_pulex_ref_kap4.fa
 
 REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/$Ref
