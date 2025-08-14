@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 
 #conda create -n spades -c bioconda -c conda-forge spades
-
+source $(conda info --base)/etc/profile.d/conda.sh
 conda activate spades && \
 spades.py \
     -1 /scratch/rjp5nc/HMW/shortreadElvis/merged_R1.fq.gz \
