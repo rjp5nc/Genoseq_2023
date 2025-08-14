@@ -15,4 +15,4 @@
 
 module load gcc openmpi R/4.3.1
 
-Rscript --vanilla /home/rjp5nc/Genoseq_2023/shortread/liftover/stats.R
+Rscript --vanilla /home/rjp5nc/Genoseq_2023/finalscripts_manuscript_3/45.stats_busco.R
