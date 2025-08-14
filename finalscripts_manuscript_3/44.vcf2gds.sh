@@ -15,5 +15,5 @@
 
 module load gcc openmpi R/4.3.1
 
-Rscript --vanilla /home/rjp5nc/Genoseq_2023/finalscripts_manuscript_3/vcf2gds.R \
+Rscript --vanilla /home/rjp5nc/Genoseq_2023/finalscripts_manuscript_3/44.vcf2gds.R \
 /scratch/rjp5nc/UK2022_2024/buscoanalysis/buscolifted_singlecopy.vcf.gz
