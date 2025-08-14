@@ -3,7 +3,7 @@
 #SBATCH -J mergehifiasmspades # A single job name for the array
 #SBATCH --ntasks-per-node=40 # multi core
 #SBATCH -N 1 # on one node
-#SBATCH -t 6-00:00 # 6 days
+#SBATCH -t 2-00:00 # 6 days
 #SBATCH --mem 100G
 #SBATCH -o /scratch/rjp5nc/Canu_error/hifiasm%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/Canu_error/hifiasm%A_%a.err # Standard error
