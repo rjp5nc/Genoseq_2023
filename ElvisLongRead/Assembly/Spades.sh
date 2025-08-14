@@ -17,6 +17,6 @@ spades.py \
     -1 /scratch/rjp5nc/HMW/shortreadElvis/merged_R1.fq.gz \
     -2 /scratch/rjp5nc/HMW/shortreadElvis/merged_R2.fq.gz \
     --pacbio /scratch/rjp5nc/HMW/HMWDNAElvis3/m84128_250121_222443_s2.hifi_reads.bc2104.fastq \
-    -o spades_output \
+    -o /scratch/rjp5nc/spades/spades_output \
     -t $(nproc) \
     -m $(( $(grep MemTotal /proc/meminfo | awk '{print $2}') / 1024 / 1024 - 2 ))
