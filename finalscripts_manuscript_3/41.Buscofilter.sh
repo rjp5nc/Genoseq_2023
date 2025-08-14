@@ -26,8 +26,8 @@ Ref=totalHiCwithallbestgapclosed.fa
 #Ref=us_pulex_ref_kap4.fa
 
 #vcf=trimmed10bp_usobtusa_vcf.vcf.gz
-vcf=trimmed10bp_eupulex_vcf_old.vcf.gz
-#vcf=trimmed10bp_eupulex_vcf.vcf.gz 
+#vcf=trimmed10bp_eupulex_vcf_old.vcf.gz
+vcf=trimmed10bp_eupulex_vcf.vcf.gz 
 #vcf=trimmed10bp_usambigua_vcf.vcf.gz
 #vcf=trimmed10bp_euobtusa_vcf.vcf.gz
 #vcf=trimmed10bp_uspulex_vcf.vcf.gz
