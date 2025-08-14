@@ -10,14 +10,14 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-conda create -n hybridmerge -c bioconda -c conda-forge ragtag minimap2 samtools nextpolish busco quast seqkit
+#conda create -n hybridmerge -c bioconda -c conda-forge ragtag minimap2 samtools nextpolish busco quast seqkit
 
 source $(conda info --base)/etc/profile.d/conda.sh
 conda activate hybridmerge
 
 cd /scratch/rjp5nc/HMW/mergeSpadesHifiasm/
 
-HIFIASM=/scratch/rjp5nc/Reference_genomes/assembly.hap2_onlydaps
+HIFIASM=/scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.fasta
 SPADES=/scratch/rjp5nc/spades/spades_output/contigs.fasta
 HIFI=/scratch/rjp5nc/HMW/HMWDNAElvis3/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
 R1=/scratch/rjp5nc/HMW/shortreadElvis/merged_R1.fq.gz
