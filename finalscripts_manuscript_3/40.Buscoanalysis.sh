@@ -18,8 +18,8 @@ module load apptainer
 # Move to data directory
 
 #Ref=US_obtusa_onlydaps.fa
-#Ref=totalHiCwithallbestgapclosed.fa
-Ref=Daphnia_ambigua_Q001_genome.fa
+Ref=totalHiCwithallbestgapclosed.fa
+#Ref=Daphnia_ambigua_Q001_genome.fa
 #Ref=assembly.hap2_onlydaps.fasta
 #Ref=us_pulex_ref_kap4.fa
 
