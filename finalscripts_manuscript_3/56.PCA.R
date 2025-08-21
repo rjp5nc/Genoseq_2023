@@ -56,7 +56,7 @@ write.csv(pca_data,
 
 
 pca_merged <- merge(pca_data, metadata, by.x = "sample.id", by.y = "Well", all.x = TRUE)
-pca_merged2 <- left_join(pca_merged, samplestats, by.x = "sample.id", by.y = "sampleId")
+pca_merged2 <- merge(pca_merged, samplestats, by.x = "sample.id", by.y = "sampleId", all.x = TRUE)
 
 
 
