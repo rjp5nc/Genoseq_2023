@@ -19,6 +19,16 @@ gds <- seqOpen(genofile.fn)
 
 metadata <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/2022_2024seqmetadata20250811.csv", header = TRUE)
 
+unique(metadata$accuratelocation)
+
+include_locations <- c("P66", "P63", "P58","P62", "Gilmer")  # replace with your names
+
+# Keep only samples NOT in these locations
+samples_to_keep <- metadata$Well[metadata$accuratelocation %in% include_locations]
+
+gds_filtered <- seqSelectSamples(gds, sample.id = samples_to_keep)
+
+
 pca_result <- snpgdsPCA(gds, num.thread=10, autosome.only=FALSE)
 
 # Extract the PCA results
