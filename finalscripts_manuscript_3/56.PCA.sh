@@ -13,6 +13,6 @@
 ### sbatch ~/Genoseq_2023/shortread/liftover/depth_GDS.sh
 ### sacct -j 22867938
 
-module load gcc openmpi R/4.3.1
+module load gcc/11.4.0 openmpi/4.1.4  R/4.3.1;R
 
 Rscript --vanilla /home/rjp5nc/Genoseq_2023/finalscripts_manuscript_3/56.PCA.R
