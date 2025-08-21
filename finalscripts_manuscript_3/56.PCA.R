@@ -30,24 +30,14 @@ print(eigenvalues)
 # Print the eigenvectors (coordinates for each individual)
 print(head(eigenvectors))
 
-pc_percent <- round(pca_result$varprop * 100, 2)
-
 pca_data <- data.frame(
   sample.id = pca_result$sample.id,  
   PC1 = pca_result$eigenvect[, 1],
   PC2 = pca_result$eigenvect[, 2],
   PC3 = pca_result$eigenvect[, 3],
   PC4 = pca_result$eigenvect[, 4],
-  PC5 = pca_result$eigenvect[, 5]
-)
-
-colnames(pca_data) <- c(
-  "sample.id",
-  paste0("PC1 (", pc_percent[1], "%)"),
-  paste0("PC2 (", pc_percent[2], "%)"),
-  paste0("PC3 (", pc_percent[3], "%)"),
-  paste0("PC4 (", pc_percent[4], "%)"),
-  paste0("PC5 (", pc_percent[5], "%)")
+  PC5 = pca_result$eigenvect[, 5],
+  varprop = pca_result$varprop
 )
 
 write.csv(pca_data,
@@ -59,9 +49,9 @@ p <- ggplot(pca_data, aes(x = PC1, y = PC2, label = sample.id)) +
   geom_point(color = "steelblue", size = 2, alpha = 0.7) +
   theme_minimal(base_size = 14) +
   labs(
-    title = "PCA of Daphnia Samples",
-    x = paste0("PC1 (", pc_percent[1], "%)"),
-    y = paste0("PC2 (", pc_percent[2], "%)")
+    title = "PCA of USobtusa Samples",
+    x = paste0("PC1"),
+    y = paste0("PC2")
   )
 
 # Save as PNG
