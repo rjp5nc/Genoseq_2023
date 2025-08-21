@@ -1,4 +1,4 @@
-# ijob -A berglandlab -c20 -p standard --mem=40G
+# ijob -A berglandlab -c10 -p standard --mem=40G
 ### module load gcc/7.1.0  openmpi/3.1.4 R/4.1.1; R
 
 
@@ -32,7 +32,10 @@ print(eigenvalues)
 print(head(eigenvectors))
 
 pca_data <- data.frame(PC1 = pca_result$eigenvectors[, 1], 
-                       PC2 = pca_result$eigenvectors[, 2])
+                       PC2 = pca_result$eigenvectors[, 2], 
+                       PC3 = pca_result$eigenvectors[, 3], 
+                       PC4 = pca_result$eigenvectors[, 4], 
+                       PC5 = pca_result$eigenvectors[, 5])
 
 # Plot PCA (PC1 vs PC2)
 
