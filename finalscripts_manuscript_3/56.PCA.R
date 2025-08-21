@@ -32,9 +32,7 @@ print(eigenvalues)
 print(head(eigenvectors))
 
 pca_data <- data.frame(PC1 = pca_result$eigenvectors[, 1], 
-                       PC2 = pca_result$eigenvectors[, 2],
-                       PC2 = pca_result$eigenvectors[, 3],
-                       PC2 = pca_result$eigenvectors[, 4])
+                       PC2 = pca_result$eigenvectors[, 2])
 
 # Plot PCA (PC1 vs PC2)
 
