@@ -14,7 +14,6 @@ library(ggplot2)
  # registerDoMC(20)
 
 
-
 genofile.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_masked_usobtusa.gds"
 gds <- seqOpen(genofile.fn)
 
@@ -31,12 +30,16 @@ print(eigenvalues)
 # Print the eigenvectors (coordinates for each individual)
 print(head(eigenvectors))
 
-pca_data <- data.frame(PC1 = pca_result$eigenvect[, 1], 
-                       PC2 = pca_result$eigenvect[, 2], 
-                       PC3 = pca_result$eigenvect[, 3], 
-                       PC4 = pca_result$eigenvect[, 4], 
-                       PC5 = pca_result$eigenvect[, 5])
+pca_data <- data.frame(
+  sample.id = pca_result$sample.id,  
+  PC1 = pca_result$eigenvect[, 1],
+  PC2 = pca_result$eigenvect[, 2],
+  PC3 = pca_result$eigenvect[, 3],
+  PC4 = pca_result$eigenvect[, 4],
+  PC5 = pca_result$eigenvect[, 5]
+)
 
-# Plot PCA (PC1 vs PC2)
 
-write.csv(pca_data,"/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca.csv")
+write.csv(pca_data,
+          "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca.csv",
+          row.names = FALSE, quote = FALSE)
