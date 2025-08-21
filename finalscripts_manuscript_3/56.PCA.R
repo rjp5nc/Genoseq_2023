@@ -1,6 +1,4 @@
 # ijob -A berglandlab -c10 -p standard --mem=40G
-### module load gcc/7.1.0  openmpi/3.1.4 R/4.1.1; R
-
 
 #module load gcc/11.4.0 openmpi/4.1.4  R/4.3.1;R
 ### libraries
@@ -18,6 +16,8 @@ genofile.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed
 gds <- seqOpen(genofile.fn)
 
 metadata <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/2022_2024seqmetadata20250811.csv", header = TRUE)
+samplestats <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/eudobtusa_samplestats.csv")
+
 
 unique(metadata$accuratelocation)
 
@@ -56,17 +56,56 @@ write.csv(pca_data,
 
 
 pca_merged <- merge(pca_data, metadata, by.x = "sample.id", by.y = "Well", all.x = TRUE)
+pca_merged2 <- left_join(pca_merged, samplestats, by.x = "sample.id", by.y = "sampleId")
 
 
-p <- ggplot(pca_merged, aes(x = PC1, y = PC2, label = sample.id, col=accuratelocation)) +
+
+p <- ggplot(pca_merged2, aes(x = PC1, y = PC2, label = sample.id, col=accuratelocation)) +
   geom_point() +
   theme_bw() +
   labs(
     title = "PCA of USobtusa Samples",
-    x = paste0("PC1"),
-    y = paste0("PC2")
+    x = paste0("PC1 14.2%"),
+    y = paste0("PC2 8.1%")
   )
 
 # Save as PNG
 ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca_plot.png",
+       plot = p, width = 7, height = 6, dpi = 300)
+
+
+
+
+
+p <- ggplot(pca_merged2, aes(x = PC1, y = PC2, label = sample.id, col=missingRate)) +
+  geom_point() +
+  theme_bw() +
+  labs(
+    title = "PCA of USobtusa Samples",
+    x = paste0("PC1 14.2%"),
+    y = paste0("PC2 8.1%")
+  )
+
+# Save as PNG
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca_plot_missingrate.png",
+       plot = p, width = 7, height = 6, dpi = 300)
+
+
+
+
+
+
+
+
+p <- ggplot(pca_merged2, aes(x = PC1, y = PC2, label = sample.id, col=meanDepth)) +
+  geom_point() +
+  theme_bw() +
+  labs(
+    title = "PCA of USobtusa Samples",
+    x = paste0("PC1 14.2%"),
+    y = paste0("PC2 8.1%")
+  )
+
+# Save as PNG
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca_plot_depth.png",
        plot = p, width = 7, height = 6, dpi = 300)
