@@ -26,8 +26,7 @@ include_locations <- c("P66", "P63", "P58","P62", "Gilmer")  # replace with your
 # Keep only samples NOT in these locations
 samples_to_keep <- metadata$Well[metadata$accuratelocation %in% include_locations]
 
-gds_filtered <- seqSelectSamples(gds, sample.id = samples_to_keep)
-
+seqSetFilter(gds, sample.id = samples_to_keep)
 
 pca_result <- snpgdsPCA(gds, num.thread=10, autosome.only=FALSE)
 
