@@ -28,7 +28,7 @@ samples_to_keep <- metadata$Well[metadata$accuratelocation %in% include_location
 
 seqSetFilter(gds, sample.id = samples_to_keep)
 
-pca_result <- snpgdsPCA(gds, num.thread=10, autosome.only=FALSE)
+pca_result <- snpgdsPCA(gds, sample.id = samples_to_keep, num.thread=10, autosome.only=FALSE)
 
 # Extract the PCA results
 eigenvalues <- pca_result$eigenvect
