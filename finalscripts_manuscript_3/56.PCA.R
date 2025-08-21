@@ -22,8 +22,8 @@ gds <- seqOpen(genofile.fn)
 pca_result <- snpgdsPCA(gds, num.thread=10, autosome.only=FALSE)
 
 # Extract the PCA results
-eigenvalues <- pca_result$eigenvalues
-eigenvectors <- pca_result$eigenvectors
+eigenvalues <- pca_result$eigenvect
+eigenvectors <- pca_result$eigenvect
 
 # Print the eigenvalues (variance explained by each principal component)
 print(eigenvalues)
@@ -31,11 +31,11 @@ print(eigenvalues)
 # Print the eigenvectors (coordinates for each individual)
 print(head(eigenvectors))
 
-pca_data <- data.frame(PC1 = pca_result$eigenvectors[, 1], 
-                       PC2 = pca_result$eigenvectors[, 2], 
-                       PC3 = pca_result$eigenvectors[, 3], 
-                       PC4 = pca_result$eigenvectors[, 4], 
-                       PC5 = pca_result$eigenvectors[, 5])
+pca_data <- data.frame(PC1 = pca_result$eigenvect[, 1], 
+                       PC2 = pca_result$eigenvect[, 2], 
+                       PC3 = pca_result$eigenvect[, 3], 
+                       PC4 = pca_result$eigenvect[, 4], 
+                       PC5 = pca_result$eigenvect[, 5])
 
 # Plot PCA (PC1 vs PC2)
 
