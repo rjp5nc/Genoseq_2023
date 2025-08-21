@@ -17,6 +17,7 @@ library(ggplot2)
 genofile.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_masked_usobtusa.gds"
 gds <- seqOpen(genofile.fn)
 
+metadata <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/2022_2024seqmetadata20250811.csv", header = TRUE)
 
 pca_result <- snpgdsPCA(gds, num.thread=10, autosome.only=FALSE)
 
@@ -45,9 +46,12 @@ write.csv(pca_data,
           row.names = FALSE, quote = FALSE)
 
 
-p <- ggplot(pca_data, aes(x = PC1, y = PC2, label = sample.id)) +
-  geom_point(color = "steelblue", size = 2, alpha = 0.7) +
-  theme_minimal(base_size = 14) +
+pca_merged <- merge(pca_data, metadata, by.x = "sample.id", by.y = "Well", all.x = TRUE)
+
+
+p <- ggplot(pca_merged, aes(x = PC1, y = PC2, label = sample.id, col=accuratelocation)) +
+  geom_point() +
+  theme_bw() +
   labs(
     title = "PCA of USobtusa Samples",
     x = paste0("PC1"),
