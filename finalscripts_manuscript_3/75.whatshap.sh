@@ -39,6 +39,7 @@ if [ -f "$BAM" ]; then
     whatshap phase \
       --reference $REF \
       --output $OUT \
+      --sample $SAMPLE \
       $VCF \
       $BAM
     echo "Done phasing $SAMPLE -> $OUT"
