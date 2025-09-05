@@ -107,7 +107,7 @@ pop_factor <- factor(metadata_sub$accuratelocation)
 
 seqResetFilter(genofile)
 
-seqSetFilter(genofile, sample.id = metadata_sub$Well)
+seqSetFilter(genofile, sample.id = metadata_sub$Well, variant.id = valid_variants)
 
 write.csv(metadata_sub, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/metadata_sub.csv")  # Save as CSV
 
@@ -213,7 +213,7 @@ unique(metadata_sub$accuratelocation)
 
 seqResetFilter(genofile)
 
-seqSetFilter(genofile, sample.id = metadata_sub$Well)
+seqSetFilter(genofile, sample.id = metadata_sub$Well, variant.id = valid_variants)
 
 # unique dates in your metadata
 date_levels <- unique(metadata_sub$date)
@@ -494,9 +494,6 @@ write.csv(fst_long_indiv,
 fst_long_indiv <- fst_long_indiv %>%
   mutate(indiv1 = factor(indiv1, levels = unique(indiv1)),
          indiv2 = factor(indiv2, levels = unique(indiv2)))
-
-
-
 
 hist_plot <- ggplot(fst_long_indiv, aes(x = Fst)) +
   geom_histogram(bins = 30, fill = "steelblue", color = "white", alpha = 0.8) +
