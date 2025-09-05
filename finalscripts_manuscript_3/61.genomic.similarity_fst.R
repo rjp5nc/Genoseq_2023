@@ -13,17 +13,27 @@ library(tibble)
 library(data.table)
 library(igraph)
 
+library(patchwork)
+library(foreach)
+library(lubridate)
+
 # ---- Step 1: Open GDS file ----
 
 metadata <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv", header = TRUE)
 metadata_with_clone <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/metadata_with_clone.csv", header = TRUE)
 samples <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species_merged_20250627.csv")
 usobtusasamps <- subset(samples, Species == "Daphnia obtusa" & Continent == "NorthAmerica")
-metadata_with_clone <- subset(metadata_with_clone, clone !="Blank" & clone !="BLANK")
 mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")
 
+metadata_with_clone <- subset(metadata_with_clone, clone !="Blank")
+metadata_with_clone <- subset(metadata_with_clone, clone !="BLANK")
 
 head(metadata)
+metadata$clone <- trimws(metadata$clone)
+metadata <- metadata %>% 
+  filter(!tolower(clone) %in% c("blank", "blanks", "na", "missing"))
+
+
 #seqClose(genofile)  
 genofile.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_masked_usobtusa.gds"
 genofile <- seqOpen(genofile.fn)
@@ -38,6 +48,8 @@ samples_to_keep <- usobtusasamps %>% filter(Species == "Daphnia obtusa") %>% pul
 #samples_to_keep <- metadata_with_clone$Well
 
 unique(metadata_with_clone$accuratelocation)
+
+seqSetFilter(genofile, sample.id = samples_to_keep)
 
 # ---- Step 2: Filter variants with missing rate < 0.05 ----
 miss_rate_per_sample <- seqMissing(genofile, per.variant = FALSE)
@@ -100,6 +112,7 @@ unique(long_filt$Group)
 metadata_sub <- metadata %>%
   filter(Well %in% final_valid_samples)
 metadata_sub <- metadata_sub[metadata_sub$accuratelocation != "PBO66", ]
+metadata_sub <- metadata_sub[metadata_sub$accuratelocation != "", ]
 
 unique(metadata_sub$accuratelocation)
 
@@ -206,6 +219,7 @@ library(dplyr)
 metadata_sub <- metadata %>%
   filter(Well %in% final_valid_samples)
 metadata_sub <- metadata_sub[metadata_sub$accuratelocation != "PBO66", ]
+metadata_sub <- metadata_sub[metadata_sub$accuratelocation != "", ]
 
 #metadata_sub <- subset(metadata_sub, accuratelocation == "P62"| accuratelocation == "P66" )
 
