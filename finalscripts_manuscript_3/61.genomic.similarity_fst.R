@@ -188,8 +188,8 @@ fst_melted <- melt(pairwise_results, varnames = c("PopulationA", "PopulationB"),
 popheatmapplot <- ggplot(fst_melted, aes(x = PopulationA, y = PopulationB, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = ifelse(is.na(Fst), "", sprintf("%.3f", Fst))), size = 3) +
-  scale_fill_gradient(low = "white", high = "red", na.value = "grey90") +
-  theme_bw() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
+                       name = "Fst") +  theme_bw() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     axis.text.y = element_text(size = 10),
@@ -307,8 +307,8 @@ write.csv(fst_long_date,
 bydateplot <- ggplot(fst_long_date, aes(x = pop1, y = pop2, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = sprintf("%.3f", Fst)), size = 3) +
-  scale_fill_gradient(low = "white", high = "red", na.value = "grey90") +
-  theme_bw() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
+                       name = "Fst") +  theme_bw() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     axis.text.y = element_text(size = 10),
@@ -388,7 +388,7 @@ fst_long <- fst_long %>%
     date1 = as.character(date1),
     date2 = as.character(date2)
   ) %>%
-  filter(!is.na(Fst), date1 < date2)
+  filter(!is.na(Fst), date1 != date2)
 
 # write to CSV
 
@@ -401,8 +401,8 @@ fst_long <- fst_long %>%
 bypondplot <- ggplot(fst_long, aes(x = date1, y = date2, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = sprintf("%.3f", Fst)), size = 3) +
-  scale_fill_gradient(low = "white", high = "red", na.value = "grey90") +
-  theme_bw(base_size = 14) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
+                       name = "Fst") +  theme_bw(base_size = 14) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     axis.text.y = element_text(size = 10),
@@ -431,6 +431,7 @@ ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap_bypo
 fst_indiv <- list()
 
 # loop over ponds
+# loop over ponds
 for (pond in unique(metadata_sub$accuratelocation)) {
   meta_p <- metadata_sub %>% filter(accuratelocation == pond)
   
@@ -450,6 +451,11 @@ for (pond in unique(metadata_sub$accuratelocation)) {
     # loop over individual pairs
     for (i in 1:(length(indivs) - 1)) {
       for (j in (i + 1):length(indivs)) {
+        
+        # ---- print progress ----
+        message("Processing: Pond=", pond,
+                " | Date=", d,
+                " | ", indivs[i], " vs ", indivs[j])
         
         idx <- meta_pd$Well %in% c(indivs[i], indivs[j])
         sub_samples <- meta_pd$Well[idx]
@@ -477,6 +483,7 @@ for (pond in unique(metadata_sub$accuratelocation)) {
     fst_indiv[[paste(pond, d, sep = "_")]] <- pairwise_results
   }
 }
+
 
 
 

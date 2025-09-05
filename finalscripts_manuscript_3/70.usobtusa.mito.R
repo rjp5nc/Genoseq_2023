@@ -603,7 +603,7 @@ fst_melted <- melt(pairwise_results, varnames = c("PopulationA", "PopulationB"),
 popheatmapplot <- ggplot(fst_melted, aes(x = PopulationA, y = PopulationB, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = ifelse(is.na(Fst), "", sprintf("%.3f", Fst))), size = 3) +
-  scale_fill_gradient(low = "white", high = "red", na.value = "grey90") +
+  scale_fill_gradient(low = "white", high = "red", na.value = "grey90", limits = c(-1, 1)) +
   theme_bw() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
@@ -721,7 +721,7 @@ write.csv(fst_long_date,
 bydateplot <- ggplot(fst_long_date, aes(x = pop1, y = pop2, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = sprintf("%.3f", Fst)), size = 3) +
-  scale_fill_gradient(low = "white", high = "red", na.value = "grey90") +
+  scale_fill_gradient(low = "white", high = "red", na.value = "grey90", limits = c(-1, 1)) +
   theme_bw() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
@@ -822,7 +822,7 @@ fst_long <- fst_long %>%
 bypondplot <- ggplot(fst_long, aes(x = date1, y = date2, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = sprintf("%.3f", Fst)), size = 3) +
-  scale_fill_gradient(low = "white", high = "red", na.value = "grey90") +
+  scale_fill_gradient(low = "white", high = "red", na.value = "grey90", limits = c(-1, 1)) +
   theme_bw(base_size = 14) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
@@ -935,7 +935,7 @@ fst_long_indiv <- fst_long_indiv %>%
 
 bypondanddateplot <- ggplot(fst_long_indiv, aes(x = indiv1, y = indiv2, fill = Fst)) +
   geom_tile(color = "white") +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0,
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
                        name = "Fst") +
   facet_wrap(~ pond + date, scales = "free", ncol = 3) +
   theme_bw() +
@@ -968,7 +968,7 @@ fst_long_indiv <- fst_long_indiv %>%
 
 bypondanddateplot <- ggplot(fst_long_indiv, aes(x = indiv1, y = indiv2, fill = Fst)) +
   geom_tile(color = "white") +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0,
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
                        name = "Fst") +
   facet_wrap(~ pond + date, scales = "free", ncol = 4,drop=TRUE) +
   theme_bw() +
@@ -1002,7 +1002,7 @@ fst_long_indiv <- fst_long_indiv %>%
 # Plot
 bypondanddateplot <- ggplot(fst_long_indiv, aes(x = indiv1, y = indiv2, fill = Fst)) +
   geom_tile(color = "white") +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0,
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
                        name = "Fst") +
   facet_wrap(~ pond_date, scales = "free", ncol = length(unique(fst_long_indiv$pond))) + 
   theme_bw() +
@@ -1054,7 +1054,7 @@ fst_long_indiv <- fst_long_indiv %>%
 
   bypondanddateplot <- ggplot(fst_long_indiv, aes(x = indiv1, y = indiv2, fill = Fst)) +
   geom_tile(color = "white") +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0,
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
                        name = "Fst") +
   facet_grid(pond_type ~ date, scales = "free", space = "free", drop = TRUE) +
   theme_bw() +
