@@ -24,7 +24,7 @@ mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
 
 head(metadata)
-seqClose(genofile)  
+#seqClose(genofile)  
 genofile.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_masked_usobtusa.gds"
 genofile <- seqOpen(genofile.fn)
 
