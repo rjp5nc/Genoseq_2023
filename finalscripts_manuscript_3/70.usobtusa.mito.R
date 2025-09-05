@@ -603,8 +603,8 @@ fst_melted <- melt(pairwise_results, varnames = c("PopulationA", "PopulationB"),
 popheatmapplot <- ggplot(fst_melted, aes(x = PopulationA, y = PopulationB, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = ifelse(is.na(Fst), "", sprintf("%.3f", Fst))), size = 3) +
-  scale_fill_gradient(low = "white", high = "red", na.value = "grey90", limits = c(-1, 1)) +
-  theme_bw() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
+                       name = "Fst") +  theme_bw() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     axis.text.y = element_text(size = 10),
@@ -710,7 +710,7 @@ fst_long_date <- fst_long_date %>%
 
 # remove diagonal and duplicates
 fst_long_date <- fst_long_date %>%
-  filter(!is.na(Fst), pop1 < pop2)
+  filter(!is.na(Fst))
 
 # write to CSV
 write.csv(fst_long_date,
@@ -721,8 +721,8 @@ write.csv(fst_long_date,
 bydateplot <- ggplot(fst_long_date, aes(x = pop1, y = pop2, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = sprintf("%.3f", Fst)), size = 3) +
-  scale_fill_gradient(low = "white", high = "red", na.value = "grey90", limits = c(-1, 1)) +
-  theme_bw() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
+                       name = "Fst") +  theme_bw() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     axis.text.y = element_text(size = 10),
@@ -760,6 +760,11 @@ for (pond in ponds) {
   for (i in 1:(length(date_levels) - 1)) {
     for (j in (i + 1):length(date_levels)) {
       
+                # ---- print progress ----
+        message("Processing: Pond=", pond,
+                " | Date=", d)
+
+
       idx <- meta_p$date %in% c(date_levels[i], date_levels[j])
       sub_samples <- meta_p$Well[idx]
       sub_pop <- factor(meta_p$date[idx])  # population defined by date
@@ -809,7 +814,7 @@ fst_long <- fst_long %>%
     date1 = as.character(date1),
     date2 = as.character(date2)
   ) %>%
-  filter(!is.na(Fst), date1 < date2)
+  filter(!is.na(Fst))
 
 # write to CSV
 
@@ -822,8 +827,8 @@ fst_long <- fst_long %>%
 bypondplot <- ggplot(fst_long, aes(x = date1, y = date2, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = sprintf("%.3f", Fst)), size = 3) +
-  scale_fill_gradient(low = "white", high = "red", na.value = "grey90", limits = c(-1, 1)) +
-  theme_bw(base_size = 14) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
+                       name = "Fst") +  theme_bw(base_size = 14) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     axis.text.y = element_text(size = 10),
@@ -922,7 +927,7 @@ fst_long_indiv <- do.call(rbind, lapply(names(fst_indiv), function(group) {
 }))
 
 fst_long_indiv <- fst_long_indiv %>%
-  filter(!is.na(Fst), indiv1 != indiv2)
+  filter(!is.na(Fst))
 
 write.csv(fst_long_indiv,
           "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_by_individual_mito.csv",

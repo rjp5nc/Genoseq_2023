@@ -138,6 +138,9 @@ pairwise_results <- matrix(NA, nrow=length(pop_levels), ncol=length(pop_levels),
 for(i in 1:(length(pop_levels)-1)){
   for(j in (i+1):length(pop_levels)){
     # logical index for samples in populations i and j
+
+      message("Processing: Pop=", pop_levels)
+
     idx <- metadata_sub$accuratelocation %in% c(pop_levels[i], pop_levels[j])
     
     sub_samples <- metadata_sub$Well[idx]
@@ -296,7 +299,7 @@ fst_long_date <- fst_long_date %>%
 
 # remove diagonal and duplicates
 fst_long_date <- fst_long_date %>%
-  filter(!is.na(Fst), pop1 < pop2)
+  filter(!is.na(Fst))
 
 # write to CSV
 write.csv(fst_long_date,
@@ -345,6 +348,9 @@ for (pond in ponds) {
   
   for (i in 1:(length(date_levels) - 1)) {
     for (j in (i + 1):length(date_levels)) {
+
+      message("Processing: Pond=", pond,
+                " | Date=", date_levels)
       
       idx <- meta_p$date %in% c(date_levels[i], date_levels[j])
       sub_samples <- meta_p$Well[idx]
@@ -388,7 +394,7 @@ fst_long <- fst_long %>%
     date1 = as.character(date1),
     date2 = as.character(date2)
   ) %>%
-  filter(!is.na(Fst), date1 != date2)
+  filter(!is.na(Fst))
 
 # write to CSV
 
@@ -505,7 +511,7 @@ fst_long_indiv <- do.call(rbind, lapply(names(fst_indiv), function(group) {
 }))
 
 fst_long_indiv <- fst_long_indiv %>%
-  filter(!is.na(Fst), indiv1 != indiv2)
+  filter(!is.na(Fst))
 
 write.csv(fst_long_indiv,
           "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_by_individual_genomic.csv",
