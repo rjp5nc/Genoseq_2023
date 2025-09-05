@@ -65,6 +65,8 @@ write.csv(dist_matrix, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv
 
 dist_matrix2 <- 1- dist_matrix
 
+
+
 long_mat <- melt(dist_matrix2, varnames = c("CloneA", "CloneB"), value.name = "Similarity") %>%
   mutate(CloneA = as.character(CloneA),
          CloneB = as.character(CloneB))  # ensure they are character, not factor
@@ -73,10 +75,17 @@ long_mat <- melt(dist_matrix2, varnames = c("CloneA", "CloneB"), value.name = "S
 long_filt <- long_mat %>%
   filter(Similarity >= 0.95, Similarity != 1)
 
+g <- graph_from_data_frame(long_filt[, c("CloneA", "CloneB")], directed = FALSE)
+
+# 4. Find connected components
+comp <- components(g)
+
+# 5. Assign group letters
+group_letters <- setNames(LETTERS[comp$membership], names(comp$membership))
+
 # 6. Add group column (both clones exist in the graph)
 long_filt <- long_filt %>%
   mutate(Group = group_letters[CloneA])
-
 
 head(long_filt)
 unique(long_filt$Group)
