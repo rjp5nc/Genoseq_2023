@@ -13,4 +13,4 @@
 
 module load gcc/11.4.0 openmpi/4.1.4 R/4.3.1;R
 
-Rscript --vanilla /home/rjp5nc/Genoseq_2023/finalscripts_manuscript_3/61.genomic.similarity_fst.R
+Rscript --vanilla /home/rjp5nc/Genoseq_2023/finalscripts_manuscript_3/61.genomic.similarity_fst_copy.R
