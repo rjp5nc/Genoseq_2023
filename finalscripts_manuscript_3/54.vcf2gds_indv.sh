@@ -16,4 +16,6 @@
 module load gcc openmpi R/4.3.1
 
 Rscript --vanilla /home/rjp5nc/Genoseq_2023/finalscripts_manuscript_3/54.vcf2gds_indv.R \
-/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.vcf.gz
+/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_vcfs/usdobtusa_mito_genotyped.vcf.gz
+
+#/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.vcf.gz
