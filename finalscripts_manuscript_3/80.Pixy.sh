@@ -1,5 +1,17 @@
+#!/usr/bin/env bash
+#
+#SBATCH -J pixy # A single job name for the array
+#SBATCH --ntasks-per-node=10 # one core
+#SBATCH -N 1 # on one node
+#SBATCH -t 0-72:00  ### 48 hours
+#SBATCH --mem 60G
+#SBATCH -o /scratch/rjp5nc/err/pixy.%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
+#SBATCH -p standard
+#SBATCH --account berglandlab
 
-ijob -A berglandlab -c10 -p standard --mem=40G
+
+#ijob -A berglandlab -c10 -p standard --mem=40G
 
 #conda create -n pixy -c conda-forge -c bioconda pixy -y
 # activate the environment
