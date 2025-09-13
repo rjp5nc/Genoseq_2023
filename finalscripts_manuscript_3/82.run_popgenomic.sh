@@ -15,6 +15,6 @@
 
 module load gcc openmpi R/4.3.1
 
-Rscript --vanilla /home/rjp5nc/Genoseq_2023/finalscripts_manuscript_3/81.popgenom_genomic.R
+Rscript --vanilla /home/rjp5nc/Genoseq_2023/finalscripts_manuscript_3/81.popgenome_genomic.R
 
 #/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.vcf.gz
