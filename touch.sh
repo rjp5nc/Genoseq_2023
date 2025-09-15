@@ -12,3 +12,4 @@
 
 cd /scratch/rjp5nc/repeatmasker
 find . -type f -exec touch {} +
+find . -type d -exec touch {} +
