@@ -19,7 +19,7 @@
 module load gatk/4.6.0.0
 
 # Parameters
-JAVAMEM=40G
+JAVAMEM=80G
 CPU=10
 
 
