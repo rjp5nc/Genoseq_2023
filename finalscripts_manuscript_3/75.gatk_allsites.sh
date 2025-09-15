@@ -19,7 +19,7 @@
 module load gatk/4.6.0.0
 
 # Parameters
-JAVAMEM=80G
+JAVAMEM=40G
 CPU=10
 
 
@@ -39,6 +39,8 @@ species="DBI_usobtusa"
 
 # Move to working directory
 cd $WORKING_FOLDER
+
+SLURM_ARRAY_TASK_ID=3
 
 # Chromosome
 i=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )
@@ -68,13 +70,12 @@ GenomeDB_path=`echo /scratch/rjp5nc/UK2022_2024/daphnia_phylo/$species/Daphnia_D
 
 # Genotype call the samples in the DBI merged set
 gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
--R $REFERENCE \
--V gendb://$GenomeDB_path \
---tmp-dir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
--all-sites \
--O $WORKING_FOLDER/${i}.${start}.${stop}.vcf.gz \
-#--genomicsdb-use-vcf-codec \
--L ${i}:${start}-${stop}
+  -R $REFERENCE \
+  -V gendb://$GenomeDB_path \
+  -L ${i}:${start}-${stop} \
+  --tmp-dir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
+  -all-sites \
+  -O $WORKING_FOLDER/${i}.${start}.${stop}.vcf.gz
 
 # Remove temp folder
 rm -rf $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
