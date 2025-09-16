@@ -36,13 +36,13 @@ awk -F',' 'NR>1 {print $1 "\t" $6}' /project/berglandlab/Robert/UKSequencing2022
 
 awk 'NF==2' pops.txt > pops_filtered.txt
 
-CONDA_PREFIX/bin/bcftools query -l  trimmed10bp_allsites_usobtusa.vcf.gz > vcf_samples.txt
+$CONDA_PREFIX/bin/bcftools query -l  trimmed10bp_allsites_usobtusa.vcf.gz > vcf_samples.txt
 
 grep -Ff vcf_samples.txt pops_filtered.txt > pops_both.txt
 
 awk '$2 != "PBO66"' pops_both.txt > pops_both2.txt
 
-grep -Ff <(CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_usobtusa.vcf.gz) pops_both2.txt > pops_fixed.txt
+grep -Ff <($CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_usobtusa.vcf.gz) pops_both2.txt > pops_fixed.txt
 
 
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa.vcf.gz"
@@ -69,11 +69,11 @@ grep -F -x -f vcf_samples.txt pops_samples.txt > pops_samples_filtered.txt
 
 tabix -p vcf trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz
 
-CONDA_PREFIX/bin/bcftools index -t trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz
-CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz > filtered_samples.txt
+$CONDA_PREFIX/bin/bcftools index -t trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz
+$CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz > filtered_samples.txt
 grep -Ff filtered_samples.txt pops_fixed.txt > pops_filtered_for_pixy.txt
 
-CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz > vcf_samples2.txt
+$CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz > vcf_samples2.txt
 awk -F'\t' 'NR==FNR {vcf[$1]; next} $1 in vcf' vcf_samples2.txt pops_filtered_for_pixy.txt > pops_pixy_ready.txt
 
 
