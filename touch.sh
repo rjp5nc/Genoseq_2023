@@ -10,6 +10,6 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-cd /scratch/rjp5nc/repeatmasker
+cd /scratch/rjp5nc
 find . -type f -exec touch {} +
 find . -type d -exec touch {} +

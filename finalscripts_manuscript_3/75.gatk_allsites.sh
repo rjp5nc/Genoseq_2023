@@ -3,13 +3,13 @@
 #SBATCH -J genotypegvcf # A single job name for the array
 #SBATCH --ntasks-per-node=10 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 7:00:00 # 8 hours
+#SBATCH -t 20:00:00 # 8 hours
 #SBATCH --mem 80G
 #SBATCH -o /scratch/rjp5nc/err/genotypegvcf.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/genotypegvcf.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-112%50
+#SBATCH --array=112-368%100
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
@@ -23,7 +23,9 @@ JAVAMEM=80G
 CPU=10
 
 
-#NEED TO DO USPULEX/AMBIGUA
+
+# cat /scratch/rjp5nc/err/genotypegvcf.3421240_105.err
+
 
 # Working folder is core folder where this pipeline is being run.
 WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf/
@@ -79,4 +81,3 @@ gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
 rm -rf $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
 
 echo ${i} "done" $(date)
-
