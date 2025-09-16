@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/FilterVCFs.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-109%50
+#SBATCH --array=1-370%100
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
