@@ -27,6 +27,9 @@ conda activate pixy
 module load bcftools
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv
 
+file trimmed10bp_allsites_usobtusa.vcf.gz
+
+
 awk -F',' 'NR>1 {print $1 "\t" $6}' /project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv > pops.txt
 
 awk 'NF==2' pops.txt > pops_filtered.txt
@@ -57,24 +60,32 @@ cut -f1 pops_fixed.txt > pops_samples.txt
 # Keep only matching samples
 grep -F -x -f vcf_samples.txt pops_samples.txt > pops_samples_filtered.txt
 
+
+#bgzip -@ 16 -c trimmed10bp_allsites_usobtusa.vcf.gz > trimmed10bp_allsites_usobtusa.bgz
+
+# rename to standard convention
+mv trimmed10bp_allsites_usobtusa.bgz trimmed10bp_allsites_usobtusa_bgz.vcf.gz
+# index for random access
+tabix -p vcf trimmed10bp_allsites_usobtusa_bgz.vcf.gz
+
 bcftools view -S pops_samples_filtered.txt -Oz \
     --threads 16 \
-    -o trimmed10bp_allsites_usobtusa.filtered.vcf.gz \
-    trimmed10bp_allsites_usobtusa.vcf.gz
+    -o trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz \
+    trimmed10bp_allsites_usobtusa_bgz.vcf.gz
 
 tabix -p vcf trimmed10bp_allsites_usobtusa.filtered.vcf.gz
 
-bcftools index -t trimmed10bp_allsites_usobtusa.filtered.vcf.gz
-bcftools query -l trimmed10bp_allsites_usobtusa.filtered.vcf.gz > filtered_samples.txt
+bcftools index -t trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz
+bcftools query -l trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz > filtered_samples.txt
 grep -Ff filtered_samples.txt pops_fixed.txt > pops_filtered_for_pixy.txt
 
-bcftools query -l trimmed10bp_allsites_usobtusa.filtered.vcf.gz > vcf_samples2.txt
+bcftools query -l trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz > vcf_samples2.txt
 awk -F'\t' 'NR==FNR {vcf[$1]; next} $1 in vcf' vcf_samples2.txt pops_filtered_for_pixy.txt > pops_pixy_ready.txt
 
 
 
 pixy --stats pi fst dxy \
---vcf trimmed10bp_allsites_usobtusa.filtered.vcf.gz \
+--vcf trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz \
 --populations pops_pixy_ready.txt \
 --window_size 10000 \
 --n_cores 16 \
