@@ -18,6 +18,7 @@
 conda init bash
 source ~/.bashrc  # or restart your shell
 conda activate pixy
+export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
 
 #conda install --yes -c conda-forge pixy
 #conda install -c conda-forge pixy=2.0.0.beta11
@@ -26,7 +27,6 @@ conda activate pixy
 #conda install -c bioconda vcftools
 #conda install -c bioconda bcftools
 
-module load bcftools
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv
 
 file trimmed10bp_allsites_usobtusa.vcf.gz
