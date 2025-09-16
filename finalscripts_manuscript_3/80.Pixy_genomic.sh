@@ -16,6 +16,7 @@
 #conda create -n pixy -c conda-forge -c bioconda pixy -y
 # activate the environment
 conda init bash
+source ~/.bashrc  # or restart your shell
 conda activate pixy
 
 #conda install --yes -c conda-forge pixy
@@ -23,7 +24,7 @@ conda activate pixy
 
 #conda install -c bioconda htslib
 #conda install -c bioconda vcftools
-
+#conda install -c bioconda bcftools
 
 module load bcftools
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv
