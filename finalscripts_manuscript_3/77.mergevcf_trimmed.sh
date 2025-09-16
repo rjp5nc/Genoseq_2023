@@ -22,9 +22,9 @@ module load gatk/4.6.0.0
 
 #euobtusa_vcf  eupulex_vcf  eupulex_vcf_old  usambigua_vcf  usobtusa_vcf  uspulex_vcf
 #        
-species=uspulex_vcf
+species=usobtusa
 
-WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/10bp_vcf/$species/${species}_snps
+WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf_10bp/usobtusa_vcf_snps/
 
 
 # Intervals to analyze
@@ -36,7 +36,7 @@ ls *vcf.gz > $WORKING_FOLDER/${species}interval_paramList.list
 intervals=$WORKING_FOLDER/${species}interval_paramList.list
 
 # Combined VCF name
-output="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed10bp_vcf/trimmed10bp_${species}.vcf.gz"
+output="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_${species}.vcf.gz"
 
 # Gatk parameters
 JAVAMEM=40G
