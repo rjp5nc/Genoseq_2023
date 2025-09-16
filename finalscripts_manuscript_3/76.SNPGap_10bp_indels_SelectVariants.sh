@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-72:00 # hours
 #SBATCH --mem 10G
-#SBATCH -o /scratch/rjp5nc/err/FilterVCFs.out # Standard output
-#SBATCH -e /scratch/rjp5nc/err/FilterVCFs.err # Standard error
+#SBATCH -o /scratch/rjp5nc/err/FilterVCFs_%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/err/FilterVCFs_%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 #SBATCH --array=1-370%100
@@ -29,11 +29,11 @@ species=usobtusa_vcf
 ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
 intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usobtusa.txt"
 
-wd=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf_10bp/$species
+wd=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf_10bp
 
-mkdir -p /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf_10bp/$species
+mkdir -p /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf_10bp
 
-WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf/$species
+WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf
 # Intervals to analyze
 
 # Parameters
