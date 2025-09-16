@@ -75,6 +75,5 @@ mkdir -p ${wd}/${species}_snps
 # Filter only SNPs
 gatk --java-options "-Xmx${JAVAMEM}" SelectVariants \
 -V ${wd}/${chrom}.${start}.${stop}_filtsnps10bpindels.vcf.gz \
---select-type-to-include SNP \
 -R $ref \
 -O ${wd}/${species}_snps/${chrom}.${start}.${stop}_filtsnps10bpindels_snps.vcf.gz
