@@ -58,6 +58,7 @@ cut -f1 pops_fixed.txt > pops_samples.txt
 grep -F -x -f vcf_samples.txt pops_samples.txt > pops_samples_filtered.txt
 
 bcftools view -S pops_samples_filtered.txt -Oz \
+    --threads 16 \
     -o trimmed10bp_allsites_usobtusa.filtered.vcf.gz \
     trimmed10bp_allsites_usobtusa.vcf.gz
 
