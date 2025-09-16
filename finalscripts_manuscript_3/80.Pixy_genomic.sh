@@ -15,6 +15,7 @@
 
 #conda create -n pixy -c conda-forge -c bioconda pixy -y
 # activate the environment
+conda init bash
 conda activate pixy
 
 #conda install --yes -c conda-forge pixy
@@ -60,10 +61,10 @@ cut -f1 pops_fixed.txt > pops_samples.txt
 # Keep only matching samples
 grep -F -x -f vcf_samples.txt pops_samples.txt > pops_samples_filtered.txt
 
-bcftools view -S pops_samples_filtered.txt -Oz \
-    --threads 16 \
-    -o trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz \
-    trimmed10bp_allsites_usobtusa.bgz.vcf.gz
+#bcftools view -S pops_samples_filtered.txt -Oz \
+#    --threads 16 \
+#    -o trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz \
+#    trimmed10bp_allsites_usobtusa.bgz.vcf.gz
 
 tabix -p vcf trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz
 
@@ -76,10 +77,12 @@ awk -F'\t' 'NR==FNR {vcf[$1]; next} $1 in vcf' vcf_samples2.txt pops_filtered_fo
 
 
 
+#overlapping vs non overlapping windows
+
 pixy --stats pi fst dxy \
 --vcf trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz \
 --populations pops_pixy_ready.txt \
---window_size 10000 \
+--window_size 100 \
 --n_cores 16 \
 --output_folder /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy2 \
 --output_prefix pixy
