@@ -62,26 +62,26 @@ grep -F -x -f vcf_samples.txt pops_samples.txt > pops_samples_filtered.txt
 
 bcftools view -S pops_samples_filtered.txt -Oz \
     --threads 16 \
-    -o trimmed10bp_allsites_usobtusa.filtered.vcf.gz \
-    trimmed10bp_allsites_usobtusa.vcf.gz
+    -o trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz \
+    trimmed10bp_allsites_usobtusa.bgz.vcf.gz
 
-tabix -p vcf trimmed10bp_allsites_usobtusa.filtered.vcf.gz
+tabix -p vcf trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz
 
-bcftools index -t trimmed10bp_allsites_usobtusa.filtered.vcf.gz
-bcftools query -l trimmed10bp_allsites_usobtusa.filtered.vcf.gz > filtered_samples.txt
+bcftools index -t trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz
+bcftools query -l trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz > filtered_samples.txt
 grep -Ff filtered_samples.txt pops_fixed.txt > pops_filtered_for_pixy.txt
 
-bcftools query -l trimmed10bp_allsites_usobtusa.filtered.vcf.gz > vcf_samples2.txt
+bcftools query -l trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz > vcf_samples2.txt
 awk -F'\t' 'NR==FNR {vcf[$1]; next} $1 in vcf' vcf_samples2.txt pops_filtered_for_pixy.txt > pops_pixy_ready.txt
 
 
 
 pixy --stats pi fst dxy \
---vcf trimmed10bp_allsites_usobtusa.filtered.vcf.gz \
+--vcf trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz \
 --populations pops_pixy_ready.txt \
 --window_size 10000 \
 --n_cores 16 \
---output_folder /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy \
+--output_folder /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy2 \
 --output_prefix pixy
 
 # --- Done ---
