@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J pixy # A single job name for the array
-#SBATCH --ntasks-per-node=10 # one core
+#SBATCH --ntasks-per-node=20 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 0-72:00  ### 48 hours
-#SBATCH --mem 60G
+#SBATCH -t 0-92:00  ### 48 hours
+#SBATCH --mem 80G
 #SBATCH -o /scratch/rjp5nc/err/pixy.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
@@ -76,7 +76,7 @@ pixy --stats pi fst dxy \
 --vcf trimmed10bp_allsites_usobtusa.filtered.vcf.gz \
 --populations pops_pixy_ready.txt \
 --window_size 10000 \
---n_cores 8 \
+--n_cores 16 \
 --output_folder /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy \
 --output_prefix pixy
 
