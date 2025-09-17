@@ -19,6 +19,8 @@ cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
 bcftools query -l  trimmed10bp_allsites_usobtusa.bgz.vcf.gz > vcf_samples_old.txt
 
+
+
 bcftools view -S passed_superclones.txt -Oz \
     --threads 16 \
     -o trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz \
