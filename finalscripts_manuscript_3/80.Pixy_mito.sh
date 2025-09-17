@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=10 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-72:00  ### 48 hours
-#SBATCH --mem 60G
+#SBATCH --mem 10G
 #SBATCH -o /scratch/rjp5nc/err/pixy.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
@@ -61,7 +61,7 @@ bcftools query -l /scratch/rjp5nc/UK2022_2024/mito_vcf/merged_vcfs/usdobtusa_mit
 # Keep only matching samples
 grep -F -x -f vcf_samples.txt pops_samples.txt > pops_samples_filtered.txt
 
-bcftools view -S pops_samples_filtered.txt -Oz -o usdobtusa_mito_genotyped_subset.vcf.gz /scratch/rjp5nc/UK2022_2024/mito_vcf/merged_vcfs/usdobtusa_mito_genotyped.vcf.gz
+bcftools view -S pops_samples_filtered.txt -Oz -o usdobtusa_mito_genotyped_subset.vcf.gz /scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.vcf.gz
 
 grep -F -w -f pops_samples_filtered.txt pops_fixed.txt > pops_fixed_filtered.txt
 
@@ -69,21 +69,44 @@ tabix -p vcf usdobtusa_mito_genotyped_subset.vcf.gz
 
 chmod u+rwx /scratch/rjp5nc/UK2022_2024/mito_vcf/results_pixy
 
+bcftools query -f '[%DP\t]\n' usdobtusa_mito_genotyped_subset.vcf.gz | \
+awk '
+{for(i=1;i<=NF;i++){sum[i]+=$i; count[i]++}}
+END{
+    for(i=1;i<=NF;i++){
+        mean=sum[i]/count[i];
+        print i, mean
+    }
+}' > sample_mean_depth.txt
+
+bcftools query -l usdobtusa_mito_genotyped_subset.vcf.gz > sample_names.txt
+paste sample_names.txt sample_mean_depth.txt > sample_depths_mapped.txt
+
+awk '$3<2 {print $1}' sample_depths_mapped.txt > low_coverage_samples.txt
+
+bcftools view -s ^$(paste -sd, low_coverage_samples.txt) \
+    -Oz -o usdobtusa_mito_filtered.vcf.gz \
+    usdobtusa_mito_genotyped_subset.vcf.gz
+
+bcftools index -t usdobtusa_mito_filtered.vcf.gz
+bcftools query -l usdobtusa_mito_filtered.vcf.gz > filtered_samples.txt
+grep -Ff filtered_samples.txt pops_fixed_filtered.txt > pops_filtered_for_pixy.txt
+
+bcftools query -l usdobtusa_mito_filtered.vcf.gz > vcf_samples.txt
+awk -F'\t' 'NR==FNR {vcf[$1]; next} $1 in vcf' vcf_samples.txt pops_fixed_filtered.txt > pops_pixy_ready.txt
+
+
 pixy --stats pi fst dxy \
---vcf usdobtusa_mito_genotyped_subset.vcf.gz \
---populations pops_fixed_filtered.txt \
+--vcf usdobtusa_mito_filtered.vcf.gz \
+--populations pops_pixy_ready.txt \
 --window_size 100 \
 --n_cores 4 \
---output_prefix /scratch/rjp5nc/UK2022_2024/mito_vcf/results_pixy/pixy
+--output_folder /scratch/rjp5nc/UK2022_2024/mito_vcf/results_pixy/ \
+--bypass_invariant_check \
+--output_prefix pixy
 
 # --- Done ---
 echo "✅ Pixy run finished. Outputs in ${OUTDIR}/"
-
-
-
-
-
-
 
 
 #awk '{print $1 > $2".txt"}' pops_fixed_filtered.txt

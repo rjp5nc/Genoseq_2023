@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J pixy # A single job name for the array
-#SBATCH --ntasks-per-node=20 # one core
+#SBATCH --ntasks-per-node=10 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-92:00  ### 48 hours
-#SBATCH --mem 80G
+#SBATCH --mem 10G
 #SBATCH -o /scratch/rjp5nc/err/pixy.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-347
+#SBATCH --array=1-347%50
 
 #ls $VCF_DIR/*_filtsnps10bpindels_snps.vcf.gz | wc -l
 
