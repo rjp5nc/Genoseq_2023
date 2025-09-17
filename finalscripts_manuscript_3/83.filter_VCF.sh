@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J popgenome # A single job name for the array
-#SBATCH --ntasks-per-node=10 # one core
+#SBATCH --ntasks-per-node=20 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-100:00  ### 48 hours
 #SBATCH --mem 100G
