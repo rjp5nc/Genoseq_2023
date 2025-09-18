@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J pixy # A single job name for the array
-#SBATCH --ntasks-per-node=10 # one core
+#SBATCH --ntasks-per-node=20 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-92:00  ### 48 hours
-#SBATCH --mem 10G
+#SBATCH --mem 50G
 #SBATCH -o /scratch/rjp5nc/err/pixy.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
@@ -28,7 +28,6 @@ export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
 #conda install -c bioconda bcftools
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv
-
 
 # Directory with chromosome VCFs
 VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz2.vcf.gz
