@@ -9,9 +9,9 @@
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-347%50
 
 #ls $VCF_DIR/*_filtsnps10bpindels_snps.vcf.gz | wc -l
+###SBATCH --array=1-347%50
 
 #conda create -n pixy -c conda-forge -c bioconda pixy -y
 # activate the environment
