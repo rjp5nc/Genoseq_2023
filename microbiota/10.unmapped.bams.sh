@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH -J DownloadMap    # Job name
+#SBATCH -J unmappedones    # Job name
 #SBATCH --ntasks=1        # Single task per job
 #SBATCH --cpus-per-task=10 # Number of CPU cores per task
 #SBATCH -N 1              # Run on one node
@@ -14,10 +14,13 @@
 module load bwa
 module load samtools
 
+#awk 'BEGIN{c=0} /^>/{c++; if(c>12) exit} {print}' /scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa > /scratch/rjp5nc/Reference_genomes/post_kraken/First_12_US_obtusa_onlydaps.fasta
+#bwa index /scratch/rjp5nc/Reference_genomes/post_kraken/First_12_US_obtusa_onlydaps.fasta
+
 # Paths
 OUT=/scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq
 mkdir -p "$OUT/bams" "$OUT/fastqs"
-REF=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
+REF=/scratch/rjp5nc/Reference_genomes/post_kraken/First_12_US_obtusa_onlydaps.fasta
 
 # Get the sample folder for this task
 SAMPLE_DIR=$(sed -n "${SLURM_ARRAY_TASK_ID}p" /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/epistylis.txt)
