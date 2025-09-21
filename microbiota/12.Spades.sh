@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 
 #conda create -n spades -c bioconda -c conda-forge spades
-source $(conda info --base)/etc/profile.d/conda.sh
+source ~/miniconda3/etc/profile.d/conda.sh
 conda activate spades && \
 spades.py --meta \
     --continue \
