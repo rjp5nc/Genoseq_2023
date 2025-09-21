@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=30 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-00:00 # 6 days
-#SBATCH --mem 300G
+#SBATCH --mem 700G
 #SBATCH -o /scratch/rjp5nc/err/Spades%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/Spades%A_%a.err # Standard error
 #SBATCH -p standard
@@ -24,10 +24,11 @@ conda activate spades && \
 #-t $(nproc) 
 
     spades.py \
-    --restart-from k33 -k 21,33 \
+    --restart-from k33 \
     -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
     -t 28\
-    -m 240 \
+    -m 650 \
+    --checkpoints last \
     --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp     
 
 
