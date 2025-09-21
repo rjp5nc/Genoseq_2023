@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=30 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-00:00 # 6 days
-#SBATCH --mem 150G
+#SBATCH --mem 300G
 #SBATCH -o /scratch/rjp5nc/err/Spades%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/Spades%A_%a.err # Standard error
 #SBATCH -p standard
