@@ -14,7 +14,7 @@
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate spades && \
 spades.py --meta \
-    --continue \
+    --restart-from last \
     -1 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged1.fq.gz \
     -2 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged2.fq.gz \
     -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
