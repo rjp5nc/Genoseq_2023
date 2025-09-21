@@ -13,10 +13,16 @@
 #conda create -n spades -c bioconda -c conda-forge spades
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate spades && \
-spades.py --meta \
+#spades.py --meta \
+#    -1 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged1.fq.gz \
+#    -2 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged2.fq.gz \
+#    -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
+#    -t $(nproc) \
+#    -m 240 \
+#    --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp
+
+    spades.py --meta \
     --restart-from last \
-    -1 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged1.fq.gz \
-    -2 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged2.fq.gz \
     -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
     -t $(nproc) \
     -m 240 \
