@@ -13,23 +13,25 @@
 #conda create -n spades -c bioconda -c conda-forge spades
 source $(conda info --base)/etc/profile.d/conda.sh
 conda activate spades && \
-#spades.py --meta \
-#    -1 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged1.fq.gz \
-#    -2 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged2.fq.gz \
-#    -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
-#    -t $(nproc) \
-#    -m $(( $(grep MemTotal /proc/meminfo | awk '{print $2}') / 1024 / 1024 - 2 )) 
-
 spades.py --meta \
-  --only-assembler \
-  -1 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/corrected/unmapped_trimmedmerged1.00.0_0.cor.fastq.gz \
-  -2 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/corrected/unmapped_trimmedmerged2.00.0_0.cor.fastq.gz \
-  --trusted-contigs /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/K21/contigs.fasta \
-  --trusted-contigs /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/K33/contigs.fasta \
-  -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_retry \
-  -t $(nproc) \
-  -m 240 \
-  --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp
+    --continue \
+    -1 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged1.fq.gz \
+    -2 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged2.fq.gz \
+    -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
+    -t $(nproc) \
+    -m 240 \
+    --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp
+
+#spades.py --meta \
+#  --only-assembler \
+#  -1 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/corrected/unmapped_trimmedmerged1.00.0_0.cor.fastq.gz \
+##  -2 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/corrected/unmapped_trimmedmerged2.00.0_0.cor.fastq.gz \
+ # --trusted-contigs /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/K21/contigs.fasta \
+ # --trusted-contigs /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/K33/contigs.fasta \
+ # -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_retry \
+ # -t $(nproc) \
+ # -m 240 \
+ # --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp
 
 #awk '/^>/ {if (seqlen){print name"\t"seqlen}; name=$0; sub(/^>/,"",name); seqlen=0; next} {seqlen+=length($0)} END {print name"\t"seqlen}' /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/scaffolds.fasta > /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/scaffoldsize.txt
 
