@@ -24,7 +24,7 @@ conda activate spades && \
 #-t $(nproc) 
 
     spades.py \
-    --restart-from last -k 21,33 \
+    --restart-from k33 -k 21,33 \
     -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
     -t 28\
     -m 240 \
