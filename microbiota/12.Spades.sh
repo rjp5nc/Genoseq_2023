@@ -24,12 +24,12 @@ conda activate spades && \
 #-t $(nproc) 
 
     spades.py \
-    --restart-from last \
-    -k 21,33 \ 
+    --restart-from last -k 21,33 \
     -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
     -t $SLURM_CPUS_PER_TASK\
     -m 240 \
-    --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp
+    --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp     
+
 
 #spades.py --meta \
 #  --only-assembler \
