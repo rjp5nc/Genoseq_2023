@@ -21,7 +21,7 @@ conda activate spades && \
 #    -m 240 \
 #    --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp
 
-    spades.py --meta \
+    spades.py \
     --restart-from last \
     -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
     -t $(nproc) \
