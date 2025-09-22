@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J Spades # A single job name for the array
-#SBATCH --ntasks-per-node=30 # multi core
+#SBATCH --ntasks-per-node=5 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-00:00 # 6 days
 #SBATCH --mem 700G
 #SBATCH -o /scratch/rjp5nc/err/Spades%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/Spades%A_%a.err # Standard error
-#SBATCH -p standard
+#SBATCH -p largemem
 #SBATCH --account berglandlab
 
 #conda create -n spades -c bioconda -c conda-forge spades
@@ -24,7 +24,7 @@ conda activate spades && \
 #-t $(nproc) 
 
     spades.py \
-    --restart-from k33 \
+    --restart-from last \
     -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
     -t 28\
     -m 650 \
