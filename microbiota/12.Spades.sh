@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J Spades # A single job name for the array
-#SBATCH --ntasks-per-node=5 # multi core
+#SBATCH --ntasks-per-node=8 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-00:00 # 6 days
-#SBATCH --mem 700G
+#SBATCH --mem 630G
 #SBATCH -o /scratch/rjp5nc/err/Spades%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/Spades%A_%a.err # Standard error
 #SBATCH -p standard
@@ -23,14 +23,13 @@ conda activate spades && \
 
 #-t $(nproc) 
 
-    spades.py \
-    --restart-from last \
-    --only-assembler \
-    -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
-    -t 28\
-    -m 650 \
-    --checkpoints last \
-    --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp     
+spades.py --meta \
+    -1 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_norm1.fq.gz \
+    -2 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_norm2.fq.gz \
+    -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm \
+    -t 8 \
+    -m 620 \
+    --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp   
 
 
 #spades.py --meta \
