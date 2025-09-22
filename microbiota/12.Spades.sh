@@ -29,6 +29,7 @@ spades.py --meta \
     -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm \
     -t 8 \
     -m 620 \
+    --checkpoints last \
     --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp   
 
 
