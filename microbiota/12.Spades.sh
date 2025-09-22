@@ -7,7 +7,7 @@
 #SBATCH --mem 700G
 #SBATCH -o /scratch/rjp5nc/err/Spades%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/Spades%A_%a.err # Standard error
-#SBATCH -p largemem
+#SBATCH -p standard
 #SBATCH --account berglandlab
 
 #conda create -n spades -c bioconda -c conda-forge spades
