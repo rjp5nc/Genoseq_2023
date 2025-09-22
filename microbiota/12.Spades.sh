@@ -25,6 +25,7 @@ conda activate spades && \
 
     spades.py \
     --restart-from last \
+    --only-assembler \
     -o /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES \
     -t 28\
     -m 650 \
