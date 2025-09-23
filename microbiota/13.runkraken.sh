@@ -25,8 +25,9 @@ source ~/.bashrc
 
 cd /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/
 
-kraken2 --db /scratch/rjp5nc/krakenDB/nt \
+kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt \
   --threads 28 \
+  --use-names \
   --report scaffolds_report.txt \
   --output scaffolds_output.txt \
   /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k.fasta
