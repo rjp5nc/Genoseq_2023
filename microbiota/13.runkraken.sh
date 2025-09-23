@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J run_kraken # A single job name for the array
-#SBATCH --ntasks-per-node=30 # multi core
+#SBATCH --ntasks-per-node=10 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 1-03:00 # 3 hours
 #SBATCH --mem 150G
@@ -10,16 +10,16 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-
 module load kraken2
 
 export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
+export kraken2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 #KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 
 #echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
 #source ~/.bashrc
 
-kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 30 \
+kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 10 \
 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_report.txt \
 --classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_classified_output.txt \
 --output /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_output.txt \
