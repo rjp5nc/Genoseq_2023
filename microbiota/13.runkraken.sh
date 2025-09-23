@@ -14,14 +14,14 @@ module load kraken2
 
 export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 export kraken2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
-#KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
+KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 
-#echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
-#source ~/.bashrc
+echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
+source ~/.bashrc
 
 #cd /scratch/rjp5nc/krakenDB/nt
 #tar -xvzf k2_core_nt_20241228.tar.gz
-kraken2-build --build --threads 10 --db /scratch/rjp5nc/krakenDB/nt
+#kraken2-build --build --threads 10 --db /scratch/rjp5nc/krakenDB/nt
 
 cd /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/
 
