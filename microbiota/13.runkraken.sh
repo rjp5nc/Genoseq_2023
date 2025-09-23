@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 1-03:00 # 3 hours
 #SBATCH --mem 150G
-#SBATCH -o /scratch/rjp5nc/Canu_error/kraken%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/Canu_error/kraken%A_%a.err # Standard error
+#SBATCH -o /scratch/rjp5nc/err/kraken%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/err/kraken%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
@@ -21,6 +21,7 @@ export kraken2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 
 #cd /scratch/rjp5nc/krakenDB/nt
 #tar -xvzf k2_core_nt_20241228.tar.gz
+kraken2-build --build --threads 10 --db /scratch/rjp5nc/krakenDB/nt
 
 cd /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/
 
