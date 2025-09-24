@@ -31,4 +31,9 @@ mkdir -p "$OUTDIR"
 SAMPLE=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$SAMPLE_LIST")
 
 # run bcftools consensus
-bcftools consensus -f "$REF" -s "$SAMPLE" -H I "$VCF" > "$OUTDIR/${SAMPLE}.fasta"
+bcftools consensus -f "$REF" -s "$SAMPLE" -H I "$VCF" > "$OUTDIR/${SAMPLE}.tmp.fasta"
+
+
+awk -v sample="$SAMPLE" '/^>/{sub(/^>/, ">"sample"_");} {print}' "$OUTDIR/${SAMPLE}.tmp.fasta" > "$OUTDIR/${SAMPLE}.fasta"
+
+rm "$OUTDIR/${SAMPLE}.tmp.fasta"
