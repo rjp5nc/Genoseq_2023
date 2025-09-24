@@ -17,8 +17,6 @@
 
 module load bcftools
 
-#SLURM_ARRAY_TASK_ID=1
-
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_two_of_each.vcf.gz"
 REF="/scratch/rjp5nc/Reference_genomes/post_kraken/First_12_US_obtusa_onlydaps.fasta"
 SAMPLE_LIST="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_two_of_each.txt"
@@ -31,4 +29,4 @@ mkdir -p "$OUTDIR"
 SAMPLE=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$SAMPLE_LIST")
 
 # run bcftools consensus
-bcftools consensus -f "$REF" -s "$SAMPLE" -H I "$VCF" > "$OUTDIR/${SAMPLE}.fasta"
+bcftools consensus -f "$REF" -s "$SAMPLE" -H IUPAC "$VCF" > "$OUTDIR/${SAMPLE}.fasta"
