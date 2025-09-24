@@ -20,11 +20,30 @@ module load ruby
 # Working directory
 wd="/scratch/rjp5nc/snapp5"
 
+cd $wd
+
 # VCF
 vcf="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_two_of_each_fixed2.vcf.gz"
 
 # Beast2 directory
 beast2="/scratch/rjp5nc/beast/beast/bin/beast"
+
+
+IN=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_genomic_type.csv
+OUTTMP=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_clone_genomic.tmp.txt
+OUT=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_clone_genomic.txt
+OUTOO=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_clone_genomic_unique_OO.txt
+
+awk -F, 'NR==1 {print "CloneA\tGenomic_type"; next} {gsub(/"/,""); print $4"\t"$2}' $IN > $OUTTMP
+tail -n +2 $OUTTMP > $OUT
+
+awk '{
+    if($2=="OO"){ 
+        count++; 
+        $2="OO_"count 
+    } 
+    print $0
+}' $OUT > $OUTOO
 
 # 5 indviduals per species - highest mean coverage
 samps=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_two_of_each.txt
@@ -46,9 +65,7 @@ ${vcf}
 # From: https://github.com/mmatschiner/snapp_prep
 ruby ${wd}/snapp_prep.rb \
 -v ${wd}/daphnia.genome.2inds.biallelic.vcf \
--t ${wd}/individuals.2inds.continent.withObtusa.txt \
--c ${wd}/constraints.withobtusa.txt \
--s ${wd}/base_tree.nwk \
+-t $OUTOO \
 -x snapp.0.1.xml \
 -o snapp.0.1 \
 -m 1000 \
