@@ -52,14 +52,14 @@ samps=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_
 #(((((Daphnia.pulex.NorthAmerica,Daphnia.pulexcaria.NorthAmerica,Daphnia.pulicaria.NorthAmerica),Daphnia.pulicaria.Europe),Daphnia.pulex.Europe),Daphnia.obtusa.NorthAmerica),Daphnia.obtusa.Europe)
 
 # Remove biallelic SNPs and no alternative alleles
-bcftools view \
---threads 15 \
--e 'AC==0 || AC==AN' \
--m2 \
--M2 \
--Ov \
--o ${wd}/daphnia.genome.2inds.biallelic.vcf \
-${vcf}
+#bcftools view \
+#--threads 15 \
+#-e 'AC==0 || AC==AN' \
+#-m2 \
+#-M2 \
+#-Ov \
+#-o ${wd}/daphnia.genome.2inds.biallelic.vcf \
+#${vcf}
 
 # Run ruby input script
 # From: https://github.com/mmatschiner/snapp_prep
