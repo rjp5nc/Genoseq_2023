@@ -19,8 +19,10 @@ module load gcc openmpi R/4.3.1
 #bcftools view -h trimmed10bp_filtered_two_of_each.vcf.gz > header.txt
 #Find the line like:
 ##INFO=<ID=MLEAC,Number=A,Type=Integer,Description="...">
+##INFO=<ID=MLEAF,Number=A,Type=Integer,Description="...">
 #Edit it to:
 ##INFO=<ID=MLEAC,Number=.,Type=Integer,Description="...">
+##INFO=<ID=MLEAF,Number=.,Type=Integer,Description="...">
 #bcftools reheader -h header.txt -o trimmed10bp_filtered_two_of_each_fixed2.vcf.gz trimmed10bp_filtered_two_of_each.vcf.gz
 #bcftools index trimmed10bp_filtered_two_of_each_fixed2.vcf.gz
 

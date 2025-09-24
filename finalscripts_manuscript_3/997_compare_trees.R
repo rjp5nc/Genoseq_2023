@@ -200,6 +200,14 @@ pond_palette <- c(
 left_tips  <- cophylo$trees[[1]]$tip.label
 right_tips <- cophylo$trees[[2]]$tip.label
 
+mito_pallete <- c(
+  "A"   = "#66C2A5", 
+  "B"   = "#E59077",
+  "C"   = "#9C9CC9",  
+  "D"   = "#AF9AAA", 
+  "E"   = "#CA9591",   
+  "F"   = "#949EC3"  
+)
 
 
 # Make a lookup: Well -> pond
@@ -215,56 +223,12 @@ png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo_colors_onl
 
 plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = ltip_colors)
 
-
 dev.off()
 
-
-
-genomictypes <- df1[, c(2,3)]
-mitotypes <- df2[, c(2,3)]
-
-types <- merge(genomictypes,mitotypes, by="CloneA")
-
-types$types <- paste(types$Group.x, types$Group.y, sep ="_")
-
-table(types$types)
-table(types$Group.x)
-table(types$Group.y)
-
-type_counts <- as.data.frame(table(types$types))
-
-# Rename columns
-colnames(type_counts) <- c("Type", "Count")
-
-# View the table
-print(type_counts)
-
-# Optional: sort by count descending
-type_counts <- type_counts[order(-type_counts$Count), ]
 
 # Save to CSV
-write.csv(type_counts, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/type_counts.csv", row.names = FALSE)
 
 library(tidyverse)
-
-combos <- types %>%
-  count(across(2:4))
-
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genxmitotypes.png", res = 300, width = 2000, height = 3000)
-
-# Make a bar plot
-ggplot(combos, aes(x = Group.x, y = n, col=Group.y)) +
-  geom_point(position = position_jitter(width = 0.2, height = 0)) +
-  ylim(0,55)+
-    geom_text(aes(label = n), vjust = -0.5, size = 4) +  # add counts above points
-  labs(x = "Superclone", y = "Mitotype", title = "Counts of A_*, B_*, etc. grouped by prefix") +
-  theme_bw()
-
-dev.off()
-
-
-subset(types, Group.x == "AC")
-subset(types, Group.x == "C")
 
 
 left_tips  <- cophylo$trees[[1]]$tip.label
@@ -281,7 +245,7 @@ welltopond3 <- well_to_pond[right_tips]
 
 
 png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo_colors.png",
-    res = 300, width = 7000, height = 10000)
+    res = 300, width = 7000, height = 8000)
 
 # Plot cophylo with colored edges
 plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = "gray40")
@@ -293,8 +257,14 @@ legend("top",                     # position, adjust as needed
        pch = 19,                       # point type to match tip symbols
        cex = 1.5,                      # text/point size
        bty = "n")                      # no box around legend
+                   # no box around legend
 
-
+legend("topright",                     # position, adjust as needed
+       legend = names(mito_pallete),   # pond names
+       col = mito_pallete,             # matching colors
+       pch = 19,                       # point type to match tip symbols
+       cex = 1.5,                      # text/point size
+       bty = "n")
 
 # Add colored tip labels
 tiplabels.cophylo(
