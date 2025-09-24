@@ -45,6 +45,9 @@ awk '{
     print $0
 }' $OUT > $OUTOO
 
+
+awk '{print $2, $1}' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_clone_genomic_unique_OO.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_clone_genomic_unique_OO_swapped.txt
+
 # 5 indviduals per species - highest mean coverage
 samps=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_two_of_each.txt
 
@@ -61,19 +64,19 @@ samps=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_
 #-o ${wd}/daphnia.genome.2inds.biallelic.vcf \
 #${vcf}
 
-bcftools view \
-  -e 'ALT="*"' \
-  -m2 -M2 \
-  -Ov \
-  -o ${wd}/daphnia.genome.2inds.biallelic.clean.vcf \
-  ${vcf}
+#bcftools view \
+#  -e 'ALT="*"' \
+#  -m2 -M2 \
+#  -Ov \
+#  -o ${wd}/daphnia.genome.2inds.biallelic.clean.vcf \
+#  ${vcf}
 
 
 # Run ruby input script
 # From: https://github.com/mmatschiner/snapp_prep
 ruby ${wd}/snapp_prep.rb \
 -v ${wd}/daphnia.genome.2inds.biallelic.clean.vcf \
--t $OUTOO \
+-t /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_clone_genomic_unique_OO_swapped.txt \
 -x snapp.0.1.xml \
 -o snapp.0.1 \
 -m 1000 \
