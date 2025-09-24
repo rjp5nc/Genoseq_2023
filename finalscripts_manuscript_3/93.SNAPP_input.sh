@@ -61,10 +61,18 @@ samps=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_
 #-o ${wd}/daphnia.genome.2inds.biallelic.vcf \
 #${vcf}
 
+bcftools view \
+  -e 'ALT="*"' \
+  -m2 -M2 \
+  -Ov \
+  -o ${wd}/daphnia.genome.2inds.biallelic.clean.vcf \
+  ${vcf}
+
+
 # Run ruby input script
 # From: https://github.com/mmatschiner/snapp_prep
 ruby ${wd}/snapp_prep.rb \
--v ${wd}/daphnia.genome.2inds.biallelic.vcf \
+-v ${wd}/daphnia.genome.2inds.biallelic.clean.vcf \
 -t $OUTOO \
 -x snapp.0.1.xml \
 -o snapp.0.1 \
