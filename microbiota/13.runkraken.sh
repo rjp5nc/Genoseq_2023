@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J run_kraken # A single job name for the array
-#SBATCH --ntasks-per-node=10 # multi core
+#SBATCH --ntasks-per-node=30 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 1-03:00 # 3 hours
 #SBATCH --mem 300G
