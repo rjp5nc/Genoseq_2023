@@ -24,8 +24,8 @@ conda activate beast2-277
 cd /scratch/rjp5nc/snapp5/
 
 
-#/path/to/beast/bin/packagemanager -add SNAPP
+#/scratch/rjp5nc/beast/beast/bin/packagemanager -add SNAPP
 
-/scratch/rjp5nc/beast/beast/bin/beast -java -threads 30 /scratch/rjp5nc/snapp5/snapp.0.0001.xml
+/scratch/rjp5nc/beast/beast/bin/beast -java -threads 30 /scratch/rjp5nc/snapp5/snapp.mono.xml
 
 #Ran treeannotator locally with increased RAM.
