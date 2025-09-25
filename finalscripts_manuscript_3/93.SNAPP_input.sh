@@ -78,9 +78,9 @@ samps=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_
 ruby ${wd}/snapp_prep.rb \
 -v ${wd}/daphnia.genome.2inds.biallelic.clean.vcf \
 -t /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_clone_genomic_unique_OO_swapped.txt \
--c /scratch/rjp5nc/snapp5/constraints.obtusa.txt \
--x ${wd}/snapp.0.1.xml \
--o ${wd}/snapp.0.1 \
+-c /scratch/rjp5nc/snapp5/constraints.obtusa_monomorphic.txt \
+-x ${wd}/snapp.mono.xml \
+-o ${wd}/snapp.mono \
 -m 1000 \
 -l 1000000
 
