@@ -23,7 +23,8 @@ conda activate beast2-277
 
 cd /scratch/rjp5nc/snapp5/
 
-#I had to increase the ram usage in the .bat file of Beauti2 to turn the alignment into a .xml file. It wasnt saving otherwise
+
+#/path/to/beast/bin/packagemanager -add SNAPP
 
 /scratch/rjp5nc/beast/beast/bin/beast -java -threads 30 /scratch/rjp5nc/snapp5/snapp.0.0001.xml
 
