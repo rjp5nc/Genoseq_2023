@@ -54,7 +54,7 @@ samps=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_
 # Starting tree: base_tree.nwk
 #(((((Daphnia.pulex.NorthAmerica,Daphnia.pulexcaria.NorthAmerica,Daphnia.pulicaria.NorthAmerica),Daphnia.pulicaria.Europe),Daphnia.pulex.Europe),Daphnia.obtusa.NorthAmerica),Daphnia.obtusa.Europe)
 
-# Remove biallelic SNPs and no alternative alleles
+# Only biallelic SNPs 
 #bcftools view \
 #--threads 15 \
 #-e 'AC==0 || AC==AN' \
@@ -71,12 +71,14 @@ samps=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_
 #  -o ${wd}/daphnia.genome.2inds.biallelic.clean.vcf \
 #  ${vcf}
 
+#cat /project/berglandlab/connor/chapter2_TSP/divergence_snps/snapp5/constraints.withobtusa.txt
 
 # Run ruby input script
 # From: https://github.com/mmatschiner/snapp_prep
 ruby ${wd}/snapp_prep.rb \
 -v ${wd}/daphnia.genome.2inds.biallelic.clean.vcf \
 -t /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_clone_genomic_unique_OO_swapped.txt \
+-c /scratch/rjp5nc/snapp5/constraints.obtusa.txt \
 -x ${wd}/snapp.0.1.xml \
 -o ${wd}/snapp.0.1 \
 -m 1000 \
