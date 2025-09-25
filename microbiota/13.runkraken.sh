@@ -13,24 +13,20 @@
 module load kraken2
 
 export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
-export kraken2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
-KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 
-echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
-source ~/.bashrc
+#echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
+#source ~/.bashrc
 
 #cd /scratch/rjp5nc/krakenDB/nt
 #tar -xvzf k2_core_nt_20241228.tar.gz
 #kraken2-build --build --threads 10 --db /scratch/rjp5nc/krakenDB/nt
 
-cd /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/
-
 kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt \
-  --threads 10 \
-  --use-names \
-  --report scaffolds_report.txt \
-  --output scaffolds_output.txt \
-  /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k.fasta
+--threads 30 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/report.txt \
+--classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_output.txt \
+--output /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_output.txt \
+--use-names \
+/scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k.fasta
 
 #kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 10 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_report.txt --classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_classified_output.txt --output /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_output.txt --use-names /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k.fasta
 
