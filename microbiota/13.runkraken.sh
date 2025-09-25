@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J run_kraken # A single job name for the array
-#SBATCH --ntasks-per-node=30 # multi core
+#SBATCH --ntasks-per-node=4 # multi core
 #SBATCH -N 1 # on one node
 #SBATCH -t 1-03:00 # 3 hours
 #SBATCH --mem 300G
@@ -22,7 +22,7 @@ export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 #kraken2-build --build --threads 10 --db /scratch/rjp5nc/krakenDB/nt
 
 kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt \
---threads 30 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/report.txt \
+--threads 4 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/report.txt \
 --classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_output.txt \
 --output /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_output.txt \
 --use-names \
