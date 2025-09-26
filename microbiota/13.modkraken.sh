@@ -10,6 +10,9 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
+module load kraken2
+export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
+
 cd /scratch/rjp5nc/krakenDB/cilliates
 
 esearch -db nucleotide -query "Vorticella[Organism]" | efetch -format fasta > vorticella_only.fasta
