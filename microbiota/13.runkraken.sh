@@ -24,7 +24,7 @@ export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 kraken2 --db /scratch/rjp5nc/krakenDB/nt \
 --threads 4 \
 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/report.txt \
---classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified#.fq \
+--classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified.txt \
 --output /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_output.txt \
 --use-names \
 --paired \
