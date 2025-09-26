@@ -22,7 +22,7 @@ module load gatk/4.6.0.0
 
 #euobtusa_vcf  eupulex_vcf  eupulex_vcf_old  usambigua_vcf  usobtusa_vcf  uspulex_vcf
 #        
-species=uspulex_vcf
+species=usobtusa_vcf
 
 WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/10bp_vcf/$species/${species}_snps
 
