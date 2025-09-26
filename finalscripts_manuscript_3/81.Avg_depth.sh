@@ -9,8 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-$(wc -l < /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/contigs.txt)
-
+#SBATCH --array=1-219
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
