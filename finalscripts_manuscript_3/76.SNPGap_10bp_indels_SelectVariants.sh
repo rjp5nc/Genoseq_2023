@@ -9,13 +9,13 @@
 #SBATCH -e /scratch/rjp5nc/err/FilterVCFs_%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-370%100
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 
 # This script will remove SNPS within 10 base pairs of indels by a chromosome basis using bcftools
 # Also filters out only SNPs using gatk
+####SBATCH --array=1-370%100
 
 # Modules to load
 module load bcftools/1.17
@@ -40,6 +40,7 @@ WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtus
 JAVAMEM=10G
 CPU=4
 
+SLURM_ARRAY_TASK_ID=80
 
 # Chromosome
 chrom=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )
