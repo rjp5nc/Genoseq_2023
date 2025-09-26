@@ -9,36 +9,61 @@
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-219
+#SBATCH --array=1-12
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
+
+#cut -f1 contigs.txt > contigs_only.txt
+#grep -v "^$" contigs_only.txt > contigs_clean.txt
 
 module load bcftools
 
 VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz2.vcf.gz
 
-# pick the contig for this task
+bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz2.vcf.gz \
+> samples.txt
+
+bcftools index -s /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz2.vcf.gz \
+| cut -f1 > contigs.txt
+
+sed -i 's/\r//g; s/ //g' contigs.txt
+VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz2.vcf.gz
+RESULTDIR=results
+mkdir -p "$RESULTDIR"
+
+# get contig for this array task
 contig=$(sed -n "${SLURM_ARRAY_TASK_ID}p" contigs.txt)
 
-# run bcftools query
-bcftools query -r $contig -f '%CHROM\t%POS[\t%DP]\n' $VCF \
-| awk '{
-    win = int($2/10000);
-    key = $1":"win;
-    for (i=3; i<=NF; i++) {
-      sum[key,i] += $i;
-      count[key,i]++;
-    }
-  }
-  END {
-    for (k in sum) {
-      split(k,a,SUBSEP);
-      chromwin=a[1];
-      sample=a[2]-2;
-      avg = sum[k]/count[k];
-      print chromwin, sample, avg;
-    }
-  }' > results/${contig}.avgdepth.txt
+# get sample names into an array
+mapfile -t samples < samples.txt
+nsamples=${#samples[@]}
+echo $nsamples  # optional check
 
+# export sample names to ENV for AWK
+for i in "${!samples[@]}"; do
+    export "samples$i=${samples[$i]}"
+done
 
-  #cat results/*.avgdepth.txt > all_samples.avgdepth.txt
+bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
+| awk -v nsamples="$nsamples" -v contig="$contig" '
+{
+    win = int($2/10000)
+    for(i=3;i<=NF;i++){
+        key=contig":"win":"i
+        sum[key] += ($i!=".") ? $i : 0
+        count[key] += ($i!=".")
+    }
+}
+END {
+    for(k in sum){
+        split(k,a,":")
+        win_start = a[2]*10000
+        win_end = win_start + 9999
+        sample_name = ENVIRON["samples" a[3]-3]
+        avg = (count[k]>0) ? sum[k]/count[k] : 0
+        printf "%s\t%d\t%d\t%s\t%.2f\n", a[1], win_start, win_end, sample_name, avg
+    }
+}' \
+| sort -k2,2n -k4,4 \
+> "$RESULTDIR/${contig}.avgdepth.long.sorted.txt"
+
