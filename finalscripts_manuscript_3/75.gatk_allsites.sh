@@ -9,11 +9,12 @@
 #SBATCH -e /scratch/rjp5nc/err/genotypegvcf.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-370
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 # This script will conduct genotype calling on the GenomeDBI object
+
+
 
 # Load Modules
 module load gatk/4.6.0.0
