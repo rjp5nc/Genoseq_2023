@@ -22,15 +22,17 @@ export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 #kraken2-build --build --threads 10 --db /scratch/rjp5nc/krakenDB/nt
 
 kraken2 --db /scratch/rjp5nc/krakenDB/nt \
---threads 4 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/report.txt \
---classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_output.txt \
---output /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_output.txt \
+--threads 4 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/report2.txt \
+--classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_output2.txt \
+--output /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_output2.txt \
 --use-names \
-/scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k.fasta
+/scratch/rjp5nc/krakenDB/cilliates/Epistylis_only.fasta
+
+#/scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k.fasta
 
 #kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 10 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_report.txt --classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_classified_output.txt --output /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_output.txt --use-names /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k.fasta
 
-grep '^>' /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_output.txt > /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_headers_output.txt
+grep '^>' /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_output2.txt > /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_headers_output2.txt
 
 
 #kraken2-build --standard --db /scratch/rjp5nc/krakenDB/test2
