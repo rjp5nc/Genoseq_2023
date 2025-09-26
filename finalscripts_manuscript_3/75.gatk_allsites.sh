@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/genotypegvcf.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=369-370
+#SBATCH --array=1-370
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
@@ -41,6 +41,8 @@ species="DBI_usobtusa"
 
 # Move to working directory
 cd $WORKING_FOLDER
+
+SLURM_ARRAY_TASK_ID=80
 
 # Chromosome
 i=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )
