@@ -41,7 +41,7 @@ WORKING_FOLDER="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/DBI_usobtusa"
 intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usobtusa.txt"
 
 # Parameters
-JAVAMEM=40G
+JAVAMEM=80G
 CPU=10
 
 # Move to working directory
