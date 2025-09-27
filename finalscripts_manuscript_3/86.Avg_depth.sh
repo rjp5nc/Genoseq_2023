@@ -11,12 +11,12 @@
 #SBATCH --account berglandlab
 #SBATCH --array=1-12
 
+#cat /scratch/rjp5nc/err/pixy.4130252_4
+
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
 
 
-#cut -f1 contigs.txt > contigs_only.txt
-#grep -v "^$" contigs_only.txt > contigs_clean.txt
 
 module load bcftools
 
@@ -29,6 +29,10 @@ bcftools index -s /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimm
 | cut -f1 > contigs.txt
 
 sed -i 's/\r//g; s/ //g' contigs.txt
+
+cut -f1 contigs.txt > contigs_only.txt
+grep -v "^$" contigs_only.txt > contigs_clean.txt
+
 VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
 RESULTDIR=results
 mkdir -p "$RESULTDIR"
@@ -87,13 +91,6 @@ done
 #     }
 # }
 # ' avg.depth.all12.txt > window_avg_depth.txt
-
-
-
-
-
-
-
 
 
 bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
