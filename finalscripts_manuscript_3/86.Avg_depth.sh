@@ -37,16 +37,20 @@ if [[ -z "$contig" ]]; then
 fi
 echo "Processing contig: $contig"
 
+
+
 bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
 | awk -v nsamples="$nsamples" -v contig="$contig" -v SAMPLES="$samples_str" '
 BEGIN { split(SAMPLES, sample_arr, ",") }
 {
     win = int($2/100000)
     for(i=1;i<=nsamples;i++){
-        dp = ($i+2 ~ /^[0-9]+$/) ? $(i+2) : 0
-        sum[i,win] += dp
-        count[i,win] += ($i+2 ~ /^[0-9]+$/) ? 1 : 0
-        seen[i,win] = 1
+        dp = $(i+2)               # FIELD i+2
+        if(dp ~ /^[0-9]+$/){
+            sum[i,win] += dp
+            count[i,win] += 1
+        }
+        seen[i,win] = 1           # mark window as seen even if DP missing
     }
 }
 END {
@@ -66,6 +70,7 @@ END {
 }' \
 | sort -k2,2n -k4,4 \
 > "$RESULTDIR/${contig}.avgdepth.long.sorted_100000.txt"
+
 
 
 
