@@ -17,7 +17,7 @@ cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
 module load bcftools
 
-VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
+VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_one_of_each.vcf.gz
 
 # bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz \
 # > samples.txt
@@ -30,7 +30,7 @@ VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsite
 # cut -f1 contigs.txt > contigs_only.txt
 # grep -v "^$" contigs_only.txt > contigs_clean.txt
 
-RESULTDIR=results2
+RESULTDIR=dp_results_one_of_each
 mkdir -p "$RESULTDIR"
 
 # bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
