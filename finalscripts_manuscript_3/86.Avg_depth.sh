@@ -19,18 +19,17 @@ module load bcftools
 
 VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
 
-bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz \
-> samples.txt
+# bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz \
+# > samples.txt
 
-bcftools index -s /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz \
-| cut -f1 > contigs.txt
+# bcftools index -s /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz \
+# | cut -f1 > contigs.txt
 
-sed -i 's/\r//g; s/ //g' contigs.txt
+# sed -i 's/\r//g; s/ //g' contigs.txt
 
-cut -f1 contigs.txt > contigs_only.txt
-grep -v "^$" contigs_only.txt > contigs_clean.txt
+# cut -f1 contigs.txt > contigs_only.txt
+# grep -v "^$" contigs_only.txt > contigs_clean.txt
 
-VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
 RESULTDIR=results2
 mkdir -p "$RESULTDIR"
 
@@ -75,7 +74,6 @@ mkdir -p "$RESULTDIR"
 #     }
 # }
 # ' avg.depth.all12.txt > window_avg_depth.txt
-
 
 
 # Get contig for this array task
