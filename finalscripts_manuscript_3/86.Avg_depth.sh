@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 #SBATCH --array=1-12
 
-#cat /scratch/rjp5nc/err/pixy.4130350_8
+#cat /scratch/rjp5nc/err/pixy.4130392_2
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
@@ -33,19 +33,6 @@ grep -v "^$" contigs_only.txt > contigs_clean.txt
 VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
 RESULTDIR=results
 mkdir -p "$RESULTDIR"
-
-# get contig for this array task
-contig=$(sed -n "${SLURM_ARRAY_TASK_ID}p" contigs.txt)
-
-# get sample names into an array
-mapfile -t samples < samples.txt
-nsamples=${#samples[@]}
-echo $nsamples  # optional check
-
-# export sample names to ENV for AWK
-for i in "${!samples[@]}"; do
-    export "samples$i=${samples[$i]}"
-done
 
 # bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
 # | awk -v nsamples="$nsamples" -v contig="$contig" '
