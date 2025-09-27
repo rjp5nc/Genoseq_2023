@@ -92,11 +92,23 @@ done
 # }
 # ' avg.depth.all12.txt > window_avg_depth.txt
 
+# get contig for this array task
+contig=$(sed -n "${SLURM_ARRAY_TASK_ID}p" contigs_clean.txt)
 
+# get sample names into an array
+mapfile -t samples < samples.txt
+nsamples=${#samples[@]}
+
+# export sample names to ENV for AWK
+for i in "${!samples[@]}"; do
+    export "samples$i=${samples[$i]}"
+done
+
+# main depth extraction + window averaging
 bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
 | awk -v nsamples="$nsamples" -v contig="$contig" '
 {
-    win = int($2/100000)
+    win = int($2/100000)   # 100kb windows
     for(i=3;i<=NF;i++){
         key=contig":"win":"i
         sum[key] += ($i!=".") ? $i : 0
