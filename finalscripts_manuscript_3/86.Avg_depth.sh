@@ -106,26 +106,32 @@ for i in "${!samples[@]}"; do
 done
 
 
-# main depth extraction + window averaging
+
+# Main depth extraction + window averaging
 bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
 | awk -v nsamples="$nsamples" -v contig="$contig" '
 {
-    win = int($2/10000)   # 100kb windows
-    for(i=3;i<=NF;i++){
-        key=contig":"win":"i
-        sum[key]   += ($i!=".") ? $i : 0
-        count[key] += ($i!=".")
+    win = int($2/100000)
+    for(i=1; i<=nsamples; i++){
+        dp = $(i+2)  # $1=CHROM, $2=POS
+        sum[i,win]   += (dp ~ /^[0-9.]+$/ && dp != ".") ? dp : 0
+        count[i,win] += (dp ~ /^[0-9.]+$/ && dp != ".") ? 1 : 0
     }
 }
 END {
-    for(k in sum){
-        split(k,a,":")
-        win_start = a[2]*10000
-        win_end   = win_start + 9999
-        sample_name = ENVIRON["samples" a[3]-3]
-        avg = (count[k] > 0) ? sum[k] / count[k] : 0
-        # always print
-        printf "%s\t%d\t%d\t%s\t%.2f\n", a[1], win_start, win_end, sample_name, avg
+    OFS="\t"
+    for(i=0; i<nsamples; i++){
+        for(win_key in sum){
+            split(win_key, w, ",")
+            if(w[1] == i){
+                win = w[2]
+                avg = (count[i,win]>0) ? sum[i,win]/count[i,win] : 0
+                win_start = win*100000
+                win_end   = win_start + 99999
+                sample_name = ENVIRON["samples" i]
+                print contig, win_start, win_end, sample_name, avg
+            }
+        }
     }
 }' \
 | sort -k2,2n -k4,4 \
