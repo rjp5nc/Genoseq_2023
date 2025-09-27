@@ -19,8 +19,8 @@ module load bcftools
 
 VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_one_of_each.vcf.gz
 
-# bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz \
-# > samples.txt
+ bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_one_of_each.vcf.gz \
+ > samples.txt
 
 # bcftools index -s /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz \
 # | cut -f1 > contigs.txt
