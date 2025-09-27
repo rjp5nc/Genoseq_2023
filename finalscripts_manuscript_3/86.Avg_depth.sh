@@ -41,21 +41,19 @@ bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
 | awk -v nsamples="$nsamples" -v contig="$contig" -v SAMPLES="$samples_str" '
 BEGIN { split(SAMPLES, sample_arr, ",") }
 {
-    win = int($2/100000)  # 100kb windows
-    for(i=1; i<=nsamples; i++){
-        dp = $(i+2)
-        if(dp ~ /^[0-9]+$/){      # only add numeric DP
-            sum[i,win]   += dp
-            count[i,win] += 1
-        }
-        seen[i,win] = 1            # mark this window as seen, even if all DP are missing
+    win = int($2/100000)
+    for(i=1;i<=nsamples;i++){
+        dp = ($i+2 ~ /^[0-9]+$/) ? $(i+2) : 0
+        sum[i,win] += dp
+        count[i,win] += ($i+2 ~ /^[0-9]+$/) ? 1 : 0
+        seen[i,win] = 1
     }
 }
 END {
-    for(i=1; i<=nsamples; i++){
+    for(i=1;i<=nsamples;i++){
         sample_name = sample_arr[i]
         for(win_key in seen){
-            split(win_key, w, ",")
+            split(win_key,w,",")
             if(w[1]==i){
                 win = w[2]
                 avg = (count[i,win]>0) ? sum[i,win]/count[i,win] : 0
@@ -68,6 +66,7 @@ END {
 }' \
 | sort -k2,2n -k4,4 \
 > "$RESULTDIR/${contig}.avgdepth.long.sorted_100000.txt"
+
 
 
 
