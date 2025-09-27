@@ -110,7 +110,7 @@ done
 bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
 | awk -v nsamples="$nsamples" -v contig="$contig" '
 {
-    win = int($2/100000)   # 100kb windows
+    win = int($2/10000)   # 100kb windows
     for(i=3;i<=NF;i++){
         key=contig":"win":"i
         sum[key]   += ($i!=".") ? $i : 0
@@ -120,8 +120,8 @@ bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
 END {
     for(k in sum){
         split(k,a,":")
-        win_start = a[2]*100000
-        win_end   = win_start + 99999
+        win_start = a[2]*10000
+        win_end   = win_start + 9999
         sample_name = ENVIRON["samples" a[3]-3]
         avg = (count[k] > 0) ? sum[k] / count[k] : 0
         # always print
