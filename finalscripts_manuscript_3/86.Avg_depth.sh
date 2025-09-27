@@ -21,6 +21,10 @@ VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtere
 
  bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_one_of_each.vcf.gz \
  > samples.txt
+nsamples=$(bcftools query -l "$VCF" | wc -l)
+
+samples_str=$(bcftools query -l "$VCF" | paste -sd "," -)
+echo "Samples: $samples_str"
 
 # bcftools index -s /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz \
 # | cut -f1 > contigs.txt
