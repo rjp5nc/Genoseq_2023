@@ -38,38 +38,35 @@ fi
 echo "Processing contig: $contig"
 
 
-
 bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
 | awk -v nsamples="$nsamples" -v contig="$contig" -v SAMPLES="$samples_str" '
 BEGIN { split(SAMPLES, sample_arr, ",") }
 {
     win = int($2/100000)
     for(i=1;i<=nsamples;i++){
-        dp = $(i+2)               # FIELD i+2
-        if(dp ~ /^[0-9]+$/){
+        dp = $(i+2)
+        if(dp ~ /^[0-9]+$/){ 
             sum[i,win] += dp
-            count[i,win] += 1
+            count[i,win]++
         }
-        seen[i,win] = 1           # mark window as seen even if DP missing
+        # mark the window even if DP missing
+        seen[win]=1
     }
 }
 END {
-    for(i=1;i<=nsamples;i++){
-        sample_name = sample_arr[i]
-        for(win_key in seen){
-            split(win_key,w,",")
-            if(w[1]==i){
-                win = w[2]
-                avg = (count[i,win]>0) ? sum[i,win]/count[i,win] : 0
-                win_start = win*100000
-                win_end   = win_start + 99999
-                print contig, win_start, win_end, sample_name, avg
-            }
+    for(win in seen){
+        win_start = win*100000
+        win_end = win_start + 99999
+        for(i=1;i<=nsamples;i++){
+            sample_name = sample_arr[i]
+            avg = (count[i,win]>0) ? sum[i,win]/count[i,win] : 0
+            print contig, win_start, win_end, sample_name, avg
         }
     }
 }' \
 | sort -k2,2n -k4,4 \
 > "$RESULTDIR/${contig}.avgdepth.long.sorted_100000.txt"
+
 
 
 
