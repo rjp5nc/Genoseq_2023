@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 #SBATCH --array=1-12
 
-#cat /scratch/rjp5nc/err/pixy.4130392_2
+#cat /scratch/rjp5nc/err/pixy.4130404_8
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
@@ -31,7 +31,7 @@ cut -f1 contigs.txt > contigs_only.txt
 grep -v "^$" contigs_only.txt > contigs_clean.txt
 
 VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
-RESULTDIR=results
+RESULTDIR=results2
 mkdir -p "$RESULTDIR"
 
 # bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
