@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 #SBATCH --array=1-12
 
-#cat /scratch/rjp5nc/err/pixy.4130252_4
+#cat /scratch/rjp5nc/err/pixy.4130350_8
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
@@ -91,44 +91,36 @@ done
 
 
 
-
-
-# get contig for this array task
+# Get contig for this array task
 contig=$(sed -n "${SLURM_ARRAY_TASK_ID}p" contigs_clean.txt)
-
-# get sample names into an array
-mapfile -t samples < samples.txt
-nsamples=${#samples[@]}
-
-# export sample names to ENV for AWK
-for i in "${!samples[@]}"; do
-    export "samples$i=${samples[$i]}"
-done
-
-
+if [[ -z "$contig" ]]; then
+    echo "ERROR: contig is empty for SLURM_ARRAY_TASK_ID=${SLURM_ARRAY_TASK_ID}"
+    exit 1
+fi
+echo "Processing contig: $contig"
 
 # Main depth extraction + window averaging
 bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
-| awk -v nsamples="$nsamples" -v contig="$contig" '
+| awk -v nsamples="$nsamples" -v contig="$contig" -v SAMPLES="$samples_str" '
+BEGIN { split(SAMPLES, sample_arr, ",") }
 {
-    win = int($2/100000)
+    win = int($2/100000)  # 100kb windows
     for(i=1; i<=nsamples; i++){
-        dp = $(i+2)  # $1=CHROM, $2=POS
+        dp = $(i+2)  # offset: $1=CHROM, $2=POS
         sum[i,win]   += (dp ~ /^[0-9.]+$/ && dp != ".") ? dp : 0
         count[i,win] += (dp ~ /^[0-9.]+$/ && dp != ".") ? 1 : 0
     }
 }
 END {
-    OFS="\t"
-    for(i=0; i<nsamples; i++){
+    for(i=1; i<=nsamples; i++){
+        sample_name = sample_arr[i]
         for(win_key in sum){
             split(win_key, w, ",")
-            if(w[1] == i){
+            if(w[1]==i){
                 win = w[2]
                 avg = (count[i,win]>0) ? sum[i,win]/count[i,win] : 0
                 win_start = win*100000
                 win_end   = win_start + 99999
-                sample_name = ENVIRON["samples" i]
                 print contig, win_start, win_end, sample_name, avg
             }
         }
