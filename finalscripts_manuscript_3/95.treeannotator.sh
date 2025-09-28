@@ -32,6 +32,6 @@ cd /scratch/rjp5nc/snapp5/
 
 /scratch/rjp5nc/beast/beast/bin/treeannotator \
 -burnin 10 \
--heights mean \
+-height mean \
 /scratch/rjp5nc/snapp5/snapp.mono2.trees \
 /scratch/rjp5nc/snapp5/snapp.tree
