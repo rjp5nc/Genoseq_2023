@@ -24,8 +24,14 @@ conda activate beast2-277
 cd /scratch/rjp5nc/snapp5/
 
 
-#/path/to/beast/bin/packagemanager -add SNAPP
+# Open resutls with Tracer
+#/home/rjp5nc/tracer/bin/tracer
 
-/scratch/rjp5nc/beast/beast/bin/beast -java -threads 30 /scratch/rjp5nc/snapp5/snapp.0.0001.xml
+# Open density tree with beast2
+#/home/rjp5nc/beast/bin/densitree
 
-#Ran treeannotator locally with increased RAM.
+/scratch/rjp5nc/beast/beast/bin/treeannotator \
+-burnin 10 \
+-heights mean \
+/scratch/rjp5nc/snapp5/snapp.mono2.trees \
+/scratch/rjp5nc/snapp5/snapp.tree

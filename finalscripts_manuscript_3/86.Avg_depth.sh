@@ -68,11 +68,6 @@ END {
 > "$RESULTDIR/${contig}.avgdepth.long.sorted_100000.txt"
 
 
-
-
-
-
-
 # cat *avgdepth.long.sorted_100000.txt > ../avg_avgdepth.long.sorted_100000.txt
 
 # awk '
