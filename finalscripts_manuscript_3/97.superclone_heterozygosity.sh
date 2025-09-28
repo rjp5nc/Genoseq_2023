@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 #SBATCH -J BEAST # A single job name for the array
-#SBATCH --ntasks-per-node=30 # one core
+#SBATCH --ntasks-per-node=2 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-0:00:00 ### 15 seconds
-#SBATCH --mem 120G
+#SBATCH --mem 90G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/beast.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/beast.%A_%a.err # Standard error
 #SBATCH -p standard
