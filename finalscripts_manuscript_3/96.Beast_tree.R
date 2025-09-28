@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=30 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 6-0:00:00 ### 15 seconds
-#SBATCH --mem 50G
+#SBATCH --mem 120G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/beast.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/beast.%A_%a.err # Standard error
 #SBATCH -p standard
@@ -24,10 +24,14 @@ conda activate beast2-277
 cd /scratch/rjp5nc/snapp5/
 
 
-#/scratch/rjp5nc/beast/beast/bin/packagemanager -add SNAPP
+# Open resutls with Tracer
+#/home/rjp5nc/tracer/bin/tracer
 
-/scratch/rjp5nc/beast/beast/bin/beast -java -threads 30 /scratch/rjp5nc/snapp5/snapp.mono2.xml
+# Open density tree with beast2
+#/home/rjp5nc/beast/bin/densitree
 
-#Ran treeannotator locally with increased RAM.
-
-
+/scratch/rjp5nc/beast/beast/bin/treeannotator \
+-burnin 10 \
+-height mean \
+/scratch/rjp5nc/snapp5/snapp.mono2.trees \
+/scratch/rjp5nc/snapp5/snapp.tree
