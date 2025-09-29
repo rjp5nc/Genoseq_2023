@@ -12,12 +12,15 @@
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
+
+# het / total_sites_in_window
+
 module load bcftools
 
 
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_two_of_each.vcf.gz"
-WINDOW=10000          # 10 kb windows
-RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_hets"
+WINDOW=100000          # 10 kb windows
+RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_hets100000"
 mkdir -p "$RESULTDIR"
 
 cd $RESULTDIR
@@ -61,5 +64,7 @@ for contig in "${contigs[@]}"; do
             het_prop = (count[k]>0) ? het[k]/count[k] : 0
             printf "%s\t%d\t%d\t%s\t%.5f\n", a[1], win_start, win_end, sample_name, het_prop
         }
-    }' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_10kb.txt"
+    }' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_100kb.txt"
 done
+
+#cat $RESULTDIR/*_het_10kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/only2_het_10kb.txt
