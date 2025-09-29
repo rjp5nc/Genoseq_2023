@@ -17,7 +17,7 @@ module load bcftools
 
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_two_of_each.vcf.gz"
 WINDOW=10000          # 10 kb windows
-RESULTDIR="windowed_hets"
+RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_hets"
 mkdir -p "$RESULTDIR"
 
 cd $RESULTDIR
