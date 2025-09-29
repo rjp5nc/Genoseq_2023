@@ -18,9 +18,9 @@
 module load bcftools
 
 
-VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_two_of_each.vcf.gz"
+VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_Gilmer.vcf.gz"
 WINDOW=100000          # 10 kb windows
-RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_hets100000"
+RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_gilmer_hets100000"
 mkdir -p "$RESULTDIR"
 
 cd $RESULTDIR
@@ -67,4 +67,4 @@ for contig in "${contigs[@]}"; do
     }' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_100kb.txt"
 done
 
-#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/only2_het_100kb.txt
+#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_100kb.txt

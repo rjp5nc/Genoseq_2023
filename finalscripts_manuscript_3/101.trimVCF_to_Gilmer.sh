@@ -12,7 +12,6 @@
 
 module load bcftools
 
-
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz"
 SAMPLES="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygotegilmer/onlygilmer.txt"
 OUT="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_Gilmer.vcf.gz"
