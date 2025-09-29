@@ -7,7 +7,7 @@ library(tidyverse)
 library(gridExtra)
 library(ggplot2)
 # Read the vcftools --het output
-het <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote/sample_het.het", header = TRUE)
+het <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote2/sample_het.het", header = TRUE)
 genomic_types <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
 
 
@@ -84,7 +84,7 @@ p2 <- ggplot(het_group, aes(x = Group, y = mean_Ho, fill = Group)) +
   )
 
 # Save plots
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote/heterozygote_sites.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote2/heterozygote_sites.png",
     width = 800, height = 1000)
 
 grid.arrange(p1, p2, ncol = 1)
@@ -130,7 +130,7 @@ p_depth <- ggplot(het_depth, aes(x = INDV, y = Ho, fill = meanDepth)) +
             inherit.aes = FALSE, angle = 0, vjust = 1, size = 5)
 
 # Save to PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote/heterozygosity_by_depth.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote2/heterozygosity_by_depth.png",
     width = 800, height = 600)
 print(p_depth)
 dev.off()
@@ -148,7 +148,7 @@ x_labels <- het_merged %>%
   pull(label)
 
 # Plot
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote/F_per_sample.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote2/F_per_sample.png",
     width = 800, height = 600)
 
 ggplot(het_merged %>% arrange(Group), aes(x = INDV, y = F, fill = Group)) +
@@ -183,7 +183,7 @@ group_labels <- het_depths %>%
   select(xpos, Group)
 
 # Plot
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote/F_per_sample_depth.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote2/F_per_sample_depth.png",
     width = 1000, height = 600)
 
 ggplot(het_depths, aes(x = xpos, y = F, fill = meanDepth)) +
