@@ -17,9 +17,9 @@ cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
 module load bcftools
 
-VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv//scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
+VCF=trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
 
- bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv//scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz > samples.txt
+ bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz > samples.txt
 nsamples=$(bcftools query -l "$VCF" | wc -l)
 echo "Samples: $nsamples"
 
