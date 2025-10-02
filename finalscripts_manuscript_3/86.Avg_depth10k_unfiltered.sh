@@ -16,6 +16,7 @@
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
 module load bcftools
+#bcftools index /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa.bgz.vcf.gz
 
 VCF=trimmed10bp_allsites_usobtusa.bgz.vcf.gz
 
