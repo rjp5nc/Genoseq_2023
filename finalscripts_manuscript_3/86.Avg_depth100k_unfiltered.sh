@@ -9,14 +9,14 @@
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=2-12
+#SBATCH --array=1-12
 
 #cat /scratch/rjp5nc/err/pixy.4130404_8
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
 module load bcftools
-bcftools index /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa.bgz.vcf.gz
+#bcftools index /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa.bgz.vcf.gz
 
 VCF=trimmed10bp_allsites_usobtusa.bgz.vcf.gz
 
