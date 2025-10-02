@@ -26,7 +26,7 @@ echo "Samples: $nsamples"
 samples_str=$(bcftools query -l "$VCF" | paste -sd "," -)
 echo "Samples: $samples_str"
 
-RESULTDIR=dp_results_100k_unfiltered
+RESULTDIR=dp_results_10k_unfiltered
 mkdir -p "$RESULTDIR"
 
 # Get contig for this array task
@@ -41,7 +41,7 @@ bcftools query -f '%CHROM\t%POS[\t%DP]\n' -r "$contig" "$VCF" \
 | awk -v nsamples="$nsamples" -v contig="$contig" -v SAMPLES="$samples_str" '
 BEGIN { split(SAMPLES, sample_arr, ",") }
 {
-    win = int($2/100000)
+    win = int($2/10000)
     for(i=1;i<=nsamples;i++){
         dp = $(i+2)
         if(dp ~ /^[0-9]+$/){ 
@@ -54,8 +54,8 @@ BEGIN { split(SAMPLES, sample_arr, ",") }
 }
 END {
     for(win in seen){
-        win_start = win*100000
-        win_end = win_start + 99999
+        win_start = win*10000
+        win_end = win_start + 9999
         for(i=1;i<=nsamples;i++){
             sample_name = sample_arr[i]
             avg = (count[i,win]>0) ? sum[i,win]/count[i,win] : 0
@@ -64,7 +64,7 @@ END {
     }
 }' \
 | sort -k2,2n -k4,4 \
-> "$RESULTDIR/${contig}.avgdepth.long.sorted_100000.txt"
+> "$RESULTDIR/${contig}.avgdepth.long.sorted_10000.txt"
 
 # cat *avgdepth.long.sorted_100000.txt > ../avgdepth_all_100000.txt
 
