@@ -27,13 +27,13 @@ mkdir -p $OUTDIR
   ${BAM}
 
 
-  MERGED="all_samples_100kb_depths.tsv"
+#   MERGED="all_samples_100kb_depths.tsv"
 
-# header
-echo -e "sample\tchrom\tstart\tend\tdepth" > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/$MERGED
+# # header
+# echo -e "sample\tchrom\tstart\tend\tdepth" > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/$MERGED
 
-for f in $OUTDIR/*.regions.bed.gz
-do
-    sample=$(basename $f .regions.bed.gz)
-    zcat $f | awk -v s=$sample '{print s"\t"$1"\t"$2"\t"$3"\t"$4}' >> /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/$MERGED
-done
+# for f in $OUTDIR/*.regions.bed.gz
+# do
+#     sample=$(basename $f .regions.bed.gz)
+#     zcat $f | awk -v s=$sample '{print s"\t"$1"\t"$2"\t"$3"\t"$4}' >> /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/$MERGED
+# done
