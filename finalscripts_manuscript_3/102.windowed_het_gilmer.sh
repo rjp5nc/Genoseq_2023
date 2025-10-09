@@ -3,7 +3,7 @@
 #SBATCH -J BEAST # A single job name for the array
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 6-0:00:00 ### 15 seconds
+#SBATCH -t 1-0:00:00 ### 15 seconds
 #SBATCH --mem 60G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/beast.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/beast.%A_%a.err # Standard error
@@ -68,3 +68,4 @@ for contig in "${contigs[@]}"; do
 done
 
 #cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_100kb.txt
+#cat *_het_10kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_10kb.txt
