@@ -34,6 +34,7 @@ for i in "${!samples[@]}"; do
     export "samples$i=${samples[$i]}"
 done
 
+
 # Main loop
 bcftools query -f '%CHROM\t%POS[\t%GT]\n' -r "$contig" "$VCF" | \
 awk -v nsamples="$nsamples" -v contig="$contig" -v win_size="$WINDOW" '
