@@ -16,8 +16,8 @@
 module load bcftools
 
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa.bgz.vcf.gz"
-WINDOW=100000
-RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_hets100000_all"
+WINDOW=1000000
+RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_hets1000000_all"
 mkdir -p "$RESULTDIR"
 
 # Get contig for this array index
@@ -57,7 +57,7 @@ END {
         het_prop = (count[k]>0) ? het[k]/count[k] : 0
         printf "%s\t%d\t%d\t%s\t%.5f\n", a[1], win_start, win_end, sample_name, het_prop
     }
-}' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_100kb.txt"
+}' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_1000kb.txt"
 
 echo "Done: $contig"
 
