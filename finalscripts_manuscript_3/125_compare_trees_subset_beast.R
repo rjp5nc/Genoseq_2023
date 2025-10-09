@@ -1,0 +1,258 @@
+##module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
+
+#R
+
+# Load libraries
+library(ape)
+library(phytools)
+library(dendextend)
+
+# Load required packages
+library(SeqArray)
+library(SNPRelate)
+library(ggtree)
+library(ggplot2)
+library(dplyr)
+library(tibble)
+library(data.table)
+library(igraph)
+library(SeqVarTools)
+library(tidyverse)
+
+library(patchwork)
+library(foreach)
+library(lubridate)
+
+# -----------------------------
+# 1. Load NJ trees
+# -----------------------------
+
+tree1_file <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_tree_genomic.nwk"
+tree2_file <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_tree_mito.nwk"
+
+tree1 <- read.tree(tree1_file)
+tree2 <- read.tree(tree2_file)
+
+# -----------------------------
+# 2. Prune to common tips
+# -----------------------------
+common_tips <- intersect(tree1$tip.label, tree2$tip.label)
+
+tree1_pruned <- drop.tip(tree1, setdiff(tree1$tip.label, common_tips))
+tree2_pruned <- drop.tip(tree2, setdiff(tree2$tip.label, common_tips))
+
+# -----------------------------
+# 3. Reorder tips to match
+# --------
+library(ape)
+
+
+# prune to common tips
+common_tips <- intersect(tree1$tip.label, tree2$tip.label)
+tree1_pruned <- drop.tip(tree1, setdiff(tree1$tip.label, common_tips))
+tree2_pruned <- drop.tip(tree2, setdiff(tree2$tip.label, common_tips))
+
+# association: one-to-one, same labels
+assoc <- cbind(tree1_pruned$tip.label, tree1_pruned$tip.label)
+
+# save bigger PNG
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_bold.png",
+    width = 6000, height = 12000, res = 300)
+
+cophyloplot(tree1_pruned, tree2_pruned,
+            assoc = assoc,
+            use.edge.length = FALSE,
+            space = 50,                # less gap → bigger trees
+            gap = 200,                   # closer to the axis
+            length.line = 100,           # connecting line length
+            col = "gray40",            # connector line color
+            lwd = 1,                   # thicker tree branches
+            cex = 1.2,                 # tip label size
+            direction = c("right","left"))  # mirrored orientation
+
+dev.off()
+
+
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_bold.png",
+    width = 6000, height = 12000, res = 300)
+    cophyloplot(wasp.cophylo,
+            use.edge.length = FALSE,
+            space = 50,                # less gap → bigger trees
+            gap = 200,                   # closer to the axis
+            length.line = 100,           # connecting line length
+            col = "gray40",            # connector line color
+            lwd = 1,                   # thicker tree branches
+            cex = 1.2,                 # tip label size
+            direction = c("right","left"))  # mirrored orientation
+dev.off()
+
+
+
+cophylo<-cophylo(tree1_pruned,tree2_pruned,
+    assoc=assoc)
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_bold.png",
+    width = 6000, height = 12000, res = 300)
+plot(cophylo)
+dev.off()
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_bold2.png",
+    width = 6000, height = 12000, res = 300)
+
+
+cotangleplot(tree1_pruned,tree2_pruned, type=c("phylogram"),
+   use.edge.length=FALSE, tangle=c("both"))
+   dev.off()
+
+
+
+
+
+# ---- Step 1: Open GDS file ----
+
+metadata <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv", header = TRUE)
+metadata_with_clone <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/metadata_with_clone.csv", header = TRUE)
+
+samples <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species_merged_20250627.csv")
+
+usobtusasamps <- subset(samples, Species == "Daphnia obtusa" & Continent == "NorthAmerica")
+metadata_with_clone$clone <- trimws(metadata_with_clone$clone)
+
+metadata_with_clone <- subset(metadata_with_clone, clone !="Blank")
+metadata_with_clone <- subset(metadata_with_clone, clone !="BLANK")
+
+head(metadata)
+metadata$clone <- trimws(metadata$clone)
+metadata <- metadata %>% 
+  filter(!tolower(clone) %in% c("blank", "blanks", "na", "missing"))
+
+Pool <- subset(metadata_with_clone, accuratelocation == "P66")
+
+samples_to_keep <- Pool %>% pull(Well)
+
+
+df1 <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
+df2 <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")
+
+library(RColorBrewer)
+
+# Example palette
+group_colors <- setNames(
+  brewer.pal(length(unique(df1$Group)), "Set2"),
+  unique(df1$Group)
+)
+
+# Assign colors in df1 and df2
+df1$color <- group_colors[df1$Group]
+df2$color <- group_colors[df2$Group]  # or a different palette if you want
+
+
+
+
+
+
+
+
+
+
+# ----------------------------
+# Tip colors
+# ----------------------------
+cols1 <- setNames(df1$color, df1$CloneA)
+cols2 <- setNames(df2$color, df2$CloneA)
+
+tipcols1 <- cols1[match(cophylo$trees[[1]]$tip.label, names(cols1))]
+tipcols2 <- cols2[match(cophylo$trees[[2]]$tip.label, names(cols2))]
+
+tipcols1[is.na(tipcols1)] <- "black"
+tipcols2[is.na(tipcols2)] <- "black"
+
+
+library(phangorn) 
+# Make sure your tip colors are ready
+cols1 <- setNames(df1$color, df1$CloneA)
+cols2 <- setNames(df2$color, df2$CloneA)
+
+tipcols1 <- cols1[match(cophylo$trees[[1]]$tip.label, names(cols1))]
+tipcols2 <- cols2[match(cophylo$trees[[2]]$tip.label, names(cols2))]
+
+tipcols1[is.na(tipcols1)] <- "black"
+tipcols2[is.na(tipcols2)] <- "black"
+
+# Define the function
+get_edge_colors <- function(tree, tipcols) {
+  edge_colors <- rep("black", nrow(tree$edge))
+  
+  for (i in seq_len(nrow(tree$edge))) {
+    node <- tree$edge[i, 2]
+    # Use phangorn::Descendants for tips
+    tips <- phangorn::Descendants(tree, node, "tips")[[1]]
+    edge_colors[i] <- tipcols[tips[1]]  # use first descendant tip's color
+  }
+  return(edge_colors)
+}
+
+# Generate edge colors
+edgecols1 <- get_edge_colors(cophylo$trees[[1]], tipcols1)
+edgecols2 <- get_edge_colors(cophylo$trees[[2]], tipcols2)
+
+# Combine into edge.col for cophylo
+edge.col <- list(left = edgecols1, right = edgecols2)
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo.png", res = 300, width = 4000, height = 5000)
+
+plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = "gray60")
+
+dev.off()
+
+
+
+genomictypes <- df1[, c(2,3)]
+mitotypes <- df2[, c(2,3)]
+
+types <- merge(genomictypes,mitotypes, by="CloneA")
+
+types$types <- paste(types$Group.x, types$Group.y, sep ="_")
+
+table(types$types)
+table(types$Group.x)
+table(types$Group.y)
+
+type_counts <- as.data.frame(table(types$types))
+
+# Rename columns
+colnames(type_counts) <- c("Type", "Count")
+
+# View the table
+print(type_counts)
+
+# Optional: sort by count descending
+type_counts <- type_counts[order(-type_counts$Count), ]
+
+# Save to CSV
+write.csv(type_counts, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/type_counts.csv", row.names = FALSE)
+
+library(tidyverse)
+
+combos <- types %>%
+  count(across(2:4))
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genxmitotypes.png", res = 300, width = 2000, height = 3000)
+
+# Make a bar plot
+ggplot(combos, aes(x = Group.x, y = n, col=Group.y)) +
+  geom_point(position = position_jitter(width = 0.2, height = 0)) +
+  ylim(0,55)+
+    geom_text(aes(label = n), vjust = -0.5, size = 4) +  # add counts above points
+  labs(x = "Superclone", y = "Mitotype", title = "Counts of A_*, B_*, etc. grouped by prefix") +
+  theme_bw()
+
+dev.off()
+
+
+subset(types, Group.x == "AC")
+subset(types, Group.x == "C")
