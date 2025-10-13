@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
-#SBATCH --array=1-256%100
+#SBATCH --array=1-256
 
 
 # This script will conduct genotype calling on the GenomeDBI object
