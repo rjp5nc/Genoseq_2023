@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=41
+#SBATCH --array=43
 
 ##5, 9-11, 17-24, 41, 43
 
