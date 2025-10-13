@@ -3,7 +3,7 @@
 #SBATCH -J CombineVCFs # A single job name for the array
 #SBATCH --ntasks-per-node=1 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 5-00:00
+#SBATCH -t 0-24:00 # hours
 #SBATCH --mem 100G
 #SBATCH -o /scratch/rjp5nc/err/genotypegvcf.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/genotypegvcf.%A_%a.err # Standard error
