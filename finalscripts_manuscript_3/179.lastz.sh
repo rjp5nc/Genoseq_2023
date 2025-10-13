@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-#SBATCH -J runFASTQC # A single job name for the array
+#SBATCH -J lastz # A single job name for the array
 #SBATCH --ntasks-per-node=40 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 1:00:00 ### 15 seconds
+#SBATCH -t 20:00:00 ### 15 seconds
 #SBATCH --mem 120G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/nFlo_1.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/nFlo_1.%A_%a.err # Standard error
