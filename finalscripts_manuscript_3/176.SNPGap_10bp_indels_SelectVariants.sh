@@ -3,7 +3,7 @@
 #SBATCH -J SNP_filtering
 #SBATCH --ntasks-per-node=4 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 0-72:00 # hours
+#SBATCH -t 0-24:00 # hours
 #SBATCH --mem 10G
 #SBATCH -o /scratch/rjp5nc/err/FilterVCFs_%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/FilterVCFs_%A_%a.err # Standard error
