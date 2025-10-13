@@ -13,7 +13,7 @@
 # sbatch /home/rjp5nc/Genoseq_2023/shortread/liftover/lastz.sh
 # sacct -j 761713
 
-module load nextflow/23.04.1
+module load nextflow/25.04.6
 module load apptainer/1.3.4
 
 ### ssdf
