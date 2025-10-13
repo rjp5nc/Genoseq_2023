@@ -20,8 +20,7 @@ module load picard
 #species=usambigua
 species=usobtusa
 speciescrossmap=us_obtusa
-vcffile=trimmed10bp_masked_${species}.vcf.gz
-sourcegenome=totalHiCwithallbestgapclosed.fa
+#vcffile=trimmed10bp_masked_${species}.vcf.gz
 #Daphnia_ambigua_Q001_genome.fa
 #US_obtusa_onlydaps.fa
 #us_pulex_ref_kap4.fa
@@ -32,11 +31,11 @@ CPU=1
 
 # Liftover using picard
 java "-Xmx${JAVAMEM}" -jar $EBROOTPICARD/picard.jar  LiftoverVcf \
-I=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/$vcffile \
-O=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}.vcf.gz \
-CHAIN=/scratch/rjp5nc/lastz/$speciescrossmap/chainnet/liftover.chain \
-REJECT=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}_rejected.vcf.gz \
-R=/scratch/rjp5nc/Reference_genomes/post_kraken/$sourcegenome \
+I=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_euobtusa.vcf.gz \
+O=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_euobtusa_lifted_to_US_picard.vcf.gz \
+CHAIN=/scratch/rjp5nc/lastz/eu_obtusa_to_usobtusa/chainnet/liftover.chain \
+REJECT=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_euobtusa_lifted_to_US_picard_rejects.vcf.gz \
+R=/scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.fasta \
 MAX_RECORDS_IN_RAM=10000000 \
 WARN_ON_MISSING_CONTIG=true \
 RECOVER_SWAPPED_REF_ALT=true 
