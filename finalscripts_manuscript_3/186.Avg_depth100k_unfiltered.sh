@@ -3,7 +3,7 @@
 #SBATCH -J pixy # A single job name for the array
 #SBATCH --ntasks-per-node=10 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 0-92:00  ### 48 hours
+#SBATCH -t 0-10:00:00  ### 48 hours
 #SBATCH --mem 30G
 #SBATCH -o /scratch/rjp5nc/err/pixy.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
