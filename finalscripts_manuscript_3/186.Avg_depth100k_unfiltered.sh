@@ -9,18 +9,24 @@
 #SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-96
+#SBATCH --array=3
+
+
+##SBATCH --array=1-96
 
 #cat /scratch/rjp5nc/err/pixy.4130404_8
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/
+
+#bcftools query -f '%CHROM\n' trimmed10bp_masked_euobtusa.vcf.gz | sort | uniq -c | awk '$1>0 {print $2}' > contigs_with_snps.txt
+
 
 module load bcftools
 #bcftools index /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa.bgz.vcf.gz
 
 VCF=trimmed10bp_masked_euobtusa.vcf.gz
 
- bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_euobtusa.vcf.gz > samples.txt
+bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_euobtusa.vcf.gz > samples.txt
 nsamples=$(bcftools query -l "$VCF" | wc -l)
 echo "Samples: $nsamples"
 
@@ -31,6 +37,8 @@ RESULTDIR=dp_results_100k_unfiltered_eu
 mkdir -p "$RESULTDIR"
 
 bcftools view -h trimmed10bp_masked_euobtusa.vcf.gz | grep '^##contig' | cut -d'=' -f3 | cut -d',' -f1 > contigs_clean.txt
+
+SLURM_ARRAY_TASK_ID=3
 
 # Get contig for this array task
 contig=$(sed -n "${SLURM_ARRAY_TASK_ID}p" contigs_clean.txt)
