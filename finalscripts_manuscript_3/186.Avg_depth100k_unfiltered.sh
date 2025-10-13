@@ -39,8 +39,6 @@ mkdir -p "$RESULTDIR"
 
 bcftools view -h trimmed10bp_masked_euobtusa.vcf.gz | grep '^##contig' | cut -d'=' -f3 | cut -d',' -f1 > contigs_clean.txt
 
-SLURM_ARRAY_TASK_ID=3
-
 # Get contig for this array task
 contig=$(sed -n "${SLURM_ARRAY_TASK_ID}p" contigs_clean.txt)
 if [[ -z "$contig" ]]; then
