@@ -19,19 +19,23 @@ module load python/3.11.4
 
 #pip install --user .
 
-#species=us_pulex
-#species=us_obtusa
-#species=us_ambigua
-species=eu_obtusa
+#species=uspulex
+#species=usobtusa
+#species=usambigua
+species=euobtusa
+speciescrossmap=eu_obtusa_to_usobtusa
+vcffile=trimmed10bp_masked_${species}.vcf.gz
 
+#Daphnia_ambigua_Q001_genome.fa
+sourcegenome=US_obtusa_onlydaps.fa
+#us_pulex_ref_kap4.fa
 
-#bed=us_pulex_ref_kap4.allbases.cleaned.slimmed.bed
-#bed=US_obtusa_onlydaps.allbases.cleaned.slimmed.bed
-#bed=Daphnia_ambigua_Q001_genome.allbases.slimmed.bed
-bed=assembly.hap2_onlydaps.allbases.slimmed.bed
+samtools faidx /scratch/rjp5nc/Reference_genomes/post_kraken/$sourcegenome
 
-/home/rjp5nc/.local/bin/CrossMap vcf path/to/your.chain \
- source_genome.fa your_input.vcf.gz output_lifted.vcf
+/home/rjp5nc/.local/bin/CrossMap vcf --chromid a /scratch/rjp5nc/lastz/$speciescrossmap/chainnet/liftover.chain \
+ /scratch/rjp5nc/Reference_genomes/post_kraken/$sourcegenome \
+ /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_euobtusa.vcf.gz \
+ /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_euobtusa_lifted_to_US.vcf.gz
 
 #cd /home/rjp5nc/Genoseq_2023/shortread/liftover
 
