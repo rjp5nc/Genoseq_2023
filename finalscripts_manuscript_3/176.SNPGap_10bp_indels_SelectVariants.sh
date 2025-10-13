@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
-
+#SBATCH --array=1-256
 
 # This script will remove SNPS within 10 base pairs of indels by a chromosome basis using bcftools
 # Also filters out only SNPs using gatk
@@ -25,22 +25,20 @@ module load gatk/4.6.0.0
 
 #need to do us pulex, us ambigua
 
-species=usobtusa_vcf
-ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usobtusa.txt"
+species=euobtusa_vcf
+ref=/scratch/rjp5nc/Reference_genomes/post_kraken/assembly.hap2_onlydaps.fasta
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_euobtusa.txt"
 
-wd=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf_10bp
+wd=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/eudobtusa_gvcf_10bp
 
-mkdir -p /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf_10bp
+mkdir -p /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/eudobtusa_gvcf_10bp
 
-WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf
+WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/eudobtusa_gvcf
 # Intervals to analyze
 
 # Parameters
 JAVAMEM=10G
 CPU=4
-
-SLURM_ARRAY_TASK_ID=80
 
 # Chromosome
 chrom=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )
@@ -71,10 +69,10 @@ module load gcc/14.2.0 htslib/1.17
 # Index filtered vcf
 tabix -p vcf ${wd}/${chrom}.${start}.${stop}_filtsnps10bpindels.vcf.gz
 
-mkdir -p ${wd}/${species}_snps
+# mkdir -p ${wd}/${species}_snps
 
-# Filter only SNPs
-gatk --java-options "-Xmx${JAVAMEM}" SelectVariants \
--V ${wd}/${chrom}.${start}.${stop}_filtsnps10bpindels.vcf.gz \
--R $ref \
--O ${wd}/${species}_snps/${chrom}.${start}.${stop}_filtsnps10bpindels_snps.vcf.gz
+# # Filter only SNPs
+# gatk --java-options "-Xmx${JAVAMEM}" SelectVariants \
+# -V ${wd}/${chrom}.${start}.${stop}_filtsnps10bpindels.vcf.gz \
+# -R $ref \
+# -O ${wd}/${species}_snps/${chrom}.${start}.${stop}_filtsnps10bpindels_snps.vcf.gz
