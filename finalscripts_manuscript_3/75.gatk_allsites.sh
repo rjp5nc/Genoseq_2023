@@ -43,8 +43,6 @@ species="DBI_usobtusa"
 # Move to working directory
 cd $WORKING_FOLDER
 
-SLURM_ARRAY_TASK_ID=80
-
 # Chromosome
 i=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )
 
