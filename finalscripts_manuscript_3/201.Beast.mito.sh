@@ -25,7 +25,7 @@ cd /scratch/rjp5nc/snapp5/
 
 #/scratch/rjp5nc/beast/beast/bin/packagemanager -add SNAPP
 
-/scratch/rjp5nc/beast/beast/bin/beast -java -threads 25 /scratch/rjp5nc/snapp5/snapp.mito.xml
+/scratch/rjp5nc/beast/beast/bin/beast -java -seed 12354 -threads 25 /scratch/rjp5nc/snapp5/snapp.mito.xml
 
 #Ran treeannotator locally with increased RAM.
 
