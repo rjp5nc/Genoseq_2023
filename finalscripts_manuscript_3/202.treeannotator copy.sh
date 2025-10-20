@@ -34,6 +34,6 @@ cd /scratch/rjp5nc/snapp5/
 -burnin 10 \
 -height mean \
 -topology MCC \
-/scratch/rjp5nc/snapp5/snapp.mono.trees \
+/scratch/rjp5nc/snapp5/snapp.mito.trees \
 /scratch/rjp5nc/snapp5/snapp.mito.highest1.tree
 
