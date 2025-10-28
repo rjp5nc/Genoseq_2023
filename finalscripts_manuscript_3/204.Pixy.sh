@@ -40,7 +40,7 @@ OUT_DIR="/scratch/rjp5nc/UK2022_2024/allsites_mito/results_pixymito"
 pixy --stats pi fst dxy \
     --vcf $VCF \
     --populations /scratch/rjp5nc/UK2022_2024/allsites_mito/pops_fixed.txt \
-    --window_size 14601 \
+    --window_size 14600 \
     --n_cores 20 \
     --output_folder $OUT_DIR \
     --bypass_invariant_check \
