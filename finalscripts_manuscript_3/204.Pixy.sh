@@ -31,15 +31,15 @@ cd /scratch/rjp5nc/UK2022_2024/mito_vcf
 
 # Directory with chromosome VCFs
 
-VCF="/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/usdobtusa_mito_combined.g.vcf.gz"
-POPS="/scratch/rjp5nc/UK2022_2024/mito_vcf/pops_fixed.txt"
+VCF="/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites_firstcol.vcf.gz"
+POPS="/scratch/rjp5nc/UK2022_2024/allsites_mito/pops_fixed.txt"
 
 # --- Output directory ---
-OUT_DIR="/scratch/rjp5nc/UK2022_2024/mito_vcf/results_pixymito"
+OUT_DIR="/scratch/rjp5nc/UK2022_2024/allsites_mito/results_pixymito"
 
 pixy --stats pi fst dxy \
     --vcf $VCF \
-    --populations /scratch/rjp5nc/UK2022_2024/mito_vcf/pops_fixed.txt \
+    --populations /scratch/rjp5nc/UK2022_2024/allsites_mito/pops_fixed.txt \
     --window_size 14601 \
     --n_cores 20 \
     --output_folder $OUT_DIR \
