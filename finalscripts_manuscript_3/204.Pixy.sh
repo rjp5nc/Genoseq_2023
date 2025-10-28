@@ -35,7 +35,7 @@ VCF="/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/usdobtusa_mito_combined.g.
 POPS="/scratch/rjp5nc/UK2022_2024/mito_vcf/pops_fixed.txt"
 
 # --- Output directory ---
-OUTDIR="/scratch/rjp5nc/UK2022_2024/mito_vcf/results_pixymito"
+OUT_DIR="/scratch/rjp5nc/UK2022_2024/mito_vcf/results_pixymito"
 
 pixy --stats pi fst dxy \
     --vcf $VCF \
