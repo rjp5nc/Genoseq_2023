@@ -43,7 +43,7 @@ pixy --stats pi fst dxy \
     --window_size 14601 \
     --n_cores 20 \
     --output_folder $OUT_DIR \
-    --bypass_invariant_check 'yes'/
+    --bypass_invariant_check 'yes' \
     --output_prefix pixy_14601_
 
 
