@@ -17,10 +17,9 @@
 
 module load bcftools
 
-
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_Gilmer.vcf.gz"
-WINDOW=10000          # 10 kb windows
-RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_gilmer_hets10000"
+WINDOW=1000000          # 10 kb windows
+RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_gilmer_hets1000000"
 mkdir -p "$RESULTDIR"
 
 cd $RESULTDIR
@@ -64,8 +63,8 @@ for contig in "${contigs[@]}"; do
             het_prop = (count[k]>0) ? het[k]/count[k] : 0
             printf "%s\t%d\t%d\t%s\t%.5f\n", a[1], win_start, win_end, sample_name, het_prop
         }
-    }' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_10kb.txt"
+    }' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_1000kb.txt"
 done
 
-#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_100kb.txt
+#cat $RESULTDIR/*_het_1000kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_1000kb.txt
 #cat *_het_10kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_10kb.txt
