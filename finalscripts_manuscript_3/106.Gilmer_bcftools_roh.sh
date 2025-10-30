@@ -33,6 +33,8 @@ conda activate rohviz
 # module spider bcftools         # see available versions
 # module load bcftools/1.17
 
+module purge
+
 module load bcftools/1.17
 
 dir=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv
