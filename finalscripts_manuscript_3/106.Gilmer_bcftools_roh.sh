@@ -11,6 +11,24 @@
 #SBATCH --account berglandlab
 
 
+
+# conda create -n rohviz -c conda-forge -c bioconda bcftools perl -y
+# conda activate rohviz
+
+# curl -L -o "$CONDA_PREFIX/bin/roh-viz" \
+#   https://raw.githubusercontent.com/samtools/bcftools/refs/heads/develop/misc/roh-viz
+# chmod +x "$CONDA_PREFIX/bin/roh-viz"
+
+# # sanity check
+# which roh-viz
+
+
+
+conda init bash
+source ~/.bashrc
+conda activate rohviz
+
+
 # module purge
 # module spider bcftools         # see available versions
 # module load bcftools/1.17
@@ -23,5 +41,5 @@ txt=bcftools_roh_gilmer_out.txt
 
 cd $dir
 
-bcftools roh -G30 --AF-dflt 0.4 trimmed10bp_filtered_Gilmer.vcf.gz -o bcftools_roh_gilmer_out.txt
-roh-viz -i ${dir}/$txt -v ${dir}/$vcf -o ${dir}/rmme.html
+bcftools roh -G30 trimmed10bp_filtered_Gilmer.vcf.gz -o bcftools_roh_gilmer_out.txt
+$CONDA_PREFIX/bin/roh-viz -i ${dir}/$txt -v ${dir}/$vcf -o ${dir}/rmme.html
