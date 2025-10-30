@@ -1,4 +1,4 @@
-#ijob -A berglandlab -c10 -p standard --mem=40G
+#ijob -A berglandlab -c2 -p standard --mem=40G
 #module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
 #R
 
@@ -10,12 +10,21 @@ library(ggplot2)
 genomic_types <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
 depths <-   read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_US_obtusa.csv")
 # Folder where all per-contig het files are
-het_data <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_100kb.txt",
+het_data <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_1000kb_all.txt",
                        header = FALSE, stringsAsFactors = FALSE)
 
 colnames(het_data) <- c("contig", "win_start", "win_end", "sample", "het_prop")
 
 # List all files
+
+
+
+
+
+
+
+
+
 
 
 het_merged <- het_data %>%
@@ -26,8 +35,9 @@ het_merged <- het_data %>%
 
 
 
+
 # Plot
-pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/het_sliding_window_Gilmer_100000.pdf",
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/het_window_Gilmer_new_1000kb.pdf",
     width = 25, height = 2)
 
 for(s in unique(het_merged$sample)){
@@ -40,7 +50,7 @@ for(s in unique(het_merged$sample)){
     geom_point(size = 0.4, alpha = 0.6, color = "darkgreen") +
     facet_grid(~contig, scales = "free_x") +
     labs(
-      title = paste0("Sliding window heterozygosity (10kb): ", s,
+      title = paste0("Windowed heterozygosity (1000kb): ", s,
                      " | Group: ", group, " | meanDepth: ", depth),
       x = "Genomic position (window start)",
       y = "Observed heterozygosity (Ho)"
@@ -56,3 +66,65 @@ for(s in unique(het_merged$sample)){
 }
 
 dev.off()
+
+
+
+
+
+
+
+  p2 <- ggplot(het_merged, aes(x = win_start, y = het_prop, group= sample, col=meanDepth)) +
+    geom_line() +
+    facet_grid(~contig, scales = "free_x") +
+    labs(
+      title = "Windowed heterozygosity (1000kb)",
+      x = "Genomic position (window start)",
+      y = "Observed heterozygosity (Ho)"
+    ) +
+    ylim(0, 0.02) +
+    theme_bw(base_size = 12) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+
+
+
+# Plot
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/het_window_Gilmer_1000000_overlap.pdf",
+    width = 100, height = 10)
+p2
+dev.off()
+
+
+
+
+  p3 <- ggplot(subset(het_merged, meanDepth > 5), aes(x = win_start, y = het_prop, group= sample, col=meanDepth)) +
+    geom_line() +
+    facet_grid(~contig, scales = "free_x") +
+    labs(
+      title = "Windowed heterozygosity (1000kb)",
+      x = "Genomic position (window start)",
+      y = "Observed heterozygosity (Ho)"
+    ) +
+    ylim(0, 0.02) +
+    theme_bw(base_size = 12) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+
+
+
+# Plot
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/het_window_Gilmer_1000000_overlap_depth5.pdf",
+    width = 100, height = 10)
+p3
+dev.off()
+
+
+
+
+
