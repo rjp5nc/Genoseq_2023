@@ -15,12 +15,13 @@ chmod +x dfam-tetools.sh
 ### make library
 
 
-
+#finished us obtusa, eu obtusa, us ambigua, eu pulex
 
 
 ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
-classified=/scratch/rjp5nc/removedups/us_dobtusa/RM_653473.SunMar301757312025/consensi.fa.classified
+classified=/scratch/rjp5nc/removedups/us_dobtusa/us_dobtusa/RM_653473.SunMar301757312025/consensi.fa.classified
 
+cd /scratch/rjp5nc/dfamtools/
 
 ### try running RepeatMasker
 ~/dfam-tetools.sh -- RepeatMasker -h
@@ -30,6 +31,6 @@ classified=/scratch/rjp5nc/removedups/us_dobtusa/RM_653473.SunMar301757312025/co
 -pa 4 \
 -qq \
 -lib $classified \
--dir /scratch/rjp5nc/removedups/eu_dobtusa/ \
+-dir /scratch/rjp5nc/removedups/us_dobtusa/ \
 -html \
 $ref

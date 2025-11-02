@@ -65,5 +65,5 @@ for contig in "${contigs[@]}"; do
     }' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_100kb.txt"
 done
 
-#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_100kb.txt
+#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/euobtusa_het_100kb.txt
 #cat *_het_10kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_10kb.txt

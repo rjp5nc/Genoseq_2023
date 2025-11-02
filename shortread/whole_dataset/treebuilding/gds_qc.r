@@ -82,7 +82,7 @@ seqSetFilter(genofile, sample.id = final_samples, variant.id = subset_snp_ids, v
 sample_ids <- seqGetData(genofile, "sample.id")  # Extract sample IDs
 
 # Compute IBS matrix on a SNP subset (you already did this)
-ibd_dist <- snpgdsIBS(genofile, sample.id = final_samples, autosome.only = FALSE, verbose = TRUE)
+ibd_dist <- snpgdsIBS(genofile, autosome.only = FALSE, verbose = TRUE)
 ibs_matrix <- 1 - ibd_dist$ibs  # Convert similarity to distance
 
 # Build tree
@@ -116,12 +116,17 @@ ibs <- snpgdsIBS(genofile, sample.id = final_samples, autosome.only = FALSE)
 ibs_matrix <- ibs$ibs  # this is the numeric similarity matrix
 rownames(ibs_matrix) <- colnames(ibs_matrix) <- ibs$sample.id
 
-write.csv(ibs_matrix, file.path(output_dir, "ibs_matrix_gilmer.csv"))
+write.csv(ibs_matrix, file.path(output_dir, "ibs_matrix_not_gilmer.csv"))
 
 
 
-ibd <- snpgdsIBDMLE(genofile,
-                    autosome.only = FALSE)
+
+
+
+set.seed(100)
+
+ibd <- snpgdsIBDMoM(genofile, sample.id=gilmer_good_samples, snp.id=snp.id,
+    maf=0.05, missing.rate=0.05, num.thread=2, verbose = TRUE, autosome.only = FALSE)
 
 relatedness <- snpgdsIBDSelection(ibd)
 write.csv(relatedness, file.path(output_dir, "estimated_relatedness_not_gilmer.csv"), row.names = FALSE)

@@ -1,156 +1,81 @@
-#ijob -A berglandlab -c10 -p standard --mem=100G
+#ijob -A berglandlab -c10 -p standard --mem=40G
 #module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
 #R
-
 library(data.table)
-fst_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_fst.txt",header = TRUE,sep = "\t")
-dxy_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_dxy.txt",header = TRUE,sep = "\t")
-pi_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pi.txt",header = TRUE,sep = "\t")
+pops <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed.txt",
+                   header = FALSE, stringsAsFactors = FALSE)
 
-library(ggplot2)
-
-
-chrom_keep <- paste0("JAACYE0100000", sprintf("%02d", 1:12), ".1")
-
-# Subset the data
-fst_subset <- fst_raw[fst_raw$chromosome %in% chrom_keep, ]
-
-# Check
-unique(fst_subset$chromosome)
-
-# Clean up
-fst_clean <- na.omit(fst_subset)
+genomic_types <-   read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
 
 
-fst_clean$window_pos_1 <- as.numeric(fst_clean$window_pos_1)
-fst_clean$avg_wc_fst   <- as.numeric(fst_clean$avg_wc_fst)
+genomic_ids <- genomic_types$CloneA
+pop_ids <- pops$V1
 
-# Add combined comparison label
-fst_clean$comparison <- paste(fst_clean$pop1, fst_clean$pop2, sep = "_")
+# find those in pops but not in genomic_types
+pops_not_in_genomic <- setdiff(pop_ids, genomic_ids)
 
-# Save plot as PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_manhattan.png",
-    width = 10000, height = 5000, res = 300)
+# make a dataframe for these, with Group = "OO"
+new_rows <- data.frame(
+  CloneA = pops_not_in_genomic,
+  Group = "OO",
+  stringsAsFactors = FALSE
+)
 
-ggplot(fst_clean, aes(x = window_pos_1, y = avg_wc_fst)) +
-  geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
-  facet_grid(comparison ~ chromosome, scales = "free_x", space = "free_x") +
-  labs(
-    title = "Manhattan-style FST Plot",
-    x = "Genomic position (window start)",
-    y = "FST"
-  ) + ylim(0,1)+
-  theme_bw(base_size = 12) +
-  theme(
-    strip.text.x = element_text(size = 10, angle = 90),
-    strip.text.y = element_text(size = 8),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    panel.grid.minor = element_blank()
-  )
+# bind to genomic_types
+genomic_types_extended <- rbind(
+  genomic_types[, c("CloneA", "Group")],  # keep only relevant cols
+  new_rows
+)
 
-dev.off()
+# if you want to keep the "X" column as well (row numbers), you can reset like this:
+genomic_types_extended$X <- seq_len(nrow(genomic_types_extended))
+
+# reorder columns to match original
+genomic_types_extended <- genomic_types_extended[, c("X", "CloneA", "Group")]
 
 
 
+depths <-   read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_US_obtusa.csv")
+
+library(dplyr)
+
+genomic_types_final <- genomic_types_extended %>%
+  left_join(depths, by = c("CloneA" = "sampleId"))
 
 
+mitotypes <-   read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")
+
+genomic_types_final2 <- genomic_types_final %>%
+  left_join(mitotypes, by = c("CloneA" = "CloneA"))
+
+# make sure it's a data.table
+setDT(genomic_types_final2)
+
+genomic_types_final <- subset(genomic_types_final2, Group.y !="NA")
+
+setnames(genomic_types_final, "Group.x", "Genomic_type")
+setnames(genomic_types_final, "Group.y", "Mito_type")
+setDT(genomic_types_final)
+
+# split out OO's
+oo_group <- genomic_types_final[Genomic_type == "OO"]
+
+# for all other groups: order by meanDepth descending, then take top 2
+top_by_group <- genomic_types_final[Genomic_type != "OO",
+                                    .SD[order(-meanDepth)][1],
+                                    by = Genomic_type]
+
+top_by_group <- na.omit(top_by_group)
+
+# combine results
+final_selection <- rbind(top_by_group, oo_group)
+
+write.csv(final_selection, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/one_of_each_genomic_type.csv")
 
 
+final_vcf_dt <- data.table(final_selection$CloneA)
 
-chrom_keep <- paste0("JAACYE0100000", sprintf("%02d", 1:12), ".1")
-
-dxy_subset <- dxy_raw[dxy_raw$chromosome %in% chrom_keep, ]
-
-
-# Check
-unique(dxy_subset$chromosome)
-
-# Clean up
-dxy_clean <- na.omit(dxy_subset)
-
-
-dxy_clean$window_pos_1 <- as.numeric(dxy_clean$window_pos_1)
-dxy_clean$avg_dxy   <- as.numeric(dxy_clean$avg_dxy)
-
-# Add combined comparison label
-dxy_clean$comparison <- paste(dxy_clean$pop1, dxy_clean$pop2, sep = "_")
-
-# Save plot as PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dxy_manhattan.png",
-    width = 10000, height = 5000, res = 300)
-
-ggplot(dxy_clean, aes(x = window_pos_1, y = avg_dxy)) +
-  geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
-  facet_grid(comparison ~ chromosome, scales = "free_x", space = "free_x") +
-  labs(
-    title = "Manhattan-style dxy Plot",
-    x = "Genomic position (window start)",
-    y = "dxy"
-  ) + ylim(0,1)+
-  theme_bw(base_size = 12) +
-  theme(
-    strip.text.x = element_text(size = 10, angle = 90),
-    strip.text.y = element_text(size = 8),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    panel.grid.minor = element_blank()
-  )
-
-dev.off()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-chrom_keep <- paste0("JAACYE0100000", sprintf("%02d", 1:12), ".1")
-
-pi_subset <- pi_raw[pi_raw$chromosome %in% chrom_keep, ]
-
-
-# Check
-unique(pi_subset$chromosome)
-
-# Clean up
-pi_clean <- na.omit(pi_subset)
-
-
-pi_clean$window_pos_1 <- as.numeric(pi_clean$window_pos_1)
-pi_clean$avg_pi   <- as.numeric(pi_clean$avg_pi)
-
-# Add combined comparison label
-
-# Save plot as PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pi_manhattan.png",
-    width = 10000, height = 5000, res = 300)
-
-ggplot(pi_clean, aes(x = window_pos_1, y = avg_pi)) +
-  geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
-  facet_grid(pop ~ chromosome, scales = "free_x", space = "free_x") +
-  labs(
-    title = "Manhattan-style pi Plot",
-    x = "Genomic position (window start)",
-    y = "pi"
-  ) + ylim(0,1)+
-  theme_bw(base_size = 12) +
-  theme(
-    strip.text.x = element_text(size = 10, angle = 90),
-    strip.text.y = element_text(size = 8),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    panel.grid.minor = element_blank()
-  )
-
-dev.off()
+# write to file
+fwrite(final_vcf_dt, 
+       "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_one_of_each.txt",
+       sep = "\t", quote = FALSE, row.names = FALSE)

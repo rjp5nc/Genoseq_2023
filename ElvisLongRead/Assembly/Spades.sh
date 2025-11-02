@@ -20,3 +20,20 @@ spades.py \
     -o /scratch/rjp5nc/spades/spades_output \
     -t $(nproc) \
     -m $(( $(grep MemTotal /proc/meminfo | awk '{print $2}') / 1024 / 1024 - 2 ))
+
+
+awk '/^>/ {if (seqlen){print name"\t"seqlen}; name=$0; sub(/^>/,"",name); seqlen=0; next} {seqlen+=length($0)} END {print name"\t"seqlen}' /scratch/rjp5nc/spades/spades_output/scaffolds.fasta > /scratch/rjp5nc/spades/spades_output/scaffoldsize.txt
+
+grep -c "^>" /scratch/rjp5nc/spades/spades_output/scaffolds.fasta
+
+awk 'BEGIN{FS="\n"; RS=">"; OFS="\n"} 
+NR>1 {
+    seq=""
+    for (i=2; i<=NF; i++) seq=seq $i
+    if (length(seq) >= 14000) {
+        print ">" $1
+        for (i=2; i<=NF; i++) print $i
+    }  
+}' /scratch/rjp5nc/spades/spades_output/scaffolds.fasta > /scratch/rjp5nc/spades/spades_output/scaffolds_min14k.fasta
+
+grep -c "^>" /scratch/rjp5nc/spades/spades_output/scaffolds_min14k.fasta

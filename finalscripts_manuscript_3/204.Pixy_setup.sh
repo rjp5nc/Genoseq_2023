@@ -26,33 +26,45 @@ export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
 #conda install -c bioconda vcftools
 #conda install -c bioconda bcftools
 
-cd /scratch/rjp5nc/UK2022_2024/mito_vcf
+cd /scratch/rjp5nc/UK2022_2024/allsites_mito/
 
-file /scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/usdobtusa_mito_combined.g.vcf.gz
+file /scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.vcf.gz
 
 
 awk -F',' 'NR>1 {print $1 "\t" $6}' /project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv > pops.txt
 
 awk 'NF==2' pops.txt > pops_filtered.txt
 
-$CONDA_PREFIX/bin/bcftools query -l  /scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/usdobtusa_mito_combined.g.vcf.gz > vcf_samples.txt
+$CONDA_PREFIX/bin/bcftools query -l  /scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.vcf.gz > vcf_samples.txt
 
 grep -Ff vcf_samples.txt pops_filtered.txt > pops_both.txt
 
 awk '$2 != "PBO66"' pops_both.txt > pops_both2.txt
 
-grep -Ff <($CONDA_PREFIX/bin/bcftools query -l /scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/usdobtusa_mito_combined.g.vcf.gz) pops_both2.txt > pops_fixed.txt
+grep -wFf <($CONDA_PREFIX/bin/bcftools query -l /scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.vcf.gz) \
+  pops_both2.txt > pops_fixed.txt
+
+POPS=/scratch/rjp5nc/UK2022_2024/allsites_mito/pops_fixed.txt
+VCF=/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.vcf.gz
+OUTVCF=/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites_firstcol.vcf.gz
+
+# --- extract first column, join with commas ---
+SAMPLES=$(cut -f1 "$POPS" | tr '\n' ',' | sed 's/,$//')
+
+# --- subset VCF to those samples ---
+$CONDA_PREFIX/bin/bcftools view -Oz -s "$SAMPLES" -o "$OUTVCF" "$VCF"
+
+# --- index the new VCF ---
+$CONDA_PREFIX/bin/bcftools index -t "$OUTVCF"
 
 
-VCF="/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/usdobtusa_mito_combined.g.vcf.gz"
-POPS="/scratch/rjp5nc/UK2022_2024/mito_vcf/pops_fixed.txt"
 
 # --- Output directory ---
-OUTDIR="/scratch/rjp5nc/UK2022_2024/mito_vcf/results_pixymito"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/allsites_mito/results_pixymito"
 mkdir -p ${OUTDIR}
 
 # --- Parameters ---
 WINDOW=14601   # window size in bp, adjust as needed
 
-chmod u+rwx /scratch/rjp5nc/UK2022_2024/mito_vcf/results_pixymito
+chmod u+rwx /scratch/rjp5nc/UK2022_2024/allsites_mito/results_pixymito
 

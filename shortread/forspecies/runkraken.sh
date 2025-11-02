@@ -30,6 +30,9 @@ kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt \
 /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged1.fq.gz \
 /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_C4/Rockpool4_C4_trimmedmerged2.fq.gz
 
+
+
+
 grep '^>' /scratch/rjp5nc/krakenDB/shortread/kraken_classified_output_Rockpool4_F9.txt > /scratch/rjp5nc/krakenDB/shortread/classified_headers_Rockpool4_F9.txt
 
 

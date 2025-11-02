@@ -3,9 +3,9 @@
 #R
 
 library(data.table)
-fst_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000/pixy__fst.txt",header = TRUE,sep = "\t")
-dxy_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000/pixy__dxy.txt",header = TRUE,sep = "\t")
-pi_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000/pixy__pi.txt",header = TRUE,sep = "\t")
+fst_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000/pixy_10000__fst.txt",header = TRUE,sep = "\t")
+dxy_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000/pixy_10000__dxy.txt",header = TRUE,sep = "\t")
+pi_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000/pixy_10000__pi.txt",header = TRUE,sep = "\t")
 
 library(ggplot2)
 

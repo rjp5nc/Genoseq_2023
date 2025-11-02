@@ -18,6 +18,9 @@ uspulex_to_eupulex <- fread("/scratch/rjp5nc/liftover/uspulex_to_eupulex.bed")
 eu_pulex <- fread("/scratch/rjp5nc/Reference_genomes/eu_pulex_totalHiCwithallbestgapclosed.clean.allbases.bed")
 
 
+
+
+
 a1 <- head(euobtusa_to_eupulex, 1500)
 a2 <- head(usambigua_to_eupulex, 1500)
 a3 <- head(usobtusa_to_eupulex)

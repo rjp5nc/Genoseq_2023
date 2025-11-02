@@ -54,7 +54,9 @@ var_filter <- which(maf_filter & miss_filter)
 seqSetFilter(genofile, sample.id = final_samples, variant.id = var_filter)
 
 # ===== PCA =====
-pca <- snpgdsPCA(genofile, autosome.only = FALSE)
+pca <- snpgdsPCA(genofile,
+                      sample.id = final_samples,
+                      snp.id = subset_snp_ids, autosome.only = FALSE)
 pc.percent <- pca$varprop * 100
 
 # Save PCA plot
@@ -69,23 +71,32 @@ dev.off()
 # ===== Random SNP Subset for IBS and Tree =====
 
 # Recalculate valid variant IDs again for safety
-miss_variant <- seqMissing(genofile, per.variant=TRUE)
-maf <- seqAlleleFreq(genofile)
-maf_filter <- (maf >= 0.05 & maf <= 0.95)
-miss_filter <- (miss_variant <= 0.10)
 valid_variants <- which(maf_filter & miss_filter)
 
 # Sample 10,000 SNPs from valid ones
 set.seed(123)
-subset_snp_ids <- sample(valid_variants, size = min(10000, length(valid_variants)))
+subset_snp_ids <- sample(valid_variants)
+#, size = min(100000, length(valid_variants))
+
 
 # Apply combined filter safely
 seqSetFilter(genofile, sample.id = final_samples, variant.id = subset_snp_ids, verbose = TRUE)
 
 # Compute IBS and construct NJ tree
 sample_ids <- seqGetData(genofile, "sample.id")
-ibd_dist <- snpgdsIBS(genofile, autosome.only = FALSE, verbose = TRUE)
-ibs_matrix <- 1 - ibd_dist$ibs  # Convert similarity to distance
+ibd_dist <- snpgdsIBS(genofile,
+                      sample.id = final_samples,
+                      snp.id = subset_snp_ids,
+                      autosome.only = FALSE,
+                      verbose = TRUE)
+                      
+
+ibs_matrix <- ibd_dist$ibs
+rownames(ibs_matrix) <- colnames(ibs_matrix) <- ibd_dist$sample.id
+
+write.csv(ibs_matrix, file.path(output_dir, "ibs_matrix_gilmer.csv"))
+
+
 
 tree <- nj(as.dist(ibs_matrix))
 tree$tip.label <- sample_ids
@@ -107,11 +118,32 @@ write.csv(data.frame(Sample = pca$sample.id,
                      PC2 = pca$eigenvect[,2]),
           file.path(output_dir, "seqarray_pca_gilmer.csv"), row.names = FALSE)
 
-ibs <- snpgdsIBS(genofile, autosome.only = FALSE)
-ibs_matrix <- ibs$ibs
-rownames(ibs_matrix) <- colnames(ibs_matrix) <- ibs$sample.id
 
-write.csv(ibs_matrix, file.path(output_dir, "ibs_matrix_gilmer.csv"))
+
+
+seqResetFilter(genofile, verbose = TRUE)
+
+sample_ids <- seqGetData(genofile, "sample.id")
+seqSetFilter(genofile, sample.id = final_samples, variant.id = subset_snp_ids, verbose = TRUE)
+
+
+# 5. Run IBD MLE using only sample.id (since variant.id is already filtered)
+
+ibd <- snpgdsIBDMLE(genofile,
+                    sample.id = final_samples,
+                    snp.id = subset_snp_ids,
+                    autosome.only = FALSE)
+
+                    
+# Select related pairs with estimated kinship
+
+relatedness <- snpgdsIBDSelection(ibd)
+write.csv(relatedness, file.path(output_dir, "estimated_relatedness.csv"), row.names = FALSE)
+
+
+
+
+
 
 # Reset and close
 seqResetFilter(genofile, verbose = FALSE)

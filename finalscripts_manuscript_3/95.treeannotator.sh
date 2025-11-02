@@ -33,5 +33,7 @@ cd /scratch/rjp5nc/snapp5/
 /scratch/rjp5nc/beast/beast/bin/treeannotator \
 -burnin 10 \
 -height mean \
+-topology MCC \
 /scratch/rjp5nc/snapp5/snapp.mono2.trees \
-/scratch/rjp5nc/snapp5/snapp.tree
+/scratch/rjp5nc/snapp5/snapp2.tree
+

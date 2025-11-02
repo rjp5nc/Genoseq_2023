@@ -21,18 +21,21 @@ module load apptainer/1.3.4
   #nextflow run evotools/nf-LO -profile test,singularity -with-singularity ${PWD}/nflo.sif
 
 #ref=dambigua_mito
-#ref=eudobtusa_mito
+ref=eudobtusa_mito
 #ref=kap4Dpulex_mito
-ref=usdobtusa_mito
+#ref=usdobtusa_mito
 
-mkdir -p "/scratch/rjp5nc/Reference_genomes/mito_reference/lastz/$ref"
+seqtk seq -r /scratch/rjp5nc/Reference_genomes/mito_reference/$ref.fasta > /scratch/rjp5nc/Reference_genomes/mito_reference/${ref}_reverse.fasta
+
+
+mkdir -p "/scratch/rjp5nc/Reference_genomes/mito_reference/lastz/${ref}_reverse.fasta"
 
   nextflow run evotools/nf-LO \
-  --source /scratch/rjp5nc/Reference_genomes/mito_reference/$ref.fasta \
+  --source /scratch/rjp5nc/Reference_genomes/mito_reference/${ref}_reverse.fasta \
   --target /scratch/rjp5nc/Reference_genomes/mito_reference/eudpulex_mito.fasta \
   --distance medium \
   --aligner lastz \
-  --outdir /scratch/rjp5nc/Reference_genomes/mito_reference/lastz/$ref \
+  --outdir /scratch/rjp5nc/Reference_genomes/mito_reference/lastz/${ref}_reverse \
   -profile singularity \
   --max_memory '60.GB' \
   --max_cpus 40 \

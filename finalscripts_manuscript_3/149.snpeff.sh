@@ -33,4 +33,15 @@ cp /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Daphnia_obtusa_genes
 
 
 ~/miniconda3/envs/snpeff_env/bin/snpEff \
--c /scratch/rjp5nc/snpEff/snpEff.config US_obtusa /path/to/input.vcf > /scratch/rjp5nc/snpEff/output.ann.vcf
+-c /scratch/rjp5nc/snpEff/snpEff.config US_obtusa /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_Gilmer_12_renamed.vcf.gz > /scratch/rjp5nc/snpEff/output.ann.vcf
+
+
+
+
+
+
+
+
+
+
+

@@ -15,7 +15,7 @@ library(data.table)
 
 # ---- Step 1: Open GDS file ----
 
-
+#BEAST to make tree? add on that Connor used?
 
 metadata <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv", header = TRUE)
 metadata_with_clone <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/metadata_with_clone.csv", header = TRUE)
@@ -47,9 +47,6 @@ valid_samples <- sample_ids[miss_rate_per_sample < 0.05]
 miss_rate_per_variant <- seqMissing(genofile, per.variant=TRUE)
 valid_variants <- seqGetData(genofile, "variant.id")[miss_rate_per_variant < 0.05]
 
-
-
-
 final_valid_samples <- intersect(valid_samples, samples_to_keep)
 
 
@@ -58,7 +55,7 @@ seqSetFilter(genofile, sample.id = final_valid_samples)
 miss_rate <- seqMissing(genofile, per.variant = TRUE)
 dp <- seqGetData(genofile, "annotation/format/DP")
 mean_depth <- rowMeans(dp, na.rm = TRUE)
-keep <- which(miss_rate < 0.05 & mean_depth > 10)
+keep <- which(miss_rate < 0.05)
 
 
 # ---- Step 3: Compute IBS distance matrix ----
@@ -112,7 +109,7 @@ tip_color_dt <- data.table(
 )
 
 
-png("/scratch/rjp5nc/UK2022_2024/mito_vcf/treemitophylogram_rectangular_eu_rooted_by_P759.png", res = 300, width = 4000, height = 9000)
+png("/scratch/rjp5nc/UK2022_2024/mito_vcf/treemitophylogram_rectangular_eu2_rooted_by_P759.png", res = 300, width = 4000, height = 9000)
 #png("/scratch/rjp5nc/UK2022_2024/mito_vcf/tree_usobtusa_circ.png", width = 1200, height = 2000)
 
 # Plot the tree
@@ -140,7 +137,7 @@ dev.off()
 
 
 
-png("/scratch/rjp5nc/UK2022_2024/mito_vcf/treemitophylogram_fan_eu_rooted_by_P759.png", res = 300, width = 4000, height = 4000)
+png("/scratch/rjp5nc/UK2022_2024/mito_vcf/treemitophylogram_fan_eu2_rooted_by_P759.png", res = 300, width = 4000, height = 4000)
 #png("/scratch/rjp5nc/UK2022_2024/mito_vcf/tree_usobtusa_circ.png", width = 1200, height = 2000)
 
 # Plot the tree

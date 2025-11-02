@@ -21,6 +21,7 @@ new_rows <- data.frame(
   stringsAsFactors = FALSE
 )
 
+
 # bind to genomic_types
 genomic_types_extended <- rbind(
   genomic_types[, c("CloneA", "Group")],  # keep only relevant cols
@@ -60,9 +61,33 @@ setDT(genomic_types_final)
 # split out OO's
 oo_group <- genomic_types_final[Genomic_type == "OO"]
 
+
+clustering <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/all_clones_no_filt_superclone.csv")
+
+
+genomic_types_final_loc <- genomic_types_final %>%
+  left_join(clustering, by = c("CloneA" = "Well"))
+
+# find OO rows and assign unique suffixes
+genomic_types_final_loc[Genomic_type == "OO", Genomic_type := paste0("OO_", seq_len(.N))]
+
+
+genomic_types_final_summary <- genomic_types_final_loc %>%
+  group_by(accuratelocation) %>%
+  summarise(
+    superclones = paste(unique(Genomic_type), collapse = ", "),
+    mitotypes   = paste(unique(Mito_type), collapse = ", ")
+  )
+
+
+write.csv(genomic_types_final_summary,"/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/all_clones_only_tree_filt_superclone_summary.csv")
+
+
+
+
 # for all other groups: order by meanDepth descending, then take top 2
 top_by_group <- genomic_types_final[Genomic_type != "OO",
-                                    .SD[order(-meanDepth)][1],
+                                    .SD[order(-meanDepth)][1:2],
                                     by = Genomic_type]
 
 top_by_group <- na.omit(top_by_group)
@@ -73,9 +98,13 @@ final_selection <- rbind(top_by_group, oo_group)
 write.csv(final_selection, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/two_of_each_genomic_type.csv")
 
 
-final_vcf_dt <- data.table(CloneA = final_vcf_filter)
+final_vcf_dt <- data.table(final_selection$CloneA)
 
 # write to file
 fwrite(final_vcf_dt, 
        "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_two_of_each.txt",
        sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+
+

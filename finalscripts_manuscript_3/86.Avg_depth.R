@@ -1,103 +1,379 @@
 #ijob -A berglandlab -c10 -p standard --mem=40G
 
 #module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
-
 #R
 
-#install.packages(c("usethis","pkgdown","gh","rcmdcheck"), repos="https://cloud.r-project.org")
+
+library(ggplot2)
+library(data.table)
+
+dp_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/window_avg_depth.txt",
+                     header = TRUE, sep = "\t")
 
 
-#install.packages("devtools")
-#library(devtools)
+dp_clean <- na.omit(dp_raw)
 
-#devtools::install_github("pievos101/PopGenome")
 
-library(PopGenome)
+dp_clean$window_start <- as.numeric(dp_clean$window_start)
+dp_clean$avg_depth   <- as.numeric(dp_clean$avg_depth)
 
-#bcftools view -h /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.bgz.vcf.gz | \
-#grep "^##contig" | cut -d'=' -f3 | cut -d',' -f1 > contigs_list.txt
 
-# 1. Load the VCF
-vcf_file <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.bgz.vcf.gz"
-contigs_file <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/contigs_list.txt"
 
-# Read into R as a vector
-contigs <- readLines(contigs_file)
-print(contigs)
 
-# Loop over all contigs and read each one
-genomes <- lapply(contigs, function(ctg) {
-  readVCF(
-    vcf_file,
-    numcols = 10000,
-    tid = ctg,
-    frompos = 1,
-    topos = 999999999,
-    include.unknown = TRUE
+dp_raw_all <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/avg.depth.all12.txt",
+                     header = FALSE, sep = "\t")
+
+dp_clean_all <- na.omit(dp_raw_all)
+
+colnames(dp_clean_all) <- c("contig", "window_start", "window_end", "sample", "depth")
+
+
+dp_clean_all$window_start <- as.numeric(dp_clean_all$window_start)
+dp_clean_all$depth   <- as.numeric(dp_clean_all$depth)
+
+
+# Save plot as PNG
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan.png",
+    width = 10000, height = 1000, res = 300)
+
+ggplot(dp_clean, aes(x = window_start, y = avg_depth)) +
+  geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
+  facet_grid(~contig, scales = "free_x", space = "free_x") +
+  labs(
+    title = "Manhattan-style dp Plot",
+    x = "Genomic position (window start)",
+    y = "dp"
+  ) + ylim(0,20)+
+  theme_bw(base_size = 12) +
+  theme(
+    strip.text.x = element_text(size = 10, angle = 90),
+    strip.text.y = element_text(size = 8),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.minor = element_blank()
   )
-})
 
-# Merge them into one PopGenome object
-genome <- do.call(c, genomes)
-
-genome_win <- sliding.window.transform(
-  genome,
-  width = 50000,   # window size in bp
-  jump = 50000     # step size = window size → non-overlapping
-)
-
-pops <- read.table("/scratch/rjp5nc/UK2022_2024/mito_vcf/pops_fixed_filtered.txt",
-                   header = FALSE, stringsAsFactors = FALSE)
-colnames(pops) <- c("sample", "population")
-
-to_remove <- pops$population == "PBO66"
-
-# Keep only non-PBO66 samples and their population labels
-pops$sample <- pops$sample[!to_remove]
-pops$population <- pops$population[!to_remove]
-
-# Split into list of populations
-pop_list <- split(pops$sample, pops$population)
-
-# Set populations
-genome_win <- set.populations(genome_win, pop_list)
-
-# Set Gilmer as outgroup
-genome_win <- set.outgroup(genome_win, pop_list$Gilmer, diploid = FALSE)
-
-# Calculate π (within-pop diversity)
-genome_win <- diversity.stats(genome_win)
-pi_vals <- genome_win@nuc.diversity.within
-
-# Calculate Dxy (between populations)
-genome_win <- diversity.stats.between(genome_win)
-dxy_matrix <- genome_win@nuc.diversity.between
-
-# Show results
-pi_vals
-dxy_matrix
-
-colnames(pi_vals) <- names(pop_list)
-
-# Rename Dxy results
-colnames(dxy_matrix) <- combn(names(pop_list), 2, FUN = paste, collapse = "/")
+dev.off()
 
 
 
-genome_win <- neutrality.stats(genome_win, detail = TRUE)  # This computes theta_Watterson
-theta_values <- genome_win@theta_Watterson
+# Save plot as PNG
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_7_manhattan.png",
+    width = 10000, height = 1000, res = 300)
 
-colnames(theta_values) <- names(pop_list)
+ggplot(subset(dp_clean, contig == "JAACYE010000007.1"), aes(x = window_start, y = avg_depth)) +
+  geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
+  facet_grid(~contig) +
+  labs(
+    title = "Manhattan-style dp Plot",
+    x = "Genomic position (window start)",
+    y = "dp"
+  ) + ylim(0,20)+
+    scale_x_continuous(breaks = seq(0, max(dp_clean$window_start), by = 1000000)) +
+  theme_bw(base_size = 12) 
 
-theta_values
+dev.off()
 
 
-tajima.D <- genome_win@Tajima.D 
-colnames(tajima.D) <- names(pop_list)
 
-tajima.D
 
-write.csv(pi_vals, file="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pi_vals.csv", row.names=FALSE)
-write.csv(dxy_matrix, file="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dxy_matrix.csv", row.names=FALSE)
-write.csv(theta_values, file="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/theta_values.csv", row.names=FALSE)
-write.csv(tajima.D, file="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tajimaD.csv", row.names=FALSE)
+
+
+
+
+
+
+
+
+
+
+
+
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_10000.pdf",
+    width = 25, height = 2)
+
+for (s in unique(dp_clean_all$sample)) {
+  p <- ggplot(subset(dp_clean_all, sample == s),
+              aes(x = window_start, y = depth)) +
+    geom_point(size = 0.4, alpha = 0.6, color = "darkblue") +
+    facet_grid(~contig, scales = "free_x") +
+    labs(
+      title = paste("Depth profile:", s),
+      x = "Genomic position (window start)",
+      y = "Depth"
+    ) +
+    ylim(0, 40) +
+    theme_bw(base_size = 12) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+  print(p)
+}
+
+dev.off()
+
+
+
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/het_10kb_per_sample.pdf",
+    width = 25, height = 2)
+
+# Loop over samples and plot
+for(s in unique(het_merged$sample)){
+  p <- ggplot(subset(het_merged, sample == s),
+              aes(x = win_start, y = het_prop)) +
+    geom_point(size = 0.4, alpha = 0.6, color = "darkgreen") +
+    facet_grid(~contig, scales = "free_x") +
+    labs(
+      title = paste("Sliding window heterozygosity (10kb):", s),
+      x = "Genomic position (window start)",
+      y = "Observed heterozygosity (Ho)"
+    ) +
+    ylim(0, 0.05) +  # adjust according to your het values
+    theme_bw(base_size = 12) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+  print(p)
+}
+
+dev.off()
+
+
+
+
+
+
+
+
+
+dp_raw_all <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/avg.depth.all12.txt",
+                     header = FALSE, sep = "\t")
+
+dp_clean_all <- na.omit(dp_raw_all)
+
+colnames(dp_clean_all) <- c("contig", "window_start", "window_end", "sample", "depth")
+
+
+dp_clean_all$window_start <- as.numeric(dp_clean_all$window_start)
+dp_clean_all$depth   <- as.numeric(dp_clean_all$depth)
+
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_10000.pdf",
+    width = 25, height = 2)
+
+for (s in unique(dp_clean_all$sample)) {
+  p <- ggplot(subset(dp_clean_all, sample == s),
+              aes(x = window_start, y = depth)) +
+    geom_point(size = 0.4, alpha = 0.6, color = "darkblue") +
+    facet_grid(~contig, scales = "free_x") +
+    labs(
+      title = paste("Depth profile:", s),
+      x = "Genomic position (window start)",
+      y = "Depth"
+    ) +
+    ylim(0, 40) +
+    theme_bw(base_size = 12) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+  print(p)
+}
+
+dev.off()
+
+
+
+
+
+
+dp_raw_all <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/avg_avgdepth.long.sorted_oneofeach_100000.txt",
+                     header = FALSE, sep = " ")
+
+dp_clean_all <- na.omit(dp_raw_all)
+
+colnames(dp_clean_all) <- c("contig", "window_start", "window_end", "sample", "depth")
+
+
+dp_clean_all$window_start <- as.numeric(dp_clean_all$window_start)
+dp_clean_all$depth   <- as.numeric(dp_clean_all$depth)
+
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_one_each_100000.pdf",
+    width = 25, height = 2)
+
+for (s in unique(dp_clean_all$sample)) {
+  p <- ggplot(subset(dp_clean_all, sample == s),
+              aes(x = window_start, y = depth)) +
+    geom_point(size = 0.4, alpha = 0.6, color = "darkblue") +
+    facet_grid(~contig, scales = "free_x") +
+    labs(
+      title = paste("Depth profile:", s),
+      x = "Genomic position (window start)",
+      y = "Depth"
+    ) +
+    ylim(0, 40) +
+    theme_bw(base_size = 12) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+  print(p)
+}
+
+dev.off()
+
+
+
+
+
+
+
+
+# dp_raw_all <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/window_avg_avgdepth.long.sorted_oneofeach_100000.txt",
+#                      header = TRUE, sep = "\t")
+
+# dp_clean_all <- na.omit(dp_raw_all)
+# head(dp_clean_all)
+
+
+# colnames(dp_clean_all) <- c("contig", "window_start", "window_end", "depth")
+
+
+# dp_clean_all$window_start <- as.numeric(dp_clean_all$window_start)
+# dp_clean_all$depth   <- as.numeric(dp_clean_all$depth)
+
+
+
+depths <-   read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_US_obtusa.csv")
+
+dp_clean_all_merged_dp <- dp_clean_all %>%
+  left_join(depths, by = c("sample" = "sampleId"))
+
+
+
+
+dp_clean_all_merged_dp$standardized_depth <- dp_clean_all_merged_dp$depth/dp_clean_all_merged_dp$meanDepth
+
+
+
+
+
+
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_one_each_100000.pdf",
+    width = 25, height = 2)
+
+  
+p <- ggplot(dp_clean_all,
+              aes(x = window_start, y = depth)) +
+    geom_point(size = 0.4, alpha = 0.6, color = "darkblue") +
+    facet_grid(~contig, scales = "free_x") +
+    labs(
+      x = "Genomic position (window start)",
+      y = "Depth"
+    ) +
+    ylim(0, 40) +
+    theme_bw(base_size = 12) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+    
+  print(p)
+
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_10000_standardized.pdf",
+    width = 25, height = 2)
+
+for (s in unique(dp_clean_all_merged_dp$sample)) {
+  p <- ggplot(subset(dp_clean_all_merged_dp, sample == s),
+              aes(x = window_start, y = standardized_depth)) +
+    geom_point(size = 0.4, alpha = 0.6, color = "darkblue") +
+    facet_grid(~contig, scales = "free_x") +
+    labs(
+      title = paste("Depth profile:", s),
+      x = "Genomic position (window start)",
+      y = "Depth"
+    ) +
+    ylim(0, 10) +
+    theme_bw(base_size = 12) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+  print(p)
+}
+
+dev.off()
+
+
+
+
+
+dp_clean_all_merged_dp$sample <- as.factor(dp_clean_all_merged_dp$sample)
+mean_profile <- dp_clean_all_merged_dp %>%
+  filter(contig == "JAACYE010000002.1") %>%
+  group_by(contig, window_start) %>%
+  summarise(mean_std_depth = mean(standardized_depth, na.rm = TRUE),
+            .groups = "drop")
+
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_10000_standardized_all_chr2.pdf",
+    width = 50, height = 50)
+
+p <- ggplot(
+    subset(dp_clean_all_merged_dp, contig == "JAACYE010000002.1"),
+    aes(x = window_start, 
+        y = standardized_depth, 
+        group = sample,         # make sure each sample is its own line
+        color = meanDepth)         # color by sample (clean separation)
+  ) +
+  geom_line() +
+ geom_line(
+  data = mean_profile,
+  aes(x = window_start, y = mean_std_depth),
+  color = "red",
+  size = 1.2,
+  inherit.aes = FALSE
+)+
+  facet_grid(~contig, scales = "free_x") +
+  labs(
+    title = paste("Depth profile: JAACYE010000002.1"),
+    x = "Genomic position (window start)",
+    y = "Depth"
+  ) +
+  ylim(0, 5) +
+  theme_bw(base_size = 12) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+print(p)
+
+
+dev.off()

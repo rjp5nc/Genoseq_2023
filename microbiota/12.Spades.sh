@@ -44,18 +44,18 @@ spades.py --meta \
  # -m 240 \
  # --tmp-dir /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/tmp
 
-#awk '/^>/ {if (seqlen){print name"\t"seqlen}; name=$0; sub(/^>/,"",name); seqlen=0; next} {seqlen+=length($0)} END {print name"\t"seqlen}' /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/scaffolds.fasta > /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/scaffoldsize.txt
+awk '/^>/ {if (seqlen){print name"\t"seqlen}; name=$0; sub(/^>/,"",name); seqlen=0; next} {seqlen+=length($0)} END {print name"\t"seqlen}' /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds.fasta > /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffoldsize.txt
 
-#grep -c "^>" /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/scaffolds.fasta
+grep -c "^>" /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds.fasta
 
-#awk 'BEGIN{FS="\n"; RS=">"; OFS="\n"} 
-#NR>1 {
-#    seq=""
-#    for (i=2; i<=NF; i++) seq=seq $i
- #   if (length(seq) >= 14000) {
- #       print ">" $1
- #       for (i=2; i<=NF; i++) print $i
- #   }  
-#}' /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/scaffolds.fasta > /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/scaffolds_min14k.fasta
+awk 'BEGIN{FS="\n"; RS=">"; OFS="\n"} 
+NR>1 {
+    seq=""
+    for (i=2; i<=NF; i++) seq=seq $i
+    if (length(seq) >= 800) {
+        print ">" $1
+        for (i=2; i<=NF; i++) print $i
+    }  
+}' /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds.fasta > /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min800.fasta
 
-#grep -c "^>" /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES/scaffolds_min14k.fasta
+grep -c "^>" /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k.fasta

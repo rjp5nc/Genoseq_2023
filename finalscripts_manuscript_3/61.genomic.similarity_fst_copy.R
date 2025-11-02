@@ -629,3 +629,18 @@ ggsave(
 
 
 summary(subset(fst_long_indiv, pond == "P66")$Fst)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

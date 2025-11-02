@@ -88,7 +88,7 @@ gatk --java-options "-Xmx${JAVAMEM}" GenomicsDBImport \
 -L ${i}:${start}-${stop}
 
 #sample name from g.vcf.gz 
-
+JAACYE010000146.1.1.70096.vcf.gz
 # Remove temp workspace
 rm -rf $WORKING_FOLDER/TEMP_Daphnia_DBI_${i}_${start}_${stop}
 

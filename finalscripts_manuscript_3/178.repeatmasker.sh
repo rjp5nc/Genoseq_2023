@@ -17,18 +17,11 @@
 
 module load gcc/12.4.0 bedtools/2.30.0 htslib
 
-awk 'NR>3 {print $5"\t"$6-1"\t"$7}' /scratch/rjp5nc/removedups/us_dobtusa/US_obtusa_onlydaps.fa.out > /scratch/rjp5nc/removedups/us_dobtusa/usobtusa_repeats.bed
+awk 'NR>3 {print $5"\t"$6-1"\t"$7}' /scratch/rjp5nc/removedups/eu_dobtusa/assembly.hap2_onlydaps.fasta.out > /scratch/rjp5nc/removedups/eu_dobtusa/euobtusa_repeats.bed
 
 bedtools subtract -header \
--a /project/berglandlab/Robert/UKSequencing2022_2024/trimmed10bp_onlysnp_vcf/trimmed10bp_usobtusa_vcf.vcf.gz \
--b /scratch/rjp5nc/removedups/us_dobtusa/usobtusa_repeats.bed > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.vcf.gz
+  -a /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_allsites_euobtusa.vcf.gz \
+  -b /scratch/rjp5nc/removedups/eu_dobtusa/euobtusa_repeats.bed \
+| bgzip > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_euobtusa.vcf.gz
 
-
-tabix -p vcf  /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.vcf.gz
-
-
-bgzip -c /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.vcf.gz \
-  > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.bgz.vcf.gz
-
-# Index with tabix
-tabix -p vcf /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usobtusa.bgz.vcf.gz
+tabix -p vcf /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_euobtusa.vcf.gz

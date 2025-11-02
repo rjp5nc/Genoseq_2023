@@ -17,17 +17,3 @@ module load apptainer/1.3.4
 
 
 
-#assembly.hap2_onlydaps.fasta
-
-
-### dmel dsim
-nextflow run evotools/nf-LO \
---source /scratch/rjp5nc/Reference_genomes/post_kraken/us_pulex_ref_kap4.fa \
---target /scratch/rjp5nc/dmel_dsim_TSP/refGenome/D_melanogaster_r6.12.Muller.fasta \
---distance medium \
---aligner lastz \
---outdir /scratch/rjp5nc/nFlo_lastz \
--profile singularity \
---max_memory '50.GB' \
---max_cpus 16 \
--with-singularity ${PWD}/nflo.sif

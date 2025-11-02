@@ -1,11 +1,17 @@
+#module load gcc openmpi R/4.3.1
+
+
 library(SeqArray)
 library(ggplot2)
 library(data.table)
+library(tidyverse)
+library(doParallel)
+library(foreach)
 
 # Convert VCF to GDS
-#vcf.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/lifted_all_missingasref.vcf.gz"          # path to your VCF file
-#gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/lifted_12major_missingasref.gds"             # output GDS file
-#seqVCF2GDS(vcf.fn, gds.fn, storage.option="ZIP_RA", parallel=10, verbose=T, optimize=T)
+vcf.fn <- "/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_vcfs/usdobtusa_mito_genotyped.vcf.gz"          # path to your VCF file
+gds.fn <- "/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_vcfs/usdobtusa_mito_genotyped.gds"             # output GDS file
+seqVCF2GDS(vcf.fn, gds.fn, storage.option="ZIP_RA", parallel=10, verbose=T, optimize=T)
 #genofile <- seqOpen(gds.fn)
 
 gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/lifted_12major_missingasref.gds"
@@ -115,7 +121,97 @@ write.csv(sampleStats, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_r
 #Filter out variants by ~10% missing
 
 #poppr, run within species
+
+
+samps <- fread("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/All_clones_metadata.csv")
+sampleId <- seqGetData(genofile, "sample.id")
+
+# Output file path
+outfile <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/sampleStats_wholedata.csv"
+
+RobertUK_A10
+
+# Write header
+fwrite(data.table(sampleId=character(), missingRate=double(), meanDepth=double(),
+                  medianDepth=double(), upper_quantile=double(), lower_quantile=double()),
+       file = outfile, row.names = FALSE)
+
+# Register parallel backend
+registerDoParallel(cores = 10)  # Adjust number of cores
+
+foreach(sample.i = sampleId, .packages = c("SeqArray", "data.table")) %dopar% {
+  seqSetFilter(genofile, sample.id = sample.i)
+  
+  missingRate <- mean(is.na(seqGetData(genofile, "$dosage")))
+  depth <- seqGetData(genofile, "annotation/format/DP")
+  
+  result <- data.table(
+    sampleId = sample.i,
+    missingRate = missingRate,
+    meanDepth = mean(depth, na.rm = TRUE),
+    medianDepth = median(depth, na.rm = TRUE),
+    upper_quantile = quantile(depth, 0.975, na.rm = TRUE),
+    lower_quantile = quantile(depth, 0.025, na.rm = TRUE)
+  )
+  
+  # Use a lock file to prevent simultaneous writes
+  lockfile <- paste0(outfile, ".lock")
+  while (file.exists(lockfile)) Sys.sleep(runif(1, 0.01, 0.1))  # Wait if another process is writing
+  file.create(lockfile)
+  fwrite(result, file = outfile, append = TRUE, col.names = FALSE)
+  file.remove(lockfile)
+}
+
 seqClose(genofile)
 
 
+samps
+
+
+samps <- fread("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/All_clones_metadata.csv")
+samps <- fread("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/accession_plus_species.csv")
+sampleId <- seqGetData(genofile, "sample.id")
+
+missing_ids <- samps$Sample_ID[!samps$Sample_ID %in% sampleId]
+missing_ids
+
+#sampleId <- gsub("-", "_", sampleId)
+
+missing_ids2 <- sampleId[!sampleId %in% samps$Sample_ID]
+missing_ids2
+
+
+missing_ids <- as.data.table(missing_ids)
+missing_ids2 <- as.data.table(missing_ids2)
+
+missingids3 <- rbind(missing_ids,missing_ids2, use.names=FALSE)
+
+write.csv(missingids3, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missing.csv")
+missing_ids2
+
+write.csv(missing_ids2, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missing_to_put_in_csv2.csv")
+
+
+
+
+
+unique_groups <- unique(samps$Sample_ID)
+
+subsetsamps <- samps[,c(1,2,3,7)]
+
+df_unique <- subsetsamps %>%
+  distinct(Sample_ID, .keep_all = TRUE)
+
+
+  write.csv(df_unique, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species.csv")
+
+
+samps
+samps2 <- fread("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species.csv")
+
+
+merged_data6 <- left_join(samps2, samps, by = c("Sample_ID" = "Sample_ID"))
+
+
+write.csv(merged_data6, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species_merged.csv")
 

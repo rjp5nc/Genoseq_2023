@@ -10,9 +10,6 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-#ls $VCF_DIR/*_filtsnps10bpindels_snps.vcf.gz | wc -l
-###SBATCH --array=1-347%50
-
 #conda create -n pixy -c conda-forge -c bioconda pixy -y
 # activate the environment
 conda init bash
@@ -41,6 +38,8 @@ pixy --stats pi \
     --n_cores 20 \
     --output_folder $OUT_DIR \
     --output_prefix pixy_10000_
+
+#awk 'NR>1 && $5 != "NA" {sum+=$5*$6; sites+=$6} END {if(sites>0) print sum/sites; else print "No data"}' /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pixy_allusobtusa/pixy_10000__pi.txt
 
 
 # cat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy_chr/*_fst.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_fst.txt

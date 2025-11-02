@@ -14,7 +14,7 @@
 
 #mv /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SR* /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR/
 
-PARENT_DIR="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR"
+PARENT_DIR="/scratch/rjp5nc/microbiota"
 
 # Get list of all folders
 FOLDERS=($(ls -d ${PARENT_DIR}/*/))  # Array of folder paths
@@ -23,10 +23,9 @@ FOLDERS=($(ls -d ${PARENT_DIR}/*/))  # Array of folder paths
 FOLDER="${FOLDERS[$SLURM_ARRAY_TASK_ID - 1]}"
 
 # Extract folder name
-FOLDER_NAME=$(basename "$FOLDER")
+FOLDER_NAME=SRR14476950
 
 # Change to the working directory
-cd "$FOLDER" || exit 1
 
 # Check if fastq.gz files exist
 if ls *.fastq.gz 1> /dev/null 2>&1; then

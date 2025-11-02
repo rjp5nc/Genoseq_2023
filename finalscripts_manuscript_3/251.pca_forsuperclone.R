@@ -856,6 +856,7 @@ genomic_type <- read.csv(genomic_type.fn, header = TRUE, stringsAsFactors = FALS
 # open GDS using SNPRelate
 # gds <- snpgdsOpen(genofile.fn)
 
+
 # --- Load files ---
 gds <- seqOpen(genofile.fn)
 
@@ -1114,19 +1115,6 @@ for (g in groups_to_split) {
   message("Saving -> ", pfn); ggsave(pfn, plot = p, width = 12, height = 8, dpi = 300)
   message("Saved: ", pfn)
   invisible(NULL)
-
-
-   if (nrow(plot_df) > 0) {
-    # ensure stable column order and types
-    plot_df <- plot_df %>%
-      mutate(Group = as.character(Group),
-             k = as.integer(k),
-             cluster = as.integer(cluster)) %>%
-      select(Group, sample, k, cluster, PC1, PC2, PC3)
-    all_plot_dfs[[as.character(g)]] <- plot_df
-  } else {
-    message(sprintf("[Group %s] no clustering rows to collect", g))
-  }
   }
 }
 

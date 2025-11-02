@@ -8,20 +8,19 @@ library(ggplot2)
 library(data.table)
 library(patchwork)
 
-dp_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/window_avg_avgdepth_all_unfilt_10000.txt",
+dp_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/window_avg_avgdepth_all_unfilt_100k.txt",
                      header = TRUE, sep = "\t")
 
 colnames(dp_raw) <- c("contig", "window_start", "window_end", "depth")
 
 dp_clean <- na.omit(dp_raw)
 
-
 dp_clean$window_start <- as.numeric(dp_clean$window_start)
 dp_clean$depth   <- as.numeric(dp_clean$depth)
 
 
 # Save plot as PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_10k_unfilt.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/dp_manhattan_100k_unfilt.png",
     width = 10000, height = 1000, res = 300)
 
 ggplot(dp_clean, aes(x = window_start, y = depth)) +
@@ -45,22 +44,6 @@ dev.off()
 
 
 
-# Save plot as PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_7_manhattan_100k.png",
-    width = 10000, height = 1000, res = 300)
-
-ggplot(subset(dp_clean, contig == "JAACYE010000007.1"), aes(x = window_start, y = avg_depth)) +
-  geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
-  facet_grid(~contig) +
-  labs(
-    title = "Manhattan-style dp Plot",
-    x = "Genomic position (window start)",
-    y = "dp"
-  ) + ylim(0,20)+
-    scale_x_continuous(breaks = seq(0, max(dp_clean$window_start), by = 1000000)) +
-  theme_bw(base_size = 12) 
-
-dev.off()
 
 
 
@@ -68,35 +51,39 @@ dev.off()
 
 
 
+dp_cleannot0 <- subset(dp_clean, depth != 0)
 
 
 
 
-
-
-
-
-
-
-dp_raw_all <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/avgdepth_all_unfilt_10000.txt",
+dp_raw_all <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/avgdepth_all_unfilt_100k.txt",
                      header = FALSE, sep = " ")
 
 dp_clean_all <- na.omit(dp_raw_all)
 
-colnames(dp_raw_all) <- c("contig", "window_start", "window_end", "sample", "depth")
+colnames(dp_clean_all) <- c("contig", "window_start", "window_end", "sample", "depth")
 
 
 dp_clean_all$window_start <- as.numeric(dp_clean_all$window_start)
 dp_clean_all$depth   <- as.numeric(dp_clean_all$depth)
 
-pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_10k_unfilt.pdf",
+
+
+
+dp_clean_standardized <- dp_clean_all %>%
+  left_join(dp_cleannot0, by = c("contig", "window_start", "window_end"))
+
+dp_clean_standardized <- subset(dp_clean_standardized, depth.y >= 6)
+
+
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/dp_manhattan_by_sample_100k_unfilt.pdf",
     width = 25, height = 2)
 
-for (s in unique(dp_clean_all$sample)) {
-  p <- ggplot(subset(dp_clean_all, sample == s),
-              aes(x = window_start, y = depth)) +
+for (s in unique(dp_clean_standardized$sample)) {
+  p <- ggplot(subset(dp_clean_standardized, sample == s),
+              aes(x = window_start, y = depth.x)) +
     geom_point(size = 0.4, alpha = 0.6, color = "darkblue") +
-    facet_grid(~contig, scales = "free_x") +
+    facet_grid(~contig, scales = "free_x", space = "free_x") +
     labs(
       title = paste("Depth profile:", s),
       x = "Genomic position (window start)",
@@ -162,7 +149,7 @@ colnames(dp_clean_all) <- c("contig", "window_start", "window_end", "sample", "d
 dp_clean_all$window_start <- as.numeric(dp_clean_all$window_start)
 dp_clean_all$depth   <- as.numeric(dp_clean_all$depth)
 
-pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_10k_unfilt.pdf",
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_100k_unfilt.pdf",
     width = 25, height = 2)
 
 for (s in unique(dp_clean_all$sample)) {
@@ -198,7 +185,7 @@ dp_clean_all_merged_dp <- dp_clean_all %>%
 
 dp_clean_all_merged_dp$standardized_depth <- dp_clean_all_merged_dp$depth/dp_clean_all_merged_dp$meanDepth
 
-pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_10k_unfilt_standardized.pdf",
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_100k_unfilt_standardized.pdf",
     width = 25, height = 2)
 
 for (s in unique(dp_clean_all_merged_dp$sample)) {
@@ -235,7 +222,7 @@ mean_profile <- dp_clean_all_merged_dp %>%
   summarise(mean_std_depth = mean(standardized_depth, na.rm = TRUE),
             .groups = "drop")
 
-pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_10k_unfilt_standardized_all_chr2.pdf",
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dp_manhattan_by_sample_100k_unfilt_standardized_all_chr2.pdf",
     width = 50, height = 10)
 
 p <- ggplot(
@@ -474,8 +461,9 @@ p <- ggplot(
   )
 
 
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2meandepth5_unfiltered.png",
-    width = 10000, height = 2000)
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2unfiltered_all.pdf",
+    width = 40, height = 6)
+
 print(p)
 dev.off()
 

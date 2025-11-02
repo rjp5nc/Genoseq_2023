@@ -1,53 +1,148 @@
-#!/usr/bin/env bash
-#
-#SBATCH -J pixy # A single job name for the array
-#SBATCH --ntasks-per-node=10 # one core
-#SBATCH -N 1 # on one node
-#SBATCH -t 0-92:00  ### 48 hours
-#SBATCH --mem 10G
-#SBATCH -o /scratch/rjp5nc/err/pixy.%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/err/pixy.%A_%a.err # Standard error
-#SBATCH -p standard
-#SBATCH --account berglandlab
-#SBATCH --array=1-347%50
+#ijob -A berglandlab -c10 -p standard --mem=100G
+#module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
+#R
 
-#ls $VCF_DIR/*_filtsnps10bpindels_snps.vcf.gz | wc -l
+library(data.table)
+fst_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_fst.txt",header = TRUE,sep = "\t")
+dxy_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_dxy.txt",header = TRUE,sep = "\t")
+pi_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pi.txt",header = TRUE,sep = "\t")
 
-#conda create -n pixy -c conda-forge -c bioconda pixy -y
-# activate the environment
-conda init bash
-source ~/.bashrc  # or restart your shell
-conda activate pixy
-export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
-
-#conda install --yes -c conda-forge pixy
-#conda install -c conda-forge pixy=2.0.0.beta11
-
-#conda install -c bioconda htslib
-#conda install -c bioconda vcftools
-#conda install -c bioconda bcftools
-
-cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv
+library(ggplot2)
 
 
-# Directory with chromosome VCFs
-VCF_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_gvcf_10bp/usobtusa_vcf_snps/
-OUT_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy_chr
-mkdir -p $OUT_DIR
+chrom_keep <- paste0("JAACYE0100000", sprintf("%02d", 1:12), ".1")
 
-# Get list of chromosome VCFs
-VCFS=($VCF_DIR/*_filtsnps10bpindels_snps.vcf.gz)
+# Subset the data
+fst_subset <- fst_raw[fst_raw$chromosome %in% chrom_keep, ]
 
-# Select VCF for this array task
-CHR_VCF=${VCFS[$SLURM_ARRAY_TASK_ID]}
-CHR_NAME=$(basename $CHR_VCF _filtsnps10bpindels_snps.vcf.gz)
+# Check
+unique(fst_subset$chromosome)
 
-echo "Running Pixy on $CHR_NAME"
+# Clean up
+fst_clean <- na.omit(fst_subset)
 
-pixy --stats pi fst dxy \
-    --vcf $CHR_VCF \
-    --populations /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_pixy_ready.txt \
-    --window_size 100 \
-    --n_cores 20 \
-    --output_folder $OUT_DIR \
-    --output_prefix pixy_${CHR_NAME}
+
+fst_clean$window_pos_1 <- as.numeric(fst_clean$window_pos_1)
+fst_clean$avg_wc_fst   <- as.numeric(fst_clean$avg_wc_fst)
+
+# Add combined comparison label
+fst_clean$comparison <- paste(fst_clean$pop1, fst_clean$pop2, sep = "_")
+
+# Save plot as PNG
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_manhattan.png",
+    width = 10000, height = 5000, res = 300)
+
+ggplot(fst_clean, aes(x = window_pos_1, y = avg_wc_fst)) +
+  geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
+  facet_grid(comparison ~ chromosome, scales = "free_x", space = "free_x") +
+  labs(
+    title = "Manhattan-style FST Plot",
+    x = "Genomic position (window start)",
+    y = "FST"
+  ) + ylim(0,1)+
+  theme_bw(base_size = 12) +
+  theme(
+    strip.text.x = element_text(size = 10, angle = 90),
+    strip.text.y = element_text(size = 8),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+dev.off()
+
+
+
+
+
+
+
+
+chrom_keep <- paste0("JAACYE0100000", sprintf("%02d", 1:12), ".1")
+
+dxy_subset <- dxy_raw[dxy_raw$chromosome %in% chrom_keep, ]
+
+
+# Check
+unique(dxy_subset$chromosome)
+
+# Clean up
+dxy_clean <- na.omit(dxy_subset)
+
+
+dxy_clean$window_pos_1 <- as.numeric(dxy_clean$window_pos_1)
+dxy_clean$avg_dxy   <- as.numeric(dxy_clean$avg_dxy)
+
+# Add combined comparison label
+dxy_clean$comparison <- paste(dxy_clean$pop1, dxy_clean$pop2, sep = "_")
+
+# Save plot as PNG
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dxy_manhattan.png",
+    width = 10000, height = 5000, res = 300)
+
+ggplot(dxy_clean, aes(x = window_pos_1, y = avg_dxy)) +
+  geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
+  facet_grid(comparison ~ chromosome, scales = "free_x", space = "free_x") +
+  labs(
+    title = "Manhattan-style dxy Plot",
+    x = "Genomic position (window start)",
+    y = "dxy"
+  ) + ylim(0,1)+
+  theme_bw(base_size = 12) +
+  theme(
+    strip.text.x = element_text(size = 10, angle = 90),
+    strip.text.y = element_text(size = 8),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+dev.off()
+
+
+
+
+
+
+
+
+
+chrom_keep <- paste0("JAACYE0100000", sprintf("%02d", 1:12), ".1")
+
+pi_subset <- pi_raw[pi_raw$chromosome %in% chrom_keep, ]
+
+
+# Check
+unique(pi_subset$chromosome)
+
+# Clean up
+pi_clean <- na.omit(pi_subset)
+
+
+pi_clean$window_pos_1 <- as.numeric(pi_clean$window_pos_1)
+pi_clean$avg_pi   <- as.numeric(pi_clean$avg_pi)
+
+# Add combined comparison label
+
+# Save plot as PNG
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pi_manhattan.png",
+    width = 10000, height = 5000, res = 300)
+
+ggplot(pi_clean, aes(x = window_pos_1, y = avg_pi)) +
+  geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
+  facet_grid(pop ~ chromosome, scales = "free_x", space = "free_x") +
+  labs(
+    title = "Manhattan-style pi Plot",
+    x = "Genomic position (window start)",
+    y = "pi"
+  ) + ylim(0,1)+
+  theme_bw(base_size = 12) +
+  theme(
+    strip.text.x = element_text(size = 10, angle = 90),
+    strip.text.y = element_text(size = 8),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+dev.off()

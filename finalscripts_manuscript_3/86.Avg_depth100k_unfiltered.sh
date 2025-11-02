@@ -67,7 +67,7 @@ END {
 | sort -k2,2n -k4,4 \
 > "$RESULTDIR/${contig}.avgdepth.long.sorted_100000.txt"
 
-# cat *avgdepth.long.sorted_10000.txt > ../avgdepth_all_unfilt_10000.txt
+# cat *avgdepth.long.sorted_10000.txt > ../avgdepth_all_unfilt_100k.txt
 
 # awk '
 # {
@@ -83,4 +83,4 @@ END {
 #         print k, avg
 #     }
 # }
-# ' avgdepth_all_unfilt_10000.txt > window_avg_avgdepth_all_unfilt_10000.txt
+# ' avgdepth_all_unfilt_100k.txt > window_avg_avgdepth_all_unfilt_100k.txt

@@ -32,6 +32,14 @@ kraken2 --db /scratch/rjp5nc/krakenDB/nt \
 /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs/unmapped_trimmedmerged2.fq.gz
 
 
+sacct -u rjp5nc --starttime=2025-09-05 --format=JobID,JobName%20,Elapsed,AllocCPUs,State,MaxRSS,TotalCPU
+
+
+sacct -u rjp5nc --starttime=2025-01-05 --endtime=2025-09-25 --format=JobID,Elapsed,AllocCPUs \
+  | awk 'NR>2 {split($2,t,":"); sec=(t[1]*3600+t[2]*60+t[3]); cpu_hours += sec*$3/3600} END {print cpu_hours " core-hours"}'
+
+sreport user top Start=2020-01-05 End=2025-09-25 user=rjp5nc
+
 #kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 10 --report /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_report.txt --classified-out /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_classified_output.txt --output /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k_kraken_output.txt --use-names /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/scaffolds_min10k.fasta
 
 #grep '^>' /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_output.txt > /scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/SPADES_norm/kraken_classified_headers_output.txt

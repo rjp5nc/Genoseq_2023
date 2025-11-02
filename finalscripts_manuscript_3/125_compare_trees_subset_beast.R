@@ -27,11 +27,44 @@ library(lubridate)
 # 1. Load NJ trees
 # -----------------------------
 
-tree1_file <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_tree_genomic.nwk"
-tree2_file <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_tree_mito.nwk"
+tree1_file <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_tree_genomic_only2.nwk"
+tree2 <- read.nexus("/scratch/rjp5nc/snapp5/snapp2.tree")
 
 tree1 <- read.tree(tree1_file)
-tree2 <- read.tree(tree2_file)
+depths <-   read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_US_obtusa.csv")
+genomic_types <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
+
+
+
+genomic_types2 <- genomic_types %>%
+  left_join(depths, by = c("CloneA" = "sampleId"))
+
+
+
+genomic_types3 <- genomic_types2 %>%
+  filter(CloneA %in% tree1$tip.label)
+
+# For each Group, keep the CloneA with highest meanDepth
+best_samples <- genomic_types3 %>%
+  group_by(Group) %>%
+  slice_max(meanDepth, n = 1, with_ties = FALSE)
+
+# Drop unused samples from tree
+tree_pruned <- drop.tip(tree1, setdiff(tree1$tip.label, best_samples$CloneA))
+
+# Make a rename map from CloneA to Group
+rename_map <- best_samples %>%
+  select(CloneA, Group) %>%
+  deframe()
+
+# Relabel tree tips
+tree_pruned$tip.label <- rename_map[tree_pruned$tip.label]
+
+# Optional: remove duplicate tip labels if any remain (safety)
+tree_pruned <- keep.tip(tree_pruned, unique(tree_pruned$tip.label))
+
+tree1 <- tree_pruned
+
 
 # -----------------------------
 # 2. Prune to common tips
@@ -41,72 +74,52 @@ common_tips <- intersect(tree1$tip.label, tree2$tip.label)
 tree1_pruned <- drop.tip(tree1, setdiff(tree1$tip.label, common_tips))
 tree2_pruned <- drop.tip(tree2, setdiff(tree2$tip.label, common_tips))
 
-# -----------------------------
-# 3. Reorder tips to match
-# --------
-library(ape)
 
 
-# prune to common tips
-common_tips <- intersect(tree1$tip.label, tree2$tip.label)
-tree1_pruned <- drop.tip(tree1, setdiff(tree1$tip.label, common_tips))
-tree2_pruned <- drop.tip(tree2, setdiff(tree2$tip.label, common_tips))
+
+# # -----------------------------
+# # 3. Reorder tips to match
+# # --------
+# library(ape)
+
+
+# # prune to common tips
+# common_tips <- intersect(tree1$tip.label, tree2$tip.label)
+# tree1_pruned <- drop.tip(tree1, setdiff(tree1$tip.label, common_tips))
+# tree2_pruned <- drop.tip(tree2, setdiff(tree2$tip.label, common_tips))
+
+
+# df1 <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
+# df2 <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")
+
+
+# genomictypes <- df1[, c(2,3)]
+# mitotypes <- df2[, c(2,3)]
+
+# types <- merge(genomictypes,mitotypes, by="CloneA")
+
+# AC_C_Clones <- subset(types, Group.x == "AC" | Group.x == "C")$CloneA
+# AC_C_Clones <- subset(types, Group.y == "B" | Group.y == "E"| Group.y == "F")$CloneA
+
+
+# tree1_pruned <- drop.tip(tree1_pruned, setdiff(tree1$tip.label, AC_C_Clones))
+# tree2_pruned <- drop.tip(tree2_pruned, setdiff(tree2$tip.label, AC_C_Clones))
+
 
 # association: one-to-one, same labels
 assoc <- cbind(tree1_pruned$tip.label, tree1_pruned$tip.label)
 
-# save bigger PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_bold.png",
-    width = 6000, height = 12000, res = 300)
-
-cophyloplot(tree1_pruned, tree2_pruned,
-            assoc = assoc,
-            use.edge.length = FALSE,
-            space = 50,                # less gap → bigger trees
-            gap = 200,                   # closer to the axis
-            length.line = 100,           # connecting line length
-            col = "gray40",            # connector line color
-            lwd = 1,                   # thicker tree branches
-            cex = 1.2,                 # tip label size
-            direction = c("right","left"))  # mirrored orientation
-
-dev.off()
+tree1_prunedrooted_tree <- root(tree1_pruned, outgroup = "A", resolve.root = TRUE)
+tree2_prunedrooted_tree <- root(tree2_pruned, outgroup = "A", resolve.root = TRUE)
 
 
-
-
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_bold.png",
-    width = 6000, height = 12000, res = 300)
-    cophyloplot(wasp.cophylo,
-            use.edge.length = FALSE,
-            space = 50,                # less gap → bigger trees
-            gap = 200,                   # closer to the axis
-            length.line = 100,           # connecting line length
-            col = "gray40",            # connector line color
-            lwd = 1,                   # thicker tree branches
-            cex = 1.2,                 # tip label size
-            direction = c("right","left"))  # mirrored orientation
-dev.off()
-
-
-
-cophylo<-cophylo(tree1_pruned,tree2_pruned,
+cophylo<-cophylo(tree1_prunedrooted_tree,tree2_prunedrooted_tree,
     assoc=assoc)
 
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_bold.png",
-    width = 6000, height = 12000, res = 300)
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_beast_vs_neighbor.png",
+    width = 6000, height = 6000, res = 300)
 plot(cophylo)
 dev.off()
-
-
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_bold2.png",
-    width = 6000, height = 12000, res = 300)
-
-
-cotangleplot(tree1_pruned,tree2_pruned, type=c("phylogram"),
-   use.edge.length=FALSE, tangle=c("both"))
-   dev.off()
-
 
 
 
@@ -134,19 +147,19 @@ Pool <- subset(metadata_with_clone, accuratelocation == "P66")
 samples_to_keep <- Pool %>% pull(Well)
 
 
-df1 <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
-df2 <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")
-
 library(RColorBrewer)
 
-# Example palette
+ngroups <- length(unique(df1$Group))
+
+# Create an extended palette (beyond 8 colors)
 group_colors <- setNames(
-  brewer.pal(length(unique(df1$Group)), "Set2"),
-  unique(df1$Group)
+  colorRampPalette(brewer.pal(8, "Set2"))(ngroups),
+  sort(unique(df1$Group))
 )
 
-# Assign colors in df1 and df2
+# Add the color column to df1
 df1$color <- group_colors[df1$Group]
+
 df2$color <- group_colors[df2$Group]  # or a different palette if you want
 
 
@@ -203,13 +216,6 @@ edgecols2 <- get_edge_colors(cophylo$trees[[2]], tipcols2)
 edge.col <- list(left = edgecols1, right = edgecols2)
 
 
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo.png", res = 300, width = 4000, height = 5000)
-
-plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = "gray60")
-
-dev.off()
-
-
 
 genomictypes <- df1[, c(2,3)]
 mitotypes <- df2[, c(2,3)]
@@ -233,26 +239,176 @@ print(type_counts)
 # Optional: sort by count descending
 type_counts <- type_counts[order(-type_counts$Count), ]
 
-# Save to CSV
-write.csv(type_counts, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/type_counts.csv", row.names = FALSE)
 
-library(tidyverse)
+# Get unique group-color mappings for left and right
+left_colors  <- unique(df1[, c("Group", "color")])
+right_colors <- unique(df2[, c("Group", "color")])
 
-combos <- types %>%
-  count(across(2:4))
+#left_colors <- subset(left_colors, Group == "C" | Group == "AC")
+#right_colors <- subset(right_colors, Group == "B" | Group == "E"| Group == "F")
 
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genxmitotypes.png", res = 300, width = 2000, height = 3000)
+cb_palette <- data.table(
+  "A" = "#F0E442",  # yellow
+  "B" = "#E69F00",  # orange
+  "C" = "#0072B2",  # dark blue
+  "D" = "#D55E00",  # reddish-orange
+  "E" = "#56B4E9",  # sky blue
+  "F" = "#009E73"  # bluish-green  
+)
 
-# Make a bar plot
-ggplot(combos, aes(x = Group.x, y = n, col=Group.y)) +
-  geom_point(position = position_jitter(width = 0.2, height = 0)) +
-  ylim(0,55)+
-    geom_text(aes(label = n), vjust = -0.5, size = 4) +  # add counts above points
-  labs(x = "Superclone", y = "Mitotype", title = "Counts of A_*, B_*, etc. grouped by prefix") +
-  theme_bw()
+cb_df <- data.frame(
+  Group = names(cb_palette),
+  color = as.character(cb_palette),
+  row.names = NULL
+)
+
+
+# Make sure they are sorted in the order you like
+left_colors  <- left_colors[order(left_colors$Group), ]
+right_colors <- right_colors[order(right_colors$Group), ]
+
+
+
+old_to_group <- setNames(right_colors$color, right_colors$Group)
+
+# Apply it to cb_df by matching the Group
+cb_df$new_color <- old_to_group[cb_df$Group]
+
+old_to_new <- setNames(cb_df$color,cb_df$new_color)
+
+# Replace colors in edge.col$right
+edge.col$right <- old_to_new[edge.col$right]
+
+
+# Check
+head(edge.col$right, 20)
+
+
+
+
+
+
+# Suppose cb_palette is:
+# B "#E69F00"  E "#56B4E9"  F "#009E73"
+
+
+
+metadata_rockpools <- subset(metadata_with_clone, accuratelocation == "P58"|accuratelocation == "P62"|
+accuratelocation =="P63"|accuratelocation == "P66"|accuratelocation == "Gilmer")
+
+metadata_rockpools2 <- metadata_rockpools[, c(2,9)]
+
+# Define pond palette for your 5 sites
+pond_palette <- c(
+  "P58"   = "#E69F00",  # orange
+  "P62"   = "#56B4E9",  # sky blue
+  "P63"   = "#009E73",  # bluish-green
+  "P66"   = "#D55E00",  # vermillion red
+  "Gilmer"= "#CC79A7"   # purple/magenta
+)
+
+left_tips  <- cophylo$trees[[1]]$tip.label
+
+# Make a lookup: Well -> pond
+well_to_pond <- setNames(metadata_rockpools2$accuratelocation,
+                         metadata_rockpools2$Well)
+
+# Get pond for each tip in the tree
+ltip_colors <- pond_palette[well_to_pond[left_tips]]
+
+
+# Create a named vector: old tip label -> new label
+tip_rename <- setNames(metadata_rockpools2$accuratelocation, metadata_rockpools2$Well)
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo_MitoBEF.png",
+    res = 300, width = 4000, height = 5000)
+
+plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = "gray")
+
+# Add legend for left tree (top left)
+legend("topleft",
+       legend = left_colors$Group,
+       col = left_colors$color,
+       lwd = 2,
+       cex = 1.2,
+       bty = "n",
+       title = "Left tree groups")
+
+# Add legend for right tree (top right)
+legend("topright",
+       legend = cb_df$Group,
+       col = cb_df$color,
+       lwd = 2,
+       cex = 1.2,
+       bty = "n",
+       title = "Right tree groups")
 
 dev.off()
 
 
-subset(types, Group.x == "AC")
-subset(types, Group.x == "C")
+
+
+
+# Keep original tip labels
+left_tips  <- cophylo$trees[[1]]$tip.label
+right_tips <- cophylo$trees[[2]]$tip.label
+
+# Map tip labels to pond colors
+well_to_pond <- setNames(metadata_rockpools2$accuratelocation,
+                         metadata_rockpools2$Well)
+
+ltip_colors <- pond_palette[well_to_pond[left_tips]]
+rtip_colors <- pond_palette[well_to_pond[right_tips]]
+
+
+
+
+
+
+
+left_tips  <- cophylo$trees[[1]]$tip.label
+right_tips  <- cophylo$trees[[2]]$tip.label
+
+# Make a lookup: Well -> pond
+well_to_pond <- setNames(metadata_rockpools2$accuratelocation,
+                         metadata_rockpools2$Well)
+
+# Get pond for each tip in the tree
+welltopond2 <- well_to_pond[left_tips]
+welltopond3 <- well_to_pond[right_tips]
+
+
+
+# Plot cophylo with original tip labels
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo_colors_BEF.png",
+    res = 300, width = 4000, height = 5000)
+
+plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = "gray60", ftype="i")
+
+# Add colored tip labels
+tiplabels.cophylo(
+  text = welltopond2,
+  col = ltip_colors,
+  frame = "none",
+    adj = -1,
+  which = "left"
+)
+
+tiplabels.cophylo(
+  text = welltopond3,
+  col = rtip_colors,
+  frame = "none",
+    adj = 1.5 ,
+  which = "right"
+)
+
+legend("top",                     # position, adjust as needed
+       legend = unique(names(rtip_colors)),   # pond names
+       col = unique(rtip_colors),             # matching colors
+       pch = 19,                       # point type to match tip symbols
+       cex = 1.5,                      # text/point size
+       bty = "n")                      # no box around legend
+
+dev.off()
+
+

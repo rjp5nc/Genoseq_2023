@@ -69,9 +69,12 @@ grouplsplots <- ggplot(long_matmerged2, aes(x = CloneA, y=CloneB, col=Similarity
 geom_point()+
   theme_bw() + 
   xlab("Similarity") +
-  ylab("Frequency") 
+  ylab("Frequency") +
+    theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+  )
 
-ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/groupsplot.png", plot = grouplsplots, width = 12, height = 8, dpi = 300)
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/groupsplot.png", plot = grouplsplots, width = 20, height = 20, dpi = 300)
 
 pair_means <- long_matmerged2 %>%
   group_by(pair) %>%

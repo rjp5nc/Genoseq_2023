@@ -9,7 +9,6 @@
 #SBATCH -e /scratch/rjp5nc/err/genotypegvcf.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-112%50
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
@@ -19,68 +18,18 @@
 module load gatk/4.6.0.0
 
 # Parameters
-JAVAMEM=80G
+JAVAMEM=40G
 CPU=10
-
 
 #NEED TO DO USPULEX/AMBIGUA
 
 # Working folder is core folder where this pipeline is being run.
-WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf3
+folder=usdobtusa_mito
 
-# Reference genome
-REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
-
-# Intervals to analyze
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usobtusa.txt"
-
-species="DBI_usobtusa"
-# This part of the pipeline will generate log files to record warnings and completion status
-
-# Move to working directory
-cd $WORKING_FOLDER
-
-# Chromosome
-i=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )
-
-# Start
-start=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f3 )
-
-# Stop
-stop=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f4 )
-
-# Create temp folder
-if [[ -d "TEMP_Daphnia_Genotype_${i}_${start}_${stop}" ]]
-then
-echo "Working TEMP_Daphnia_Genotype folder exist"
-echo "Lets move on"
-date
-else
-echo "Folder doesnt exist. Lets fix that"
-mkdir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
-date
-fi
-
-echo ${i}_${start}_${stop} "is being processed" $(date)
-
-# Identify the Genome database to genotyoe
-GenomeDB_path=`echo /scratch/rjp5nc/UK2022_2024/daphnia_phylo/$species/Daphnia_DBI_${i}_${start}_${stop}`
-
-# Genotype call the samples in the DBI merged set
-gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
--R $REFERENCE \
--V gendb://$GenomeDB_path \
---tmp-dir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
--O $WORKING_FOLDER/${i}.${start}.${stop}.vcf.gz \
-#--genomicsdb-use-vcf-codec \
--L ${i}:${start}-${stop}
-
-# Remove temp folder
-rm -rf $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
-
-echo ${i} "done" $(date)
+  gatk --java-options "-Xmx40G" GenotypeGVCFs \
+    -R "/scratch/rjp5nc/Reference_genomes/mito_reference/${folder}.fasta" \
+    -V "/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/${folder}_combined.g.vcf.gz" \
+    -O "/scratch/rjp5nc/UK2022_2024/mito_vcf/merged_vcfs/${folder}_genotyped.vcf.gz"
 
 
-#find . -type f -name "*.vcf.gz" | sed 's|^\./||' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/unmerged_eudobtusa_vcf_files.txt
-
-
+#Flag to spit out all sites?

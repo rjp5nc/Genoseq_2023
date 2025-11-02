@@ -45,7 +45,7 @@ grep -Ff <($CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_Repeatmasked
 
 
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz2.vcf.gz"
-POPS="/scratch/rjp5nc/UK2022_2024/mito_vcf/pops_fixed.txt"
+POPS="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed.txt"
 
 # --- Output directory ---
 OUTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000"

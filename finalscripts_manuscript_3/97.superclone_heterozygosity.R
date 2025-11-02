@@ -9,6 +9,7 @@ library(ggplot2)
 # Read the vcftools --het output
 het <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote/sample_het.het", header = TRUE)
 genomic_types <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
+depths <-   read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_US_obtusa.csv")
 
 
 het <- het %>%

@@ -9,7 +9,7 @@ library(foreach)
 library(data.table)
 
 
-gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/trimmed10bp_masked_usobtusa.gds"
+gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_masked_usobtusa.gds"
 
 samples <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species_merged_20250627.csv")
 
@@ -50,7 +50,7 @@ miss_rates_all_short_plot <- ggplot(miss_rates_all_short_df, aes(x = missing_rat
   xlab("Missing Rate") +
   ylab("Frequency")
 
-ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/eudobtusa_missrates_variant.png", plot = miss_rates_all_short_plot, width = 6, height = 4, dpi = 300)
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/eudobtusa_missrates_variant.png", plot = miss_rates_all_short_plot, width = 6, height = 4, dpi = 300)
 
 
 
@@ -66,7 +66,7 @@ miss_rates_samps_short_plot <- ggplot(miss_rates_samps_short_df, aes(x = missing
 
 # View plot
 
-ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/eudobtusa_missrates_samps.png", plot = miss_rates_samps_short_plot, width = 6, height = 4, dpi = 300)
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/eudobtusa_missrates_samps.png", plot = miss_rates_samps_short_plot, width = 6, height = 4, dpi = 300)
 
 seqResetFilter(genofile, verbose = TRUE)
 
@@ -102,5 +102,5 @@ sampleStats <- foreach(sample.i=sampleId, .combine = "rbind")%dopar%{
   }
 
   
-write.csv(sampleStats, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/eudobtusa_samplestats.csv", row.names = FALSE)
+write.csv(sampleStats, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/eudobtusa_samplestats.csv", row.names = FALSE)
 

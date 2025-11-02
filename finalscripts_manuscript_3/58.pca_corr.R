@@ -10,10 +10,15 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 
+
+
+
+
 # ---- Input files ----
 genofile.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_masked_usobtusa.gds"
 metadata <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/2022_2024seqmetadata20250811.csv", header = TRUE)
-samplestats <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/eudobtusa_samplestats.csv")
+samplestats <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_samplestats.csv")
+mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")  # Save as CSV
 
 outdir <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/"
 
@@ -33,12 +38,15 @@ colnames(pc_scores)[-1] <- paste0("PC", 1:nPCs)
 
 merged <- merge(pc_scores, metadata, by.x = "sample.id", by.y = "Well", all.x = TRUE)
 merged2 <- merge(merged,samplestats , by.x = "sample.id", by.y = "sampleId", all.x = TRUE)
+merged3 <- merge(merged2,mitotypes , by.x = "sample.id", by.y = "CloneA", all.x = TRUE)
+
+merged2 <- merged3
 
 # ---- Define predictors ----
 # Continuous: e.g., MeanDepth, Missingness
 # Categorical: e.g., Pool, Mitotype
 continuous_vars <- c("meanDepth", "missingRate")
-categorical_vars <- c("accuratelocation", "date")  # adjust to actual column names
+categorical_vars <- c("accuratelocation", "date", "Group")  # adjust to actual column names
 
 
 

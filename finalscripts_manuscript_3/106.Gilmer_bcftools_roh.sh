@@ -44,4 +44,4 @@ txt=bcftools_roh_gilmer_out.txt
 cd $dir
 
 bcftools roh -G30 trimmed10bp_filtered_Gilmer.vcf.gz -o bcftools_roh_gilmer_out.txt
-$CONDA_PREFIX/bin/roh-viz -i ${dir}/$txt -v ${dir}/$vcf -o ${dir}/rmme.html
+$CONDA_PREFIX/bin/roh-viz -i ${dir}/$txt -v ${dir}/$vcf -o ${dir}/rmme2.html

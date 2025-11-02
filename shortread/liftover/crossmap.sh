@@ -19,11 +19,11 @@ module load python/3.11.4
 
 #pip install --user .
 
-
 #species=us_pulex
 #species=us_obtusa
 #species=us_ambigua
 species=eu_obtusa
+
 
 #bed=us_pulex_ref_kap4.allbases.cleaned.slimmed.bed
 #bed=US_obtusa_onlydaps.allbases.cleaned.slimmed.bed
@@ -36,3 +36,6 @@ bed=assembly.hap2_onlydaps.allbases.slimmed.bed
 /scratch/rjp5nc/liftover/euobtusa_to_eupulex.bed
 
 #cd /home/rjp5nc/Genoseq_2023/shortread/liftover
+
+
+CrossMap.py vcf path/to/your.chain source_genome.fa your_input.vcf.gz output_lifted.vcf

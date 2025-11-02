@@ -39,19 +39,26 @@ END {
   }
 }' usdobtusa_mito_DP_per_sample.txt > usdobtusa_mito_avg_DP_per_sample.txt
 
-awk '$2>10 {print $1}' usdobtusa_mito_avg_DP_per_sample.txt > high_DP_samples.txt
+# awk '$2>10 {print $1}' usdobtusa_mito_avg_DP_per_sample.txt > high_DP_samples.txt
 
 
-bcftools view -S high_DP_samples.txt \
-  /scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/usdobtusa_mito_combined.g.vcf.gz \
-  -Oz -o usdobtusa_mito_highDP_samples.g.vcf.gz
-bcftools index usdobtusa_mito_highDP_samples.g.vcf.gz
-tabix -p vcf usdobtusa_mito_highDP_samples.g.vcf.gz
+# bcftools view -S high_DP_samples.txt \
+#   /scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/usdobtusa_mito_combined.g.vcf.gz \
+#   -Oz -o usdobtusa_mito_highDP_samples.g.vcf.gz
+# bcftools index usdobtusa_mito_highDP_samples.g.vcf.gz
+# tabix -p vcf usdobtusa_mito_highDP_samples.g.vcf.gz
 
+
+# filter VCF by samples and bgzip output
+bcftools view -S /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/final_vcf_filter_one_of_each.txt -Oz -o usdobtusa_mito_highDP_samples2.g.vcf.gz /scratch/rjp5nc/UK2022_2024/mito_vcf/merged_gvcf/usdobtusa_mito_combined.g.vcf.gz
+
+# index the new VCF
+bcftools index -f usdobtusa_mito_highDP_samples2.g.vcf.gz
+tabix -p vcf usdobtusa_mito_highDP_samples2.g.vcf.gz
 
 
 # Mitochondrial VCF
-vcf=${wd}/usdobtusa_mito_highDP_samples.g.vcf.gz
+vcf=${wd}/usdobtusa_mito_highDP_samples2.g.vcf.gz
 
 
 gatk GenotypeGVCFs \
@@ -93,9 +100,18 @@ bcftools query -l /scratch/rjp5nc/snapp5/usdobtusa.mito.biallelic.clean.vcf \
   > /scratch/rjp5nc/snapp5/samples_mito_USobtusa_snapp_clean.txt
 
 echo -n "monophyletic NA " > snapp_constraints.txt
-paste -sd, samples_mito_USobtusa_snapp_clean.txt >> snapp_constraints.txt
+sed 's/$/_clone/' samples_mito_USobtusa_snapp_clean.txt | paste -sd, - >> snapp_constraints.txt
 
-awk '{print $1, $1}' /scratch/rjp5nc/snapp5/samples_mito_USobtusa_snapp_clean.txt > samples_mito_USobtusa_snapp_clean_2col.txt
+awk '{print $1 "_clone", $1}' /scratch/rjp5nc/snapp5/samples_mito_USobtusa_snapp_clean.txt > samples_mito_USobtusa_snapp_clean_2col.txt
+
+
+
+usdobtusa_mito_avg_DP_per_sample.txt
+
+
+
+
+
 
 ruby ${wd}/snapp_prep.rb \
   -v ${wd}/usdobtusa.mito.biallelic.clean.vcf \

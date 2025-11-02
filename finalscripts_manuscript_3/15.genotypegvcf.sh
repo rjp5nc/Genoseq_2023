@@ -22,7 +22,7 @@ module load gatk/4.6.0.0
 JAVAMEM=80G
 CPU=10
 
-
+SLURM_ARRAY_TASK_ID=80
 #NEED TO DO USPULEX/AMBIGUA
 
 # Working folder is core folder where this pipeline is being run.
@@ -66,14 +66,17 @@ echo ${i}_${start}_${stop} "is being processed" $(date)
 # Identify the Genome database to genotyoe
 GenomeDB_path=`echo /scratch/rjp5nc/UK2022_2024/daphnia_phylo/$species/Daphnia_DBI_${i}_${start}_${stop}`
 
+JAVAMEM=40
 # Genotype call the samples in the DBI merged set
 gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
 -R $REFERENCE \
 -V gendb://$GenomeDB_path \
 --tmp-dir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
 -O $WORKING_FOLDER/${i}.${start}.${stop}.vcf.gz \
-#--genomicsdb-use-vcf-codec \
 -L ${i}:${start}-${stop}
+
+
+#--genomicsdb-use-vcf-codec \
 
 # Remove temp folder
 rm -rf $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}

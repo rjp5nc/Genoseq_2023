@@ -24,7 +24,7 @@ HIFI=/scratch/rjp5nc/HMW/HMWDNAElvis3/m84128_250121_222443_s2.hifi_reads.bc2104.
 R1=/scratch/rjp5nc/HMW/shortreadElvis/merged_R1.fq.gz
 R2=/scratch/rjp5nc/HMW/shortreadElvis/merged_R2.fq.gz
 
-THREADS=38   # change as needed
+THREADS=10   # change as needed
 
 # Filter Spades contigs >=1kb
 seqkit seq -m 1000 "$SPADES" > spades.1kb.fasta
@@ -34,11 +34,12 @@ ragtag.py patch -o ragtag_patch "$HIFIASM" spades.1kb.fasta
 MINPUT=ragtag_patch/ragtag.patch.fasta
 
 # Map HiFi reads
-minimap2 -t $THREADS -x map-hifi "$MINPUT" "$HIFI" | samtools sort -@ 8 -o hifi.bam
+minimap2 -t $THREADS -ax map-hifi "$MINPUT" "$HIFI" | \
+samtools sort -@ 8 -o hifi.bam
 samtools index hifi.bam
 
 # Make fofn for NextPolish
-echo "$(realpath hifi.bam)" > hifi.fofn
+ls reads1_R1.fq reads1_R2.fq reads2_R1.fq reads2_R2.fq > sgs.fofn
 
 # Round 1: polish with HiFi
 nextPolish run -g "$MINPUT" -t $THREADS -p pb -hifi_fofn hifi.fofn -o np_round1.fasta

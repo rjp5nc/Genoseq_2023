@@ -245,7 +245,7 @@ welltopond3 <- well_to_pond[right_tips]
 
 
 png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo_colors.png",
-    res = 300, width = 7000, height = 8000)
+    res = 1000, width = 7000, height = 8000)
 
 # Plot cophylo with colored edges
 plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = "gray40")

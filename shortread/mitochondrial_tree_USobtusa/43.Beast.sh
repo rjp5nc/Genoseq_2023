@@ -25,6 +25,6 @@ cd /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/
 
 #I had to increase the ram usage in the .bat file of Beauti2 to turn the alignment into a .xml file. It wasnt saving otherwise
 
-#beast -beagle_SSE -threads 30 /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/all_aligned.xml
-
 beast -java -threads 30 /scratch/rjp5nc/UK2022_2024/consensusmitoaligned2/all_aligned.xml
+
+#Ran treeannotator locally with increased RAM.

@@ -139,14 +139,17 @@ df2 <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_t
 
 library(RColorBrewer)
 
-# Example palette
+ngroups <- length(unique(df1$Group))
+
+# Create an extended palette (beyond 8 colors)
 group_colors <- setNames(
-  brewer.pal(length(unique(df1$Group)), "Set2"),
-  unique(df1$Group)
+  colorRampPalette(brewer.pal(8, "Set2"))(ngroups),
+  sort(unique(df1$Group))
 )
 
-# Assign colors in df1 and df2
+# Add the color column to df1
 df1$color <- group_colors[df1$Group]
+
 df2$color <- group_colors[df2$Group]  # or a different palette if you want
 
 
@@ -203,9 +206,41 @@ edgecols2 <- get_edge_colors(cophylo$trees[[2]], tipcols2)
 edge.col <- list(left = edgecols1, right = edgecols2)
 
 
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo.png", res = 300, width = 4000, height = 5000)
 
-plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = "gray60")
+
+
+metadata_rockpools <- subset(metadata_with_clone, accuratelocation == "P58"|accuratelocation == "P62"|
+accuratelocation =="P63"|accuratelocation == "P66"|accuratelocation == "Gilmer")
+
+metadata_rockpools2 <- metadata_rockpools[, c(2,9)]
+
+# Define pond palette for your 5 sites
+pond_palette <- c(
+  "P58"   = "#E69F00",  # orange
+  "P62"   = "#56B4E9",  # sky blue
+  "P63"   = "#009E73",  # bluish-green
+  "P66"   = "#D55E00",  # vermillion red
+  "Gilmer"= "#CC79A7"   # purple/magenta
+)
+
+left_tips  <- cophylo$trees[[1]]$tip.label
+right_tips <- cophylo$trees[[2]]$tip.label
+
+
+
+# Make a lookup: Well -> pond
+well_to_pond <- setNames(metadata_rockpools2$accuratelocation,
+                         metadata_rockpools2$Well)
+
+# Get pond for each tip in the tree
+ltip_colors <- pond_palette[well_to_pond[left_tips]]
+rtip_colors <- pond_palette[well_to_pond[right_tips]]
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo_colors.png", res = 300, width = 4000, height = 19000)
+
+plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = ltip_colors)
+
 
 dev.off()
 
@@ -256,3 +291,89 @@ dev.off()
 
 subset(types, Group.x == "AC")
 subset(types, Group.x == "C")
+
+
+left_tips  <- cophylo$trees[[1]]$tip.label
+right_tips  <- cophylo$trees[[2]]$tip.label
+
+# Make a lookup: Well -> pond
+well_to_pond <- setNames(metadata_rockpools2$accuratelocation,
+                         metadata_rockpools2$Well)
+
+# Get pond for each tip in the tree
+welltopond2 <- well_to_pond[left_tips]
+welltopond3 <- well_to_pond[right_tips]
+
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/cophylo_colors.png",
+    res = 300, width = 7000, height = 10000)
+
+# Plot cophylo with colored edges
+plot(cophylo, edge.col = edge.col, fsize = 0.8, lwd = 2, link.col = "gray40")
+
+# Add legend for left tree tip colors
+legend("top",                     # position, adjust as needed
+       legend = names(pond_palette),   # pond names
+       col = pond_palette,             # matching colors
+       pch = 19,                       # point type to match tip symbols
+       cex = 1.5,                      # text/point size
+       bty = "n")                      # no box around legend
+
+
+
+# Add colored tip labels
+tiplabels.cophylo(
+  text = welltopond2,
+  col = ltip_colors,
+  frame = "none",
+    adj = -1,
+  which = "left"
+)
+
+tiplabels.cophylo(
+  text = welltopond3,
+  col = rtip_colors,
+  frame = "none",
+    adj = 1.5 ,
+  which = "right"
+)
+
+
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+library(dplyr)
+
+rockpools_super <- metadata_rockpools2 %>%
+  left_join(genomictypes, by = c("Well" = "CloneA"))
+
+rockpools_super_mito <- rockpools_super %>%
+  left_join(mitotypes, by = c("Well" = "CloneA"))
+
+colnames(rockpools_super_mito) <- c("Well", "accuratelocation", "superclone", "mitotype")
+
+
+library(dplyr)
+
+summary_table <- rockpools_super_mito %>%
+  group_by(accuratelocation) %>%
+  summarise(
+    superclones = paste(unique(superclone), collapse = ", "),
+    mitotypes   = paste(unique(mitotype), collapse = ", ")
+  )
+
+print(summary_table)
+
+write.csv(summary_table,"/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/all_clones_no_filt_superclone_summary.csv")
+write.csv(rockpools_super_mito,"/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/all_clones_no_filt_superclone.csv")

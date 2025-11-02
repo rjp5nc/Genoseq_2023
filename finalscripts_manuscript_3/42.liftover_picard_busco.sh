@@ -13,32 +13,32 @@
 module load tabix
 module load picard
 
-#finished eu_obtusa, ambigua, usobtusa
+#vcffile=trimmed10bp_euobtusa_vcf.vcf.gz_busco.vcf.gz
+vcffile=trimmed10bp_usambigua_vcf.vcf.gz_busco.vcf.gz
+#vcffile=trimmed10bp_usobtusa_vcf.vcf.gz_busco.vcf.gz
+#vcffile=trimmed10bp_uspulex_vcf.vcf.gz_busco.vcf.gz
 
-#species=uspulex
-#species=usobtusa
-#species=usambigua
-species=usobtusa
-speciescrossmap=us_obtusa
-vcffile=trimmed10bp_masked_${species}.vcf.gz
+
+#speciescrossmap=eu_obtusa
+speciescrossmap=us_ambigua
+#speciescrossmap=us_obtusa
+#speciescrossmap=us_pulex
+
 sourcegenome=totalHiCwithallbestgapclosed.fa
-#Daphnia_ambigua_Q001_genome.fa
-#US_obtusa_onlydaps.fa
-#us_pulex_ref_kap4.fa
 
 # Parameters
-JAVAMEM=100G
+JAVAMEM=40G
 CPU=1
 
 # Liftover using picard
 java "-Xmx${JAVAMEM}" -jar $EBROOTPICARD/picard.jar  LiftoverVcf \
-I=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/$vcffile \
-O=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}.vcf.gz \
+I= /scratch/rjp5nc/UK2022_2024/buscoanalysis/filteredvcf/$vcffile \
+O= /scratch/rjp5nc/UK2022_2024/buscoanalysis/filteredvcf_lifted/lifted_${speciescrossmap}.vcf.gz \
 CHAIN=/scratch/rjp5nc/lastz/$speciescrossmap/chainnet/liftover.chain \
-REJECT=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}_rejected.vcf.gz \
+REJECT=/scratch/rjp5nc/UK2022_2024/buscoanalysis/filteredvcf_lifted/lifted_${speciescrossmap}_rejected.vcf.gz \
 R=/scratch/rjp5nc/Reference_genomes/post_kraken/$sourcegenome \
 MAX_RECORDS_IN_RAM=10000000 \
 WARN_ON_MISSING_CONTIG=true \
 RECOVER_SWAPPED_REF_ALT=true 
 
-tabix -p vcf /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_${species}.vcf.gz
+tabix -p vcf /scratch/rjp5nc/UK2022_2024/buscoanalysis/filteredvcf_lifted/lifted_${speciescrossmap}.vcf.gz

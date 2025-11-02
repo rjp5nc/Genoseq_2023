@@ -16,15 +16,18 @@ genofile.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed
 gds <- seqOpen(genofile.fn)
 
 metadata <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/2022_2024seqmetadata20250811.csv", header = TRUE)
-samplestats <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/eudobtusa_samplestats.csv")
+samplestats <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_samplestats.csv")
+mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")
+genomic_types <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
 
 
 unique(metadata$accuratelocation)
 
 include_locations <- c("P66", "P63", "P58","P62", "Gilmer")  # replace with your names
 
-# Keep only samples NOT in these locations
+# Keep only samples in these locations
 samples_to_keep <- metadata$Well[metadata$accuratelocation %in% include_locations]
+samples_to_keep <- samples_to_keep[samples_to_keep %in% genomic_types$CloneA]
 
 seqSetFilter(gds, sample.id = samples_to_keep)
 
@@ -49,6 +52,8 @@ pca_data <- data.frame(
   PC5 = pca_result$eigenvect[, 5],
   varprop = pca_result$varprop
 )
+
+
 
 write.csv(pca_data,
           "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca.csv",
@@ -75,6 +80,18 @@ ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca_pl
 
 
 
+
+p <- ggplot(pca_merged2, aes(x = PC2, y = PC3, label = sample.id, col=accuratelocation)) +
+  geom_point() +
+  theme_bw() +
+  labs(
+    title = "PCA of USobtusa Samples",
+    x = paste0("PC2 8.1%"),
+    y = paste0("PC3 6.9%")
+  )
+
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca2_pca3_plot.png",
+       plot = p, width = 7, height = 6, dpi = 300)
 
 
 p <- ggplot(pca_merged2, aes(x = PC1, y = PC2, label = sample.id, col=missingRate)) +
@@ -108,4 +125,57 @@ p <- ggplot(pca_merged2, aes(x = PC1, y = PC2, label = sample.id, col=meanDepth)
 
 # Save as PNG
 ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca_plot_depth.png",
+       plot = p, width = 7, height = 6, dpi = 300)
+
+
+
+
+
+p <- ggplot(pca_merged2, aes(x = PC1, y = PC2, label = sample.id, shape=accuratelocation,col=date)) +
+  geom_point() +
+  theme_bw() +
+  labs(
+    title = "PCA of USobtusa Samples",
+    x = paste0("PC1 14.2%"),
+    y = paste0("PC2 8.1%")
+  )
+
+# Save as PNG
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pca_plot_date.png",
+       plot = p, width = 7, height = 6, dpi = 300)
+
+
+
+
+pca_merged3 <- merge(pca_merged2, mitotypes, by.x = "sample.id", by.y = "CloneA", all.x = TRUE)
+
+
+p <- ggplot(pca_merged3, aes(x = PC1, y = PC2, label = sample.id,col=Group)) +
+  geom_point() +
+  theme_bw() +
+  labs(
+    title = "PCA of USobtusa Samples",
+    x = paste0("PC1 14.2%"),
+    y = paste0("PC2 8.1%")
+  )
+
+# Save as PNG
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mitotype_pca.png",
+       plot = p, width = 7, height = 6, dpi = 300)
+
+
+
+
+
+p <- ggplot(pca_merged3, aes(x = meanDepth, y = missingRate,col=accuratelocation)) +
+  geom_point() +
+  theme_bw() +
+  labs(
+    title = "Depth by Missing Rate per sample",
+    x = paste0("Depth"),
+    y = paste0("Missingrate")
+  )
+
+# Save as PNG
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/missingratexdepth.png",
        plot = p, width = 7, height = 6, dpi = 300)

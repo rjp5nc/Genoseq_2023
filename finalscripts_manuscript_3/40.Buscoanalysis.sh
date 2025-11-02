@@ -40,4 +40,27 @@ busco \
 
 
 
-/scratch/rjp5nc/UK2022_2024/buscoanalysis
+cd /scratch/rjp5nc/UK2022_2024/buscoanalysis/
+
+# Directory with BUSCO GFF files
+GFF_DIR=/scratch/rjp5nc/UK2022_2024/buscoanalysis/${Ref}/run_arthropoda_odb10/busco_sequences/single_copy_busco_sequences
+
+# Output directory for BED files
+
+mkdir -p /scratch/rjp5nc/UK2022_2024/buscoanalysis/beds/$Ref
+BED_OUT=/scratch/rjp5nc/UK2022_2024/buscoanalysis/beds/$Ref
+
+# Loop over GFFs and convert to BED
+for GFF in $GFF_DIR/*.gff; do
+    BASENAME=$(basename $GFF .gff)
+    awk '$3=="gene" {print $1"\t"$4-1"\t"$5"\t"$9"\t0\t"$7}' $GFF > $BED_OUT/$BASENAME.bed
+done
+
+# Combine all BED files into one
+cat $BED_OUT/*.bed > /scratch/rjp5nc/UK2022_2024/buscoanalysis/${Ref}_BUSCO_combined.bed
+
+# Optional: sort by contig and start position
+sort -k1,1 -k2,2n /scratch/rjp5nc/UK2022_2024/buscoanalysis/${Ref}_BUSCO_combined.bed > /scratch/rjp5nc/UK2022_2024/buscoanalysis/${Ref}_BUSCO_combined.sorted.bed
+rm /scratch/rjp5nc/UK2022_2024/buscoanalysis/${Ref}_BUSCO_combined.bed
+
+

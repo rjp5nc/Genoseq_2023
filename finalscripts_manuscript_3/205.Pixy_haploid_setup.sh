@@ -29,24 +29,62 @@ export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
 
 cd /scratch/rjp5nc/UK2022_2024/mito_vcf
 
-# Directory with chromosome VCFs
+vcf=/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.haploid.vcf.gz
+bcftools query -l "$vcf" > /scratch/rjp5nc/UK2022_2024/allsites_mito/mito_samples.txt
 
-VCF="/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites_firstcol.vcf.gz"
-POPS="/scratch/rjp5nc/UK2022_2024/allsites_mito/pops_fixed.txt"
-
-# --- Output directory ---
-OUT_DIR="/scratch/rjp5nc/UK2022_2024/allsites_mito/results_pixymito"
-
-pixy --stats pi fst dxy \
-    --vcf $VCF \
-    --populations /scratch/rjp5nc/UK2022_2024/allsites_mito/pops_fixed.txt \
-    --window_size 14600 \
-    --n_cores 20 \
-    --output_folder $OUT_DIR \
-    --bypass_invariant_check \
-    --output_prefix pixy_14601_
+contig=CM028013.1
+len=$(bcftools view -h "$vcf" | awk -v c=$contig '$0 ~ "##contig=<ID="c"," {match($0,/length=([0-9]+)/,m); if(m[1]) print m[1];}')
+printf "%s\t0\t%s\n" "$contig" "$len" > /scratch/rjp5nc/UK2022_2024/allsites_mito/mito.whole.bed
 
 
-# cat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy_chr/*_fst.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_fst.txt
-# cat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy_chr/*_dxy.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_dxy.txt
-# cat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy_chr/*_pi.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pi.txt
+
+awk -F',' 'NR>1 {print $1 "\t" $1}' /project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv > pops.txt
+
+#awk -F',' 'NR>1 {print $1 "\t" $6}' /project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/2022_2024seqmetadata20250131.csv > pops.txt
+
+awk 'NF==2' pops.txt > pops_filtered.txt
+
+# /scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species_merged_20250627.csv
+echo -e "SRR5012393\tSRR5012393\nSRR5012394\tSRR5012394\nSRR5012770\tSRR5012770\nSRR5012396\tSRR5012396\nSRR5012773\tSRR5012773\nSRR5012771\tSRR5012771" \
+>> /scratch/rjp5nc/UK2022_2024/mito_vcf/pops_filtered.txt
+
+
+$CONDA_PREFIX/bin/bcftools query -l  $vcf > vcf_samples.txt
+
+grep -Ff vcf_samples.txt pops_filtered.txt > pops_both.txt
+
+awk '$2 != "PBO66"' pops_both.txt > pops_both2.txt
+
+grep -wFf <($CONDA_PREFIX/bin/bcftools query -l $vcf) \
+  pops_both2.txt > pops_fixed.txt
+
+
+
+
+POPS=/scratch/rjp5nc/UK2022_2024/mito_vcf/pops_fixed.txt
+
+OUT=/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_subset.vcf.gz
+awk '{print $1}' "$POPS" | sort | uniq > /scratch/rjp5nc/UK2022_2024/allsites_mito/pixy_keep_samples.txt
+
+
+
+bcftools view \
+  -S /scratch/rjp5nc/UK2022_2024/allsites_mito/pixy_keep_samples.txt \
+  -Oz -o "$OUT" "$vcf"
+  
+bcftools index -t "$OUT"
+
+conda init bash
+source ~/.bashrc  # or restart your shell
+conda activate pixy
+export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+
+pixy --stats pi dxy \
+     --vcf "$OUT" \
+     --populations /scratch/rjp5nc/UK2022_2024/mito_vcf/pops_fixed.txt \
+     --bed_file /scratch/rjp5nc/UK2022_2024/allsites_mito/mito.whole.bed \
+     --n_cores 8 \
+         --output_folder /scratch/rjp5nc/UK2022_2024/allsites_mito/pixy_mito_whole \
+    --output_prefix pixy_14601_incSRR
+
+

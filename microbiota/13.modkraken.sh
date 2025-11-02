@@ -15,10 +15,13 @@ export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 
 cd /scratch/rjp5nc/krakenDB/cilliates
 
-esearch -db nucleotide -query "Vorticella[Organism]" | efetch -format fasta > vorticella_only.fasta
+esearch -db nucleotide -query "Epistylis[Organism]" | efetch -format fasta > Epistylis_only.fasta
 
 # --- Add sequences to the Kraken2 library ---
+grep -v "pdb|" vorticella_only.fasta > vorticella_clean.fasta
+
 kraken2-build --add-to-library vorticella_only.fasta --db /scratch/rjp5nc/krakenDB/nt
+kraken2-build --add-to-library Epistylis_only.fasta --db /scratch/rjp5nc/krakenDB/nt
 kraken2-build --add-to-library cilliates.fasta --db /scratch/rjp5nc/krakenDB/nt
 # --- Rebuild the Kraken2 database ---
 kraken2-build --build --db /scratch/rjp5nc/krakenDB/nt --threads 10

@@ -13,58 +13,24 @@
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 
-# het / total_sites_in_window
+module load samtools 
+# index the fasta (creates first12_contigs.fasta.fai if not already there)
+samtools faidx /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/first12_contigs.fasta
 
-module load bcftools
+# extract the contig
+samtools faidx /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/first12_contigs.fasta JAACYE010000002.1 \
+  > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/JAACYE010000002.1.fasta
+
+mkdir /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2
+
+mv /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/JAACYE010000002.1.fasta /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2
 
 
-VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_Gilmer.vcf.gz"
-WINDOW=10000          # 10 kb windows
-RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_gilmer_hets10000"
-mkdir -p "$RESULTDIR"
+seqkit sliding --window 150 --step 150 \
+  /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2/JAACYE010000002.1.fasta \
+  > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2/JAACYE010000002.1_split_150.fasta
 
-cd $RESULTDIR
-
-# Get sample names
-bcftools query -l "$VCF" > samples.txt
-mapfile -t samples < samples.txt
-nsamples=${#samples[@]}
-
-# Export sample names for awk
-for i in "${!samples[@]}"; do
-    export "samples$i=${samples[$i]}"
-done
-
-# Get contigs/chromosomes
-bcftools query -l "$VCF" | head -n0  # just to check
-bcftools view -h "$VCF" | grep "^##contig" | sed 's/##contig=<ID=//; s/,.*//' > contigs.txt
-mapfile -t contigs < contigs.txt
-
-for contig in "${contigs[@]}"; do
-    echo "Processing $contig..."
-    bcftools query -f '%CHROM\t%POS[\t%GT]\n' -r "$contig" "$VCF" | \
-    awk -v nsamples="$nsamples" -v contig="$contig" -v win_size="$WINDOW" '
-    {
-        win = int($2 / win_size)
-        for(i=3;i<=NF;i++){
-            key = contig ":" win ":" i
-            # count heterozygous genotypes (0/1 or 1/0)
-            if($i ~ /^0[\/|]1$/ || $i ~ /^1[\/|]0$/){
-                het[key]++
-            }
-            count[key]++
-        }
-    }
-    END {
-        for(k in count){
-            split(k,a,":")
-            win_start = a[2]*win_size
-            win_end = win_start + win_size - 1
-            sample_name = ENVIRON["samples" a[3]-3]
-            het_prop = (count[k]>0) ? het[k]/count[k] : 0
-            printf "%s\t%d\t%d\t%s\t%.5f\n", a[1], win_start, win_end, sample_name, het_prop
-        }
-    }' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_10kb.txt"
-done
-
-#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_100kb.txt
+  grep "^>" /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2/JAACYE010000002.1_split_10kb.fasta \
+  | cut -d' ' -f1 \
+  | sed 's/^>//' \
+  > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2/contig_names.txt

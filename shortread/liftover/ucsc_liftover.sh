@@ -3,7 +3,6 @@
 #samtools faidx eu_pulex_totalHiCwithallbestgapclosed.clean.fa
 #cut -f1,2 eu_pulex_totalHiCwithallbestgapclosed.clean.fa.fai | awk '{print $1 "\t0\t" $2}' > eu_pulex_all_chr.bed
 
-
 conda create -n liftover-env -c bioconda ucsc-liftover
 conda activate liftover-env
 

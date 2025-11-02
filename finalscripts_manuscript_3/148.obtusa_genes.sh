@@ -12,59 +12,52 @@
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
+module load samtools
 
-# het / total_sites_in_window
+
+
+
+
+cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Daphnia_obtusa_genes
+
+/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps
+
+cut -f1 /scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa.fai | head -n 12 > contigs12.txt
+
+seqkit head -n 12 /scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa > first12_contigs.fasta
+samtools faidx Daphnia_obtusa_FS6_genome.fa
+cut -f1 Daphnia_obtusa_FS6_genome.fa.fai | head -n 12 > contigs12.txt
+
+cut -f1,2 Daphnia_obtusa_FS6_genome.fa.fai 
+cut -f1,2 first12_contigs.fasta.fai
+
 
 module load bcftools
+module load samtools
+module load htslib
+
+bcftools view \
+  -r JAACYE010000001.1,JAACYE010000002.1,JAACYE010000003.1,JAACYE010000004.1,JAACYE010000005.1,JAACYE010000006.1,JAACYE010000007.1,JAACYE010000008.1,JAACYE010000009.1,JAACYE010000010.1,JAACYE010000011.1,JAACYE010000012.1 \
+  -Oz -o trimmed10bp_filtered_Gilmer_12.vcf.gz \
+  trimmed10bp_filtered_Gilmer.vcf.gz
+
+#zcat trimmed10bp_filtered_Gilmer_12.vcf.gz \
+  | sed 's/JAACYE010000001.1/DOBTUS_1/g; 
+         s/JAACYE010000002.1/DOBTUS_2/g; 
+         s/JAACYE010000003.1/DOBTUS_3/g; 
+         s/JAACYE010000004.1/DOBTUS_4/g; 
+         s/JAACYE010000005.1/DOBTUS_5/g; 
+         s/JAACYE010000006.1/DOBTUS_6/g; 
+         s/JAACYE010000007.1/DOBTUS_7/g; 
+         s/JAACYE010000008.1/DOBTUS_8/g; 
+         s/JAACYE010000009.1/DOBTUS_9/g; 
+         s/JAACYE010000010.1/DOBTUS_10/g; 
+         s/JAACYE010000011.1/DOBTUS_11/g; 
+         s/JAACYE010000012.1/DOBTUS_12/g' \
+  | bgzip > trimmed10bp_filtered_Gilmer_12_renamed.vcf.gz
+
+# Index
+tabix -p vcf trimmed10bp_filtered_Gilmer_12_renamed.vcf.gz
 
 
-VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_Gilmer.vcf.gz"
-WINDOW=100000          # 10 kb windows
-RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_gilmer_hets100000"
-mkdir -p "$RESULTDIR"
-
-cd $RESULTDIR
-
-# Get sample names
-bcftools query -l "$VCF" > samples.txt
-mapfile -t samples < samples.txt
-nsamples=${#samples[@]}
-
-# Export sample names for awk
-for i in "${!samples[@]}"; do
-    export "samples$i=${samples[$i]}"
-done
-
-# Get contigs/chromosomes
-bcftools query -l "$VCF" | head -n0  # just to check
-bcftools view -h "$VCF" | grep "^##contig" | sed 's/##contig=<ID=//; s/,.*//' > contigs.txt
-mapfile -t contigs < contigs.txt
-
-for contig in "${contigs[@]}"; do
-    echo "Processing $contig..."
-    bcftools query -f '%CHROM\t%POS[\t%GT]\n' -r "$contig" "$VCF" | \
-    awk -v nsamples="$nsamples" -v contig="$contig" -v win_size="$WINDOW" '
-    {
-        win = int($2 / win_size)
-        for(i=3;i<=NF;i++){
-            key = contig ":" win ":" i
-            # count heterozygous genotypes (0/1 or 1/0)
-            if($i ~ /^0[\/|]1$/ || $i ~ /^1[\/|]0$/){
-                het[key]++
-            }
-            count[key]++
-        }
-    }
-    END {
-        for(k in count){
-            split(k,a,":")
-            win_start = a[2]*win_size
-            win_end = win_start + win_size - 1
-            sample_name = ENVIRON["samples" a[3]-3]
-            het_prop = (count[k]>0) ? het[k]/count[k] : 0
-            printf "%s\t%d\t%d\t%s\t%.5f\n", a[1], win_start, win_end, sample_name, het_prop
-        }
-    }' | sort -k2,2n -k4,4 > "$RESULTDIR/${contig}_het_100kb.txt"
-done
-
-#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_100kb.txt
+cut -f1 trimmed10bp_filtered_Gilmer_12_renamed.vcf.gz | head -n 1

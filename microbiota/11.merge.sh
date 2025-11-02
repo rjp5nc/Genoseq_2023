@@ -16,12 +16,15 @@ PARENT_DIR="/scratch/rjp5nc/UK2022_2024/unmapped_fastqs_newseq/fastqs"  # Change
 cd "$PARENT_DIR" || exit
 
 # Loop through all subdirectories
-ls *trimmed1.fq.gz 1> /dev/null 2>&1; then
-        cat *trimmed1.fq.gz > "unmapped_trimmedmerged1.fq.gz"
+# Check for forward reads
+if ls *R1.unmapped.fq.gz 1> /dev/null 2>&1; then
+    cat *R1.unmapped.fq.gz > "unmapped_trimmedmerged1.fq.gz"
+fi
 
-    # Check for reverse reads
-ls *trimmed2.fq.gz 1> /dev/null 2>&1; then
-        cat *trimmed2.fq.gz > "unmapped_trimmedmerged2.fq.gz"
+# Check for reverse reads
+if ls *R2.unmapped.fq.gz 1> /dev/null 2>&1; then
+    cat *R2.unmapped.fq.gz > "unmapped_trimmedmerged2.fq.gz"
+fi
 
 
 

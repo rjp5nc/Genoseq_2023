@@ -12,11 +12,11 @@
 
 module load bcftools 
 
-cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/lifted_notcomb
+cd /scratch/rjp5nc/UK2022_2024/mito_vcf/lifted_vcfs/
 
-bcftools merge -0 -Oz -o ../lifted_all_missingasref.vcf.gz *.vcf.gz
+bcftools merge -0 -Oz -o ../mito_lifted_all_missingasref.vcf.gz *.vcf.gz
 
 #Assume homozygous ref - assume genotype is ref - use -0
 
-tabix -p ../lifted_all_missingasref.vcf.gz
+tabix -p vcf ../mito_lifted_all_missingasref.vcf.gz
 

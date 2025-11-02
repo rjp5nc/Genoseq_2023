@@ -77,27 +77,3 @@ $CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_usobtusa.filtered_bgz.v
 awk -F'\t' 'NR==FNR {vcf[$1]; next} $1 in vcf' vcf_samples2.txt pops_filtered_for_pixy.txt > pops_pixy_ready.txt
 
 
-
-#overlapping vs non overlapping windows
-
-pixy --stats pi fst dxy \
---vcf trimmed10bp_allsites_usobtusa.filtered_bgz.vcf.gz \
---populations pops_pixy_ready.txt \
---window_size 100 \
---n_cores 16 \
---output_folder /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy2 \
---output_prefix pixy
-
-# --- Done ---
-echo "✅ Pixy run finished. Outputs in ${OUTDIR}/"
-
-
-#awk '{print $1 > $2".txt"}' pops_fixed_filtered.txt
-
-#for popfile in P58.txt P62.txt P63.txt P66.txt Gilmer.txt; do
-#    popname=$(basename "$popfile" .txt)
-#    vcftools --gzvcf usdobtusa_mito_genotyped_subset.vcf.gz \
-#             --keep "$popfile" \
-#             --site-pi \
-#             --out "${popname}_pi"
-#done

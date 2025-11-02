@@ -296,3 +296,22 @@ ggplot(merged, aes(x = PC3, y = PC4, color = meanDepth, label = sampleId)) +
        color = "Mean Depth")
 
 dev.off()
+
+
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pca_het_3_4_lims.png",
+    width = 500, height = 500)
+
+ggplot(merged, aes(x = PC3, y = PC4, color = meanDepth, label = sampleId)) +
+  geom_point(size = 3) +
+  scale_color_viridis_c(option = "plasma") +
+  theme_minimal() +
+  xlim(-50,50)+
+  ylim(-25,25)+
+  labs(title = "PCA of het_prop per window",
+       x = pc3_lab,
+       y = pc4_lab,
+       color = "Mean Depth")
+
+dev.off()

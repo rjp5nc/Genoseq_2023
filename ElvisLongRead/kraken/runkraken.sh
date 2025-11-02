@@ -10,7 +10,6 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-
 module load kraken2
 
 export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
@@ -19,7 +18,13 @@ export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"
 #echo 'export KRAKEN2_DATA_PATH="/scratch/rjp5nc/krakenDB/nt"' >> ~/.bashrc
 #source ~/.bashrc
 
-kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt --threads 30 --report /scratch/rjp5nc/krakenDB/US_obtusa/report.txt --classified-out /scratch/rjp5nc/krakenDB/US_obtusa/kraken_classified_output.txt --output /scratch/rjp5nc/krakenDB/US_obtusa/kraken_output.txt --use-names /scratch/rjp5nc/Reference_genomes/orig_ref/JAACYE01.1.fasta
+# /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/newseq/Rockpool4_D1 to Rockpool4_F12
+
+kraken2 --memory-mapping --db /scratch/rjp5nc/krakenDB/nt \
+--threads 30 --report /scratch/rjp5nc/krakenDB/US_obtusa/report.txt \
+--classified-out /scratch/rjp5nc/krakenDB/US_obtusa/kraken_classified_output.txt \
+--output /scratch/rjp5nc/krakenDB/US_obtusa/kraken_output.txt \
+--use-names /scratch/rjp5nc/Reference_genomes/orig_ref/us_obtusa_JAACYE01.1.fasta
 
 grep '^>' /scratch/rjp5nc/krakenDB/US_obtusa/kraken_classified_output.txt > /scratch/rjp5nc/krakenDB/US_obtusa/classified_headers.txt
 

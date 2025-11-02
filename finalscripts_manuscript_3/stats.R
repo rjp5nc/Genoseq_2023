@@ -9,10 +9,9 @@ library(foreach)
 library(data.table)
 
 
-vcf.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usambigua.vcf.gz"          # path to your VCF file
-gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/trimmed10bp_masked_usambigua.gds"             # output GDS file
+vcf.fn <- "/project/berglandlab/Robert/UKSequencing2022_2024/raw_vcfs/raw_usambigua_vcf.vcf.gz"          # path to your VCF file
+gds.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/raw_usambigua.gds"             # output GDS file
 seqVCF2GDS(vcf.fn, gds.fn, storage.option="ZIP_RA", parallel=10, verbose=T, optimize=T)
-
 
 
 
@@ -64,7 +63,7 @@ miss_rates_all_short_plot <- ggplot(miss_rates_all_short_df, aes(x = missing_rat
   xlab("Missing Rate") +
   ylab("Frequency")
 
-ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missrates_variant_ambigua_raw.png", plot = miss_rates_all_short_plot, width = 6, height = 4, dpi = 300)
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missrates_variant_ambigua_raw_beforeeverything.png", plot = miss_rates_all_short_plot, width = 6, height = 4, dpi = 300)
 
 
 
@@ -80,7 +79,7 @@ miss_rates_samps_short_plot <- ggplot(miss_rates_samps_short_df, aes(x = missing
 
 # View plot
 
-ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missrates_variant_USambigua_raw_samps.png", plot = miss_rates_samps_short_plot, width = 6, height = 4, dpi = 300)
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/missrates_variant_USambigua_raw_samps_beforeall.png", plot = miss_rates_samps_short_plot, width = 6, height = 4, dpi = 300)
 
 seqResetFilter(genofile, verbose = TRUE)
 
@@ -116,5 +115,5 @@ sampleStats <- foreach(sample.i=sampleId, .combine = "rbind")%dopar%{
   }
 
   
-write.csv(sampleStats, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_ambigua_raw.csv", row.names = FALSE)
+write.csv(sampleStats, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_ambigua_raw_beforeeverything.csv", row.names = FALSE)
 

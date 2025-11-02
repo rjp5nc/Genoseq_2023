@@ -5,7 +5,6 @@
 library(data.table)
 library(ggplot2)
 
-
 dxy_raw <- read.table("/scratch/rjp5nc/UK2022_2024/allsites_mito/pixy_mito_whole/pixy_14601_incSRR_dxy.txt",header = TRUE,sep = "\t")
 
 

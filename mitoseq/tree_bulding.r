@@ -54,9 +54,6 @@ heatmap(sim_matrix)  # Quick visualization
 
 
 
-
-
-
 genind_data <- tab(genind_obj2)  # Convert genind object to genotype table
 sim_matrix <- simil(genind_data, method = "Jaccard")
 

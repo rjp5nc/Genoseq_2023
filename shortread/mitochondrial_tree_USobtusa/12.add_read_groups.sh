@@ -14,7 +14,7 @@
 # Load modules
 module load picard
 
-#find /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref/ -name "*_finalmap.bam" | sort > /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito/bam_files_newref.txt
+#find /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref/ -name "*_finalmap.bam" | sort > /scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref/bam_files_newref.txt
 
 # Parameters
 parameterFile="/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref/bam_files_newref.txt"

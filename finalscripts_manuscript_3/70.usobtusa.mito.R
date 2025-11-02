@@ -12,6 +12,7 @@ library(dplyr)
 library(tibble)
 library(data.table)
 library(igraph)
+library(SeqVarTools)
 
 library(patchwork)
 library(foreach)
@@ -28,8 +29,9 @@ metadata_with_clone <- read.csv("/project/berglandlab/Robert/UKSequencing2022_20
 samples <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species_merged_20250627.csv")
 
 usobtusasamps <- subset(samples, Species == "Daphnia obtusa" & Continent == "NorthAmerica")
-metadata_with_clone$clone <- trimws(metadata_with_clone$clone)
 
+metadata_with_clone <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/metadata_with_clone.csv", header = TRUE)
+metadata_with_clone$clone <- trimws(metadata_with_clone$clone)
 metadata_with_clone <- subset(metadata_with_clone, clone !="Blank")
 metadata_with_clone <- subset(metadata_with_clone, clone !="BLANK")
 
@@ -196,7 +198,82 @@ legend("topleft",                   # position
 
 dev.off()
 
+write.tree(tree_rooted, file = "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_tree_nwk.nwk")
+
+
+
 write.csv(unique_clones, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")  # Save as CSV
+
+
+
+
+
+
+
+
+p63subset <- subset(metadata_with_clone, accuratelocation == "P63" & date != "2024")
+
+# ---- Step 4: Build neighbor-joining tree ----
+tree <- nj(as.dist(dist_matrix))
+
+
+
+# ---- Step 5 (Optional): Relabel tips from metadata CSV ----
+# CSV should have columns: Sample_ID and Label (or Well, Clone, etc.)
+tree_rooted <- root(tree, outgroup = "Rockpool2_G7", resolve.root = TRUE)
+
+label_map <- setNames(p63subset$Well, p63subset$date)
+
+# Apply labels (optional: fallback to Sample_ID if label is missing)
+group_colors <- setNames(rainbow(length(unique(p63subset$date))), unique(p63subset$date))
+
+# Assign color to each tip
+
+tip_colors <- group_colors[p63subset$date]
+
+tip_color_dt <- data.table(p63subset$date, p63subset$Well)
+
+final_valid_samples2 <- as.data.frame(final_valid_samples)
+
+final_valid_samples3 <- left_join(final_valid_samples2, tip_color_dt, by= c("final_valid_samples"="V2"))
+
+tip_colors <- group_colors[final_valid_samples3$V1]
+
+
+tip_color_dt <- data.table(
+  sample = names(tip_colors),
+  color  = as.vector(tip_colors)
+)
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_mito_P63_dates.png", res = 300, width = 4000, height = 9000)
+#png("/scratch/rjp5nc/UK2022_2024/mito_vcf/tree_usobtusa_circ.png", width = 1200, height = 2000)
+
+# Plot the tree
+plot.phylo(tree_rooted,
+           type = "phylogram",
+#           type = "fan",
+           cex = 0.8,
+           label.offset = 0.01,
+           no.margin = TRUE,
+           tip.color = tip_colors,
+           main = "Rooted NJ Tree (root = P759)")
+
+# Add legend
+legend("topleft",                   # position
+       legend = unique(tip_color_dt$sample),     # group names
+       col = unique(tip_color_dt$color),        # matching colors
+       pch = 19,                   # solid circle
+       pt.cex = 1.5,               # point size
+       cex = 1,                    # text size
+       bty = "n",                  # no box
+       title = "Sample Group")
+
+dev.off()
+
+
+
+
 
 
 
@@ -1136,3 +1213,382 @@ final_plot <- patchwork::wrap_plots(pond_plots, ncol = 1)
 # Save
 ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap_eachpond_freexy_mito.png",
        plot = final_plot, width = 20, height = 6 * length(ponds), dpi = 300, limitsize = FALSE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#per snp FST?
+
+
+metadata_sub <- metadata %>%
+  filter(Well %in% final_valid_samples)
+metadata_sub <- metadata_sub[metadata_sub$accuratelocation != "PBO66", ]
+
+#metadata_sub <- subset(metadata_sub, accuratelocation == "P62"| accuratelocation == "P66" )
+
+unique(metadata_sub$accuratelocation)
+
+seqResetFilter(genofile)
+
+seqSetFilter(genofile, sample.id = metadata_sub$Well, variant.id = valid_variants)
+
+# unique dates in your metadata
+date_levels <- unique(metadata_sub$date)
+pop_levels  <- unique(metadata_sub$accuratelocation)
+
+
+fst_snp_all <- list()
+
+for (pond in unique(metadata_sub$accuratelocation)) {
+  meta_p <- metadata_sub %>% filter(accuratelocation == pond)
+  
+  for (d in unique(meta_p$date)) {
+    meta_pd <- meta_p %>% filter(date == d)
+    indivs <- meta_pd$Well
+    
+    if (length(indivs) < 2) next  # need at least 2
+    
+    message("Processing per-SNP Fst: Pond=", pond, " | Date=", d)
+    
+    all_samples <- metadata_sub$Well
+    group <- ifelse(all_samples %in% indivs, "ingroup", "outgroup")
+    
+    # Compute Fst
+    fst <- snpgdsFst(
+      genofile,
+      sample.id = all_samples,
+      population = factor(group),
+      snp.id = valid_variants,
+      method = "W&C84",
+      with.id = TRUE,
+      verbose = FALSE
+    )
+
+
+    
+    df <- data.frame(
+      SNP = fst$snp.id,
+      Chr = fst$snp.chromosome,
+      Pos = fst$snp.position,
+      Fst = fst$FstSNP,   # per-SNP values
+      pond = pond,
+      date = d
+    )
+    
+    fst_snp_all[[paste(pond, d, sep = "_")]] <- df
+  }
+}
+
+fst_snp_all <- bind_rows(fst_snp_all)
+
+write.csv(
+  fst_snp_all,
+  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_perSNP_pond_date.csv",
+  row.names = FALSE
+)
+
+
+
+
+
+
+
+
+
+
+
+
+fst_within_pond <- list()
+
+for (pond in ponds) {
+  meta_p <- metadata_sub %>% filter(accuratelocation == pond)
+  date_levels <- unique(meta_p$date)
+  
+  # matrix of pairwise Fst between dates for this pond
+  pairwise_results <- matrix(NA,
+                             nrow = length(date_levels),
+                             ncol = length(date_levels),
+                             dimnames = list(date_levels, date_levels))
+  
+  for (i in 1:(length(date_levels) - 1)) {
+    for (j in (i + 1):length(date_levels)) {
+      
+                # ---- print progress ----
+        message("Processing: Pond=", pond,
+                " | Date=", d)
+
+
+      idx <- meta_p$date %in% c(date_levels[i], date_levels[j])
+      sub_samples <- meta_p$Well[idx]
+      sub_pop <- factor(meta_p$date[idx])  # population defined by date
+      
+      # only compute if both dates have samples
+      if (length(unique(sub_pop)) == 2) {
+      fst <- snpgdsFst(
+      genofile,
+      sample.id = all_samples,
+      population = sub_pop,
+      snp.id = valid_variants,
+      method = "W&C84",
+      with.id = TRUE,
+      verbose = FALSE
+    )
+
+    df <- data.frame(
+      SNP = fst$snp.id,
+      Chr = fst$snp.chromosome,
+      Pos = fst$snp.position,
+      Fst = fst$FstSNP,   # per-SNP values
+      pond = pond,
+      date = d
+    )
+      }
+    }
+  }
+  
+  fst_within_pond[[pond]] <- pairwise_results
+}
+
+# flatten the list into a long dataframe
+fst_long <- do.call(rbind, lapply(names(fst_within_pond), function(pond) {
+  mat <- fst_within_pond[[pond]]
+  
+  # only process if it's a proper matrix
+  if (is.matrix(mat)) {
+    df <- as.data.frame(as.table(mat)) %>%
+      rename(date1 = Var1, date2 = Var2, Fst = Freq) %>%
+      mutate(pond = pond)
+    return(df)
+  } else {
+    message("Skipping pond: ", pond, " (not a matrix)")
+    return(NULL)
+  }
+}))
+
+# remove duplicate lower triangle and diagonal
+fst_long <- fst_long %>%
+  mutate(
+    date1 = as.character(date1),
+    date2 = as.character(date2)
+  ) %>%
+  filter(!is.na(Fst))
+
+# write to CSV
+
+write.csv(fst_long,"/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_within_pond_mito.csv")
+
+fst_long <- fst_long %>%
+  filter(!date1 %in% c("2023", "2024"),
+         !date2 %in% c("2023", "2024"))
+         
+bypondplot <- ggplot(fst_long, aes(x = date1, y = date2, fill = Fst)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = sprintf("%.3f", Fst)), size = 3) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
+                       name = "Fst") +  theme_bw(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 10),
+    panel.grid = element_blank()
+  ) +
+  labs(title = "Pairwise Fst Within Ponds by Date", fill = "Fst") +
+  facet_wrap(~ pond, scales = "free")
+
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap_bypondplot_mito.png", plot = bypondplot, width = 12, height = 8, dpi = 300)
+
+
+
+
+
+
+metadata_sub <- subset(metadata_sub, date !="2023")
+metadata_sub <- subset(metadata_sub, date !="2024")
+
+seqResetFilter(genofile)
+
+seqSetFilter(genofile, sample.id = metadata_sub$Well)
+
+# Prepare output list
+
+
+fst_temporal <- list()
+
+for (pond in unique(metadata_sub$accuratelocation)) {
+  meta_p <- metadata_sub %>% filter(accuratelocation == pond)
+  date_levels <- unique(meta_p$date)
+  
+  # Compare all pairs of dates in this pond
+  for (i in 1:(length(date_levels) - 1)) {
+    for (j in (i + 1):length(date_levels)) {
+      
+      date_i <- date_levels[i]
+      date_j <- date_levels[j]
+      
+      message("Calculating temporal Fst: Pond=", pond, " | ", date_i, " vs ", date_j)
+      
+      # Select samples from the two dates
+      meta_pd <- meta_p %>% filter(date %in% c(date_i, date_j))
+      sub_samples <- meta_pd$Well
+      sub_pop <- factor(meta_pd$date)  # population = date groups
+      
+      if(length(unique(sub_pop)) < 2) {
+        message("Skipping Pond=", pond, " | Dates=", date_i, " & ", date_j, " (not enough groups)")
+        next
+      }
+      
+      # Reset filter and select samples + variants
+      seqResetFilter(genofile)
+      seqSetFilter(genofile,
+                   sample.id = sub_samples,
+                   variant.id = valid_variants,
+                   verbose = TRUE)
+      
+      # Compute per-SNP Fst
+      fst <- snpgdsFst(
+        genofile,
+        sample.id = sub_samples,
+        population = sub_pop,
+        snp.id = valid_variants,
+        method = "W&C84",
+        autosome.only = FALSE,   # <- this skips non-autosomal variants
+        with.id = TRUE,
+        verbose = TRUE
+      )
+      
+      # Build dataframe
+      df <- data.frame(
+        SNP   = fst$snp.id,
+        Fst   = fst$FstSNP,
+        pond  = pond,
+        date1 = date_i,
+        date2 = date_j
+      )
+      
+      fst_temporal[[paste(pond, date_i, date_j, sep = "_")]] <- df
+    }
+  }
+}
+
+# Combine all comparisons
+fst_temporal_df <- bind_rows(fst_temporal)
+
+# Write to CSV
+write.csv(
+  fst_temporal_df,
+  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_perSNP_temporal.csv",
+  row.names = FALSE
+)
+
+
+
+fst_temporal_df_pop <- fst_temporal_df %>%
+  mutate(date1 = as.Date(date1, format="%m/%d/%Y"),
+         date2 = as.Date(date2, format="%m/%d/%Y"))
+
+# Optional: combine dates for x-axis label
+fst_temporal_df_pop <- fst_temporal_df_pop %>%
+  mutate(pair = paste(format(date1, "%Y-%m-%d"), "vs", format(date2, "%Y-%m-%d")))
+
+# Plot Fst by pond
+fst_plot <- ggplot(fst_temporal_df_pop, aes(x = pair, y = Fst, color = pond)) +
+  geom_boxplot() +
+  facet_wrap(~pond, scales = "free_x") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Temporal Fst Between Dates Within Ponds",
+    x = "Date Pairs",
+    y = "Fst",
+    color = "Pond"
+  )
+
+# Save plot
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/temporal_Fst_plot.png",
+  plot = fst_plot,
+  width = 14,
+  height = 8,
+  dpi = 300
+)
+
+
+
+
+
+# Plot Fst by pond
+fst_plot <- ggplot(fst_temporal_df_pop, aes(x = SNP, y = Fst, color = pond)) +
+  geom_point() +
+  facet_wrap(pond~pair, scales = "free_x") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Temporal Fst Between Dates Within Ponds",
+    x = "Date Pairs",
+    y = "Fst",
+    color = "Pond"
+  )
+
+# Save plot
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/temporal_Fst_plot.png",
+  plot = fst_plot,
+  width = 14,
+  height = 8,
+  dpi = 300
+)
+
+
+
+
+library(ggplot2)
+library(dplyr)
+library(foreach)
+library(patchwork)
+library(tidyr)
+
+# Make sure Fst is numeric
+fst_temporal_df_pop <- fst_temporal_df_pop %>%
+  mutate(Fst = as.numeric(Fst),
+         pond_type = pond)  # keep pond column consistent
+
+# Get unique ponds
+ponds <- unique(fst_temporal_df_pop$pond_type)
+
+pond_plots <- foreach(p = ponds, .combine = list, .multicombine = TRUE) %do% {
+
+  df <- fst_temporal_df_pop %>% filter(pond_type == p)
+
+  # Make pair a factor to keep consistent order
+  df <- df %>% mutate(pair = factor(pair, levels = unique(pair)))
+
+  ggplot(df, aes(x = SNP, y = Fst)) +
+    geom_point(color = "steelblue", size = 1.5, alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+      panel.grid = element_blank(),
+      strip.text = element_text(size = 10, face = "bold")
+    ) + ylim(0,1)+
+    facet_wrap(~ pair, scales = "free_x") +  # each date pair gets a facet
+    labs(title = paste("Pond:", p),
+         x = "SNP", y = "Fst")
+}
+
+# Combine all pond plots vertically
+final_plot <- patchwork::wrap_plots(pond_plots, ncol = 1)
+
+# Save
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_bydate_eachpond.png",
+       plot = final_plot, width = 14, height = 4 * length(ponds), dpi = 300, limitsize = FALSE)

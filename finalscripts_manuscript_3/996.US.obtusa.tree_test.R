@@ -25,7 +25,7 @@ mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
 head(metadata)
 seqClose(genofile)  
-genofile.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_masked_usobtusa.gds"
+genofile.fn <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_two_of_each_fixed2.gds"
 genofile <- seqOpen(genofile.fn)
 
 
@@ -37,24 +37,13 @@ samples_to_keep <- usobtusasamps %>% filter(Species == "Daphnia obtusa") %>% pul
 
 #samples_to_keep <- metadata_with_clone$Well
 
-unique(metadata_with_clone$accuratelocation)
 
-# ---- Step 2: Filter variants with missing rate < 0.05 ----
-miss_rate_per_sample <- seqMissing(genofile, per.variant = FALSE)
-miss_rate_per_variant <- seqMissing(genofile, per.variant = TRUE)
-sample_ids <- seqGetData(genofile, "sample.id")
-valid_samples <- sample_ids[miss_rate_per_sample < 0.5]
-miss_rate_per_variant <- seqMissing(genofile, per.variant=TRUE)
-valid_variants <- seqGetData(genofile, "variant.id")[miss_rate_per_variant < 0.05]
-
-final_valid_samples <- intersect(valid_samples, samples_to_keep)
+final_valid_samples <- samples_to_keep
 
 
 seqSetFilter(genofile, sample.id = final_valid_samples)
 
 miss_rate <- seqMissing(genofile, per.variant = TRUE)
-dp <- seqGetData(genofile, "annotation/format/DP")
-mean_depth <- rowMeans(dp, na.rm = TRUE)
 keep <- which(miss_rate < 0.05)
 
 
@@ -62,65 +51,16 @@ keep <- which(miss_rate < 0.05)
 ibs <- snpgdsIBS(genofile, sample.id = final_valid_samples, snp.id = keep, num.thread = 4, autosome.only = FALSE)
 dist_matrix <- 1 - ibs$ibs
 rownames(dist_matrix) <- colnames(dist_matrix) <- ibs$sample.id
-write.csv(dist_matrix, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_similarity_matrix.csv")  # Save as CSV
+write.csv(dist_matrix, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_similarity_matrix_only2.csv")  # Save as CSV
 
 dist_matrix2 <- 1- dist_matrix
-
-long_mat <- melt(dist_matrix2, varnames = c("CloneA", "CloneB"), value.name = "Similarity") %>%
-  mutate(CloneA = as.character(CloneA),
-         CloneB = as.character(CloneB))  # ensure they are character, not factor
-
-
-long_mat_plot <- ggplot(long_mat, aes(x = Similarity)) +
-  geom_histogram(bins = 200) +
-  theme_bw() + 
-  xlab("Similarity") + ylim(0,15000) + xlim(0.5,1.05) + 
-  ylab("Frequency") +
-  geom_vline(xintercept = 0.975, linetype = "dashed", color = "red") 
-
-ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/long_mat_genomic_plot.png", plot = long_mat_plot, width = 6, height = 4, dpi = 300)
-
-# 2. Filter dataset
-long_filt <- long_mat %>%
-  filter(Similarity >= 0.95, Similarity != 1)
-
-# 3. Build graph
-g <- graph_from_data_frame(long_filt[, c("CloneA", "CloneB")], directed = FALSE)
-
-
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/grouping_graph_genomic.png",
-    width = 2000, height = 2000, res = 300)
-plot(g, vertex.size = 5, vertex.label = NA)  # basic igraph plot
-dev.off()
-
-# 4. Find connected components
-comp <- components(g)
-
-# 5. Assign group letters
-group_letters <- setNames(LETTERS[comp$membership], names(comp$membership))
-
-# 6. Add group column (both clones exist in the graph)
-long_filt <- long_filt %>%
-  mutate(Group = group_letters[CloneA])
-
-
-head(long_filt)
-unique(long_filt$Group)
-
-long_filt_onlywell <- long_filt[,c(1,4)]
-
-unique_clones <- long_filt_onlywell %>%
-  distinct(CloneA, Group)
-unique_clones
-unique(long_filt$Group)
-
 
 # ---- Step 4: Build neighbor-joining tree ----
 tree <- nj(as.dist(dist_matrix))
 
 # ---- Step 5 (Optional): Relabel tips from metadata CSV ----
 # CSV should have columns: Sample_ID and Label (or Well, Clone, etc.)
-tree_rooted <- root(tree, outgroup = "SRR5012393", resolve.root = TRUE)
+tree_rooted <- root(tree, outgroup = "Gilmer5_F6", resolve.root = TRUE)
 
 merged_data2 <- left_join(tree_rooted, metadata_with_clone, by = c("label" = "Well"))
 
@@ -145,12 +85,14 @@ tip_color_dt <- data.table(
   color  = as.vector(tip_colors)
 )
 
+phylo_tree <- merged_data2@phylo
+write.tree(phylo_tree, file = "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_tree_genomic_only2.nwk")
 
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups.png", res = 300, width = 4000, height = 9000)
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups_only2.png", res = 300, width = 4000, height = 9000)
 #png("/scratch/rjp5nc/UK2022_2024/mito_vcf/tree_usobtusa_circ.png", width = 1200, height = 2000)
 
 # Plot the tree
-plot.phylo(merged_data2,
+plot.phylo(phylo_tree,
            type = "phylogram",
 #           type = "fan",
            cex = 0.8,
@@ -452,6 +394,23 @@ fst_long <- fst_long[fst_long$PopulationA < fst_long$PopulationB, ]
 fst_long
 
 
+fst_melted <- melt(pairwise_results, varnames = c("PopulationA", "PopulationB"), value.name = "Fst")
+
+# Heatmap
+popheatmapplot <- ggplot(fst_melted, aes(x = PopulationA, y = PopulationB, fill = Fst)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = ifelse(is.na(Fst), "", sprintf("%.3f", Fst))), size = 3) +
+  scale_fill_gradient(low = "white", high = "red", na.value = "grey90") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 10),
+    panel.grid = element_blank()
+  ) +
+  labs(title = "Pairwise Fst Heatmap", fill = "Fst")
+
+
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap.png", plot = popheatmapplot, width = 7, height = 6, dpi = 300)
 
 
 
@@ -556,6 +515,23 @@ write.csv(fst_long_date,
           row.names = FALSE)
 
 
+bydateplot <- ggplot(fst_long_date, aes(x = pop1, y = pop2, fill = Fst)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = sprintf("%.3f", Fst)), size = 3) +
+  scale_fill_gradient(low = "white", high = "red", na.value = "grey90") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 10),
+    panel.grid = element_blank()
+  ) +
+  labs(title = "Pairwise Fst by Date", fill = "Fst") +
+  facet_wrap(~ date)
+
+
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap_bydateplot.png", plot = bydateplot, width = 7, height = 6, dpi = 300)
+
+
 
 
 
@@ -628,3 +604,226 @@ fst_long <- fst_long %>%
 # write to CSV
 
 write.csv(fst_long,"/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_within_pond.csv")
+
+fst_long <- fst_long %>%
+  filter(!date1 %in% c("2023", "2024"),
+         !date2 %in% c("2023", "2024"))
+
+bypondplot <- ggplot(fst_long, aes(x = date1, y = date2, fill = Fst)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = sprintf("%.3f", Fst)), size = 3) +
+  scale_fill_gradient(low = "white", high = "red", na.value = "grey90") +
+  theme_bw(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 10),
+    panel.grid = element_blank()
+  ) +
+  labs(title = "Pairwise Fst Within Ponds by Date", fill = "Fst") +
+  facet_wrap(~ pond, scales = "free")
+
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap_bypondplot.png", plot = bypondplot, width = 12, height = 8, dpi = 300)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# list to hold results
+fst_indiv <- list()
+
+# loop over ponds
+for (pond in unique(metadata_sub$accuratelocation)) {
+  meta_p <- metadata_sub %>% filter(accuratelocation == pond)
+  
+  # loop over dates for this pond
+  for (d in unique(meta_p$date)) {
+    meta_pd <- meta_p %>% filter(date == d)
+    indivs <- meta_pd$Well
+    
+    if (length(indivs) < 2) next  # need at least 2 individuals
+    
+    # initialize pairwise matrix
+    pairwise_results <- matrix(NA,
+                               nrow = length(indivs),
+                               ncol = length(indivs),
+                               dimnames = list(indivs, indivs))
+    
+    # loop over individual pairs
+    for (i in 1:(length(indivs) - 1)) {
+      for (j in (i + 1):length(indivs)) {
+        
+        idx <- meta_pd$Well %in% c(indivs[i], indivs[j])
+        sub_samples <- meta_pd$Well[idx]
+        sub_pop <- factor(meta_pd$Well[idx])  # population = individual ID
+        
+        if (length(unique(sub_pop)) == 2) {
+          fst_tmp <- snpgdsFst(
+            genofile,
+            sample.id = sub_samples,
+            population = sub_pop,
+            snp.id = valid_variants,
+            autosome.only = FALSE,
+            method = "W&C84",
+            maf = 0.05,
+            missing.rate = 0.5,
+            verbose = FALSE
+          )
+          
+          pairwise_results[i, j] <- fst_tmp$Fst
+          pairwise_results[j, i] <- fst_tmp$Fst
+        }
+      }
+    }
+    
+    fst_indiv[[paste(pond, d, sep = "_")]] <- pairwise_results
+  }
+}
+
+
+
+
+
+fst_long_indiv <- do.call(rbind, lapply(names(fst_indiv), function(group) {
+  mat <- fst_indiv[[group]]
+  if (is.null(mat)) return(NULL)
+  
+  parts <- strsplit(group, "_")[[1]]
+  pond <- parts[1]
+  date <- paste(parts[-1], collapse = "_")
+  
+  df <- as.data.frame(as.table(mat)) %>%
+    rename(indiv1 = Var1, indiv2 = Var2, Fst = Freq) %>%
+    mutate(pond = pond, date = date)
+  
+  return(df)
+}))
+
+fst_long_indiv <- fst_long_indiv %>%
+  filter(!is.na(Fst), indiv1 != indiv2)
+
+write.csv(fst_long_indiv,
+          "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_by_individual.csv",
+          row.names = FALSE)
+
+
+fst_long_indiv <- fst_long_indiv %>%
+  mutate(indiv1 = factor(indiv1, levels = unique(indiv1)),
+         indiv2 = factor(indiv2, levels = unique(indiv2)))
+
+
+
+
+hist_plot <- ggplot(fst_long_indiv, aes(x = Fst)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white", alpha = 0.8) +
+  facet_wrap(~ pond, scales = "free_y") +
+  theme_bw() +
+  labs(title = "Distribution of Pairwise Fst by Pond",
+       x = "Fst", y = "Count") +
+  theme(strip.text = element_text(size = 10, face = "bold"))
+
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_hist_by_pond_genomic.png",
+       plot = hist_plot, width = 10, height = 6, dpi = 300)
+
+
+
+
+fst_long_indiv <- fst_long_indiv %>%
+  mutate(date = mdy(date))
+
+fst_long_indiv <- fst_long_indiv %>%
+  mutate(date = factor(date, levels = sort(unique(date))))
+
+
+
+
+# Make sure date is a proper Date object
+fst_long_indiv <- fst_long_indiv %>%
+  mutate(date = as.character(date)) %>%  # convert to character first
+  mutate(date = ifelse(nchar(date) == 4, paste0("1/1/", date), date)) %>%
+  mutate(date = mdy(date)) %>%           # convert to Date
+  arrange(date, pond) %>%
+  mutate(
+    pond = factor(pond, levels = unique(pond)),
+    date = factor(date, levels = sort(unique(date)))  # chronological
+  )
+
+# Create a new column for pond + date to facet only existing combinations
+fst_long_indiv <- fst_long_indiv %>%
+  mutate(pond_date = paste(pond, date, sep = "_"))
+
+
+
+
+fst_long_indiv <- fst_long_indiv %>%
+  # Ensure date is character
+  mutate(date = as.character(date)) %>%
+  # Handle 4-digit years as Jan 1
+  mutate(date = ifelse(grepl("^\\d{4}$", date), paste0("1/1/", date), date)) %>%
+  # Parse dates safely with mdy()
+  mutate(date_parsed = suppressWarnings(mdy(date))) %>%
+  # If mdy fails, try ymd()
+  mutate(date_parsed = ifelse(is.na(date_parsed), ymd(date), date_parsed)) %>%
+  # Convert back to Date class
+  mutate(date_parsed = as.Date(date_parsed, origin = "1970-01-01")) %>%
+  # Create pond_type grouping
+  mutate(pond_type = case_when(
+    grepl("^Gilmer", pond) ~ "Gilmer",
+    pond %in% c("P58") ~ "P58",
+    pond %in% c("P62") ~ "P62",
+    pond %in% c("P63") ~ "P63",
+    pond %in% c("P66") ~ "P66",
+    TRUE ~ pond
+  )) %>%
+  # Convert pond_type and date to factors for plotting
+  mutate(
+    pond_type = factor(pond_type, levels = c("Gilmer", "P58", "P62", "P63", "P66")),
+    date = factor(format(date_parsed, "%m/%d/%Y"),
+                  levels = unique(format(sort(date_parsed), "%m/%d/%Y")))
+  )
+
+
+
+library(ggplot2)
+library(dplyr)
+library(patchwork)
+library(foreach)
+
+ponds <- unique(fst_long_indiv$pond)
+
+fst_long_indiv <- subset(fst_long_indiv, date != "01/01/2024")
+
+pond_plots <- foreach(p = ponds, .combine = list, .multicombine = TRUE) %do% {
+  
+  df <- fst_long_indiv %>% filter(pond == p)
+  
+  ggplot(df, aes(x = indiv1, y = indiv2, fill = Fst)) +
+    geom_tile(color = "white") +
+    scale_fill_gradient2(low = "blue", mid = "white", high = "red",
+                         midpoint = 0, limits = c(-1, 1), name = "Fst") +
+    facet_wrap(~ date, scales = "free", nrow = 1) +  # free x and y
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+      panel.grid = element_blank(),
+      strip.text = element_text(size = 10, face = "bold")
+    ) +
+    labs(title = paste("Pond:", p),
+         x = "Individual", y = "Individual")
+}
+
+# Combine vertically
+final_plot <- patchwork::wrap_plots(pond_plots, ncol = 1)
+
+# Save
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap_eachpond_Genomic_freexy.png",
+       plot = final_plot, width = 20, height = 6 * length(ponds), dpi = 300, limitsize = FALSE)

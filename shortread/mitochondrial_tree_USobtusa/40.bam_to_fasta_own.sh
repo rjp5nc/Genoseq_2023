@@ -21,6 +21,8 @@ module load samtools
 
 #SLURM_ARRAY_TASK_ID=1
 
+#Uses the output from 12.add_read_groups.sh
+
 cd /scratch/rjp5nc/UK2022_2024/final_mitobam_rg2
 outfq=/scratch/rjp5nc/UK2022_2024/final_mitobam_rg2
 outfq2=/scratch/rjp5nc/UK2022_2024/consensusmito
@@ -47,16 +49,16 @@ bcftools filter -i 'QUAL>20 && INFO/DP>=20' -Oz -o ${outfq}/${samp}.filt.mito.vc
   cat ${ref_path} | \
   bcftools consensus ${outfq}/${samp}.filt.mito.vcf.gz \
   --sample ${samp} > \
-  ${outfq2}/${ref_name}.${samp}.filt.consensus.mito.fa
+  ${outfq2}/${samp}.filt.consensus.mito.fa
 
   # Change name of header
-  name=$( echo ${ref_name}.${samp}.filt.consensus.mito.fa | tr "." '\t' | cut -f1 | tr "/" '\t' | cut -f1 )
+  name=$( echo ${samp}.filt.consensus.mito.fa | tr "." '\t' | cut -f1 | tr "/" '\t' | cut -f1 )
   echo ${name}
 
   # Extracts chromosome via bed file
- sed -i "1s|^>.*$|>mtdna.${name}|" "${outfq2}/${ref_name}.${samp}.filt.consensus.mito.fa"
+ sed -i "1s|^>.*$|>mtdna.${name}|" "${outfq2}/${samp}.filt.consensus.mito.fa"
 
 
 
   # Index fasta
-  samtools faidx ${outfq2}/${ref_name}.${samp}.filt.consensus.mito.fa
+  samtools faidx ${outfq2}/${samp}.filt.consensus.mito.fa

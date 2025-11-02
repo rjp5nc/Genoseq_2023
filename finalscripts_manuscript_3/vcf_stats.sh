@@ -13,8 +13,17 @@
 module load bcftools/1.17
 
 VCF="lifted_12major.vcf.gz"
-out="lifted_12major_stats.txt"
+out="lifted_12major_stats.vchk"
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf
 
 bcftools stats $VCF > $out
+
+mkdir -p plots
+
+#conda create -n vcfplots python=3.9 matplotlib -y
+conda activate vcfplots
+#cd plots/
+#python plot.py
+
+plot-vcfstats -p plots/ $out

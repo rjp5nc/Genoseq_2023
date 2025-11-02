@@ -9,34 +9,22 @@
 #SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
-#SBATCH --array=1-521%40
 
 # Load modules
 module load picard
 
-# Parameters
-parameterFile="/scratch/rjp5nc/UK2022_2024/mapped_bam/bam_files.txt"
-wd="/scratch/rjp5nc/UK2022_2024/final_bam_rg2"
-
-# Extract sample name
-samp=`sed -n ${SLURM_ARRAY_TASK_ID}p $parameterFile`
-out2=`echo $samp | sed 's/_finalmap.bam//'`
-out=$(echo "$out2" | sed 's#/scratch/rjp5nc/UK2022_2024/mapped_bam/##')
-
-echo "Adding read groups -" "Sample:" $SLURM_ARRAY_TASK_ID
-
 # Move to directory
-cd /scratch/rjp5nc/UK2022_2024/mapped_bam
+cd /scratch/rjp5nc/microbiota/chlorella/mapped_bam
 
 # Force add read groups
 java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
--I ${samp} \
--O $wd/${out}finalmap_RG.bam \
+-I chlorella_ours_finalmap.bam \
+-O /scratch/rjp5nc/microbiota/chlorella/mapped_bam/cholerlla_ours_finalmap_RG.bam \
 -LB "library" \
 -PL "ILLumina" \
 -PU "platunit" \
--SM ${out} 
+-SM chlorella_ours 
 
 # Index Bam files
 java -jar $EBROOTPICARD/picard.jar BuildBamIndex \
--I $wd/${out}finalmap_RG.bam
+-I /scratch/rjp5nc/microbiota/chlorella/mapped_bam/cholerlla_ours_finalmap_RG.bam

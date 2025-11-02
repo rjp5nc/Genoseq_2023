@@ -61,4 +61,4 @@ END {
 
 echo "Done: $contig"
 
-#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_1000kb_all.txt
+#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_het_100kb_all.txt

@@ -474,8 +474,9 @@ p <- ggplot(
   )
 
 
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2meandepth5_unfiltered.png",
-    width = 10000, height = 2000)
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/chr2unfiltered_all.pdf",
+    width = 40, height = 6)
+
 print(p)
 dev.off()
 

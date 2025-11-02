@@ -119,3 +119,39 @@ seqClose(genofile)
 
 
 
+samps <- fread("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/All_clones_metadata.csv")
+sampleId <- seqGetData(genofile, "sample.id")
+
+# Output file path
+outfile <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/trimmed_10bp_repeatmasked_vcf/lifted_vcf/sampleStats_wholedata.csv"
+
+# Write header
+fwrite(data.table(sampleId=character(), missingRate=double(), meanDepth=double(),
+                  medianDepth=double(), upper_quantile=double(), lower_quantile=double()),
+       file = outfile, row.names = FALSE)
+
+# Register parallel backend
+registerDoParallel(cores = 4)  # Adjust number of cores
+
+foreach(sample.i = samps$Sample_ID, .packages = c("SeqArray", "data.table")) %dopar% {
+  seqSetFilter(genofile, sample.id = sample.i)
+  
+  missingRate <- mean(is.na(seqGetData(genofile, "$dosage")))
+  depth <- seqGetData(genofile, "annotation/format/DP")
+  
+  result <- data.table(
+    sampleId = sample.i,
+    missingRate = missingRate,
+    meanDepth = mean(depth, na.rm = TRUE),
+    medianDepth = median(depth, na.rm = TRUE),
+    upper_quantile = quantile(depth, 0.975, na.rm = TRUE),
+    lower_quantile = quantile(depth, 0.025, na.rm = TRUE)
+  )
+  
+  # Use a lock file to prevent simultaneous writes
+  lockfile <- paste0(outfile, ".lock")
+  while (file.exists(lockfile)) Sys.sleep(runif(1, 0.01, 0.1))  # Wait if another process is writing
+  file.create(lockfile)
+  fwrite(result, file = outfile, append = TRUE, col.names = FALSE)
+  file.remove(lockfile)
+}

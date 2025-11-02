@@ -68,7 +68,7 @@ END {
 > "$RESULTDIR/${contig}.avgdepth.long.sorted_100000.txt"
 
 
-# cat *avgdepth.long.sorted_100000.txt > ../avg_avgdepth.long.sorted_100000.txt
+# cat *avgdepth.long.sorted_100000.txt > ../avg_avgdepth.long.sorted_oneofeach_100000.txt
 
 # awk '
 # {
@@ -84,4 +84,4 @@ END {
 #         print k, avg
 #     }
 # }
-# ' avg.depth.only1each_12_100000.txt > window_avg.depth.only1each_12_100000.txt
+# ' avg_avgdepth.long.sorted_oneofeach_100000.txt > window_avg_avgdepth.long.sorted_oneofeach_100000.txt

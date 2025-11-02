@@ -43,6 +43,3 @@ bedtools subtract -header \
 | bgzip -c > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
 
 tabix -p vcf /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz.vcf.gz
-
-# Index with tabix
-tabix -p vcf /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz2.vcf.gz

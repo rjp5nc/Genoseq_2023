@@ -27,7 +27,7 @@ awk '/^>/{count[$0]++; if(count[$0]>1) $0=$0"_"count[$0]; print; next}1' \
 /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_aligned.fasta \
 > /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_aligned_unique.fasta
 
-FastTree -nt -gtr /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_aligned_unique.fasta > /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/mito_tree.nwk
+#FastTree -nt -gtr /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_aligned_unique.fasta > /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/mito_tree.nwk
 
 #awk 'BEGIN{n=0} /^>/ {n++} n<=100 {print}' /scratch/rjp5nc/UK2022_2024/consensusmitoaligned/all_mitosequences.fasta > mito_subset.fasta
 

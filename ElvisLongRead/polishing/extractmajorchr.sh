@@ -18,3 +18,4 @@ bcftools view -r Scaffold_1863_HRSCAF_2081,Scaffold_1931_HRSCAF_2197,Scaffold_22
   -Oz -o lifted_12major.vcf.gz lifted_all.vcf.gz
 
 
+

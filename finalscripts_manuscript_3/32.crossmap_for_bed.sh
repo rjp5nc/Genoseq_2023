@@ -19,11 +19,11 @@ module load python/3.11.4
 
 #pip install --user .
 
-
 #species=us_pulex
 #species=us_obtusa
 #species=us_ambigua
 species=eu_obtusa
+
 
 #bed=us_pulex_ref_kap4.allbases.cleaned.slimmed.bed
 #bed=US_obtusa_onlydaps.allbases.cleaned.slimmed.bed

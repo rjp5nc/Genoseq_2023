@@ -44,11 +44,11 @@ done < sra_ids.txt
 
 
 
-SRA_ACCESSION="ASM2113471v1"
+SRA_ACCESSION="SRR14476950"
 
 
 # Create output directory
-OUTPUT_DIR="/scratch/rjp5nc/Reference_genomes/orig_ref"
+OUTPUT_DIR="/scratch/rjp5nc/microbiota"
 mkdir -p "$OUTPUT_DIR"
 
 # Download SRA file

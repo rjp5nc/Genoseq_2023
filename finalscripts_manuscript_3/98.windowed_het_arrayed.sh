@@ -17,7 +17,7 @@ module load bcftools
 
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa.bgz.vcf.gz"
 WINDOW=1000000
-RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_hets1000000_all"
+RESULTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/windowed_hets100000_all"
 mkdir -p "$RESULTDIR"
 
 # Get contig for this array index
@@ -61,4 +61,4 @@ END {
 
 echo "Done: $contig"
 
-#cat $RESULTDIR/*_het_10kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/only2_het_10kb_all.txt
+#cat $RESULTDIR/*_het_100kb.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/only2_het_100kb_all.txt

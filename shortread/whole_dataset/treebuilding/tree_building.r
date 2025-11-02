@@ -1,7 +1,4 @@
 
-
-
-
 library(vcfR)
 library(adegenet)
 library(ape)

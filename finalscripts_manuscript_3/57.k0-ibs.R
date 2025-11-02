@@ -200,46 +200,142 @@ merged4 <- merged4 %>%
 unique(merged4$date_pair)
 
 
-merged3_sub <- subset(merged3, location_pair == "Gilmer_Gilmer"| 
-                      location_pair == "Gilmer_P63"|
-                      location_pair == "Gilmer_P66"|
-                      location_pair == "Gilmer_P58"|
-                      location_pair == "Gilmer_P62"|
+merged4_sub <- subset(merged4,
+date_pair ==    "12/22/2023_12/22/2023" |
+date_pair ==    "12/22/2023_5/10/2024"  |
+date_pair ==    "10/7/2023_12/22/2023"   |  
+date_pair ==    "12/22/2023_6/8/2021"   |
+date_pair ==    "12/22/2023_7/12/2023"  |
+date_pair ==    "12/22/2023_5/4/2024"|
+date_pair == "12/22/2023_7/17/2024"  |
+date_pair == "12/22/2023_6/29/2023"  |
+date_pair == "12/22/2023_9/2/2023"|
+date_pair == "5/10/2024_5/10/2024" | 
+date_pair ==   "10/7/2023_5/10/2024"|
+date_pair == "5/10/2024_6/8/2021"    |
+date_pair == "5/10/2024_7/12/2023"|
+date_pair == "5/10/2024_5/4/2024"  |  
+date_pair == "5/10/2024_7/17/2024"  | 
+date_pair == "5/10/2024_6/29/2023"|
+date_pair == "5/10/2024_9/2/2023"  |  
+date_pair ==  "10/7/2023_10/7/2023" | 
+date_pair == "10/7/2023_6/8/2021"  |
+date_pair ==   "10/7/2023_7/12/2023"| 
+date_pair ==   "10/7/2023_5/4/2024"|
+date_pair == "10/7/2023_7/17/2024"  | 
+date_pair == "10/7/2023_6/29/2023"  |
+date_pair ==  "10/7/2023_9/2/2023"   | 
+date_pair ==     "6/8/2021_6/8/2021"|
+date_pair ==          "6/8/2021_7/12/2023"|
+date_pair =="5/4/2024_6/8/2021"   |
+date_pair ==  "6/8/2021_7/17/2024" |
+date_pair ==     "6/29/2023_6/8/2021"|
+date_pair == "6/8/2021_9/2/2023"   |
+date_pair ==   "7/12/2023_7/12/2023"| 
+date_pair ==     "5/4/2024_7/12/2023"|
+date_pair == "7/12/2023_7/17/2024"  |
+date_pair ==  "6/29/2023_7/12/2023" |
+date_pair ==    "7/12/2023_9/2/2023"|
+date_pair == "5/4/2024_5/4/2024"     |
+date_pair == "5/4/2024_7/17/2024"  |
+date_pair ==   "5/4/2024_6/29/2023"|
+date_pair == "5/4/2024_9/2/2023"  |
+date_pair ==    "7/17/2024_7/17/2024" | 
+date_pair ==  "6/29/2023_7/17/2024"|
+date_pair == "7/17/2024_9/2/2023"  |
+date_pair ==   "6/29/2023_6/29/2023"|
+date_pair ==      "6/29/2023_9/2/2023"|
+date_pair == "9/2/2023_9/2/2023")
+
+
+
+
+# ---- Plot IBS0 vs Kinship ----
+p <- ggplot(merged4_sub, aes(x = IBS0, y = Kinship, col=date_pair)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  theme_bw(base_size = 14) + ylim(0,0.51)+ xlim(0,0.05)+
+  labs(
+    title = "IBS0 vs Kinship (KING estimates)",
+    x = "IBS0 (proportion sites with 0 shared alleles)",
+    y = "Kinship coefficient"
+  )
+
+# Save dataframe and plot
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/ibs0_vs_kinship_col_dates_short_05.png", plot = p, width = 15, height = 6, dpi = 300)
+
+
+
+
+# ---- Plot IBS0 vs Kinship ----
+p <- ggplot(merged4_sub, aes(x = IBS0, y = Kinship, col=date_pair)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  theme_bw(base_size = 14) + ylim(0,0.51)+ xlim(0,0.005)+
+  labs(
+    title = "IBS0 vs Kinship (KING estimates)",
+    x = "IBS0 (proportion sites with 0 shared alleles)",
+    y = "Kinship coefficient"
+  )
+
+# Save dataframe and plot
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/ibs0_vs_kinship_col_dates_short_005.png", plot = p, width = 15, height = 6, dpi = 300)
+
+
+
+
+
+
+
+
+
+
+merged3_subshort <- subset(merged3, location_pair == "Gilmer_Gilmer"| 
                       location_pair == "P63_P63"|
-                      location_pair == "P63_P66"|
-                      location_pair == "P58_P63"|
-                      location_pair == "P62_P63"|
                       location_pair == "P66_P66"|
-                      location_pair == "P58_P66"|
-                      location_pair == "P62_P66"|
                       location_pair == "P58_P58"|
-                      location_pair == "P58_P62"|
                       location_pair == "P62_P62"
     )
 
-date_pair
+# ---- Plot IBS0 vs Kinship ----
+p <- ggplot(merged3_subshort, aes(x = IBS0, y = Kinship, col=location_pair)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  theme_bw(base_size = 14) +
+  labs(
+    title = "IBS0 vs Kinship (KING estimates)",
+    x = "IBS0 (proportion sites with 0 shared alleles)",
+    y = "Kinship coefficient"
+  )
 
-    "12/22/2023_12/22/2023" 
-    "12/22/2023_5/10/2024"  
- "10/7/2023_12/22/2023"                        "12/22/2023_2023"
-"12/22/2023_6/8/2021"   "12/22/2023_7/12/2023"  "12/22/2023_5/4/2024"
- "12/22/2023_7/17/2024"  "12/22/2023_6/29/2023"  "12/22/2023_9/2/2023"
- "5/10/2024_5/10/2024"   "2024_5/10/2024"        "10/7/2023_5/10/2024"
- "2023_5/10/2024"        "5/10/2024_6/8/2021"    "5/10/2024_7/12/2023"
- "5/10/2024_5/4/2024"    "5/10/2024_7/17/2024"   "5/10/2024_6/29/2023"
- "5/10/2024_9/2/2023"    "2024_2024"             "10/7/2023_2024"
- "2023_2024"             "2024_6/8/2021"         "2024_7/12/2023"
- "2024_5/4/2024"         "2024_7/17/2024"        "2024_6/29/2023"
- "2024_9/2/2023"         "10/7/2023_10/7/2023"   "10/7/2023_2023"
- "10/7/2023_6/8/2021"    "10/7/2023_7/12/2023"   "10/7/2023_5/4/2024"
- "10/7/2023_7/17/2024"   "10/7/2023_6/29/2023"   "10/7/2023_9/2/2023"
- "2023_2023"             "2023_6/8/2021"         "2023_7/12/2023"
- "2023_5/4/2024"         "2023_7/17/2024"        "2023_6/29/2023"
- "2023_9/2/2023"         "6/8/2021_6/8/2021"     "6/8/2021_7/12/2023"
-"5/4/2024_6/8/2021"     "6/8/2021_7/17/2024"    "6/29/2023_6/8/2021"
- "6/8/2021_9/2/2023"     "7/12/2023_7/12/2023"   "5/4/2024_7/12/2023"
- "7/12/2023_7/17/2024"   "6/29/2023_7/12/2023"   "7/12/2023_9/2/2023"
- "5/4/2024_5/4/2024"     "5/4/2024_7/17/2024"    "5/4/2024_6/29/2023"
- "5/4/2024_9/2/2023"     "7/17/2024_7/17/2024"   "6/29/2023_7/17/2024"
- "7/17/2024_9/2/2023"    "6/29/2023_6/29/2023"   "6/29/2023_9/2/2023"
- "9/2/2023_9/2/2023"
+# Save dataframe and plot
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/ibs0_vs_kinship_col_locationsmerged3_subshort.png", plot = p, width = 7, height = 6, dpi = 300)
+
+
+
+# ---- Plot IBS0 vs Kinship ----
+p <- ggplot(merged3_subshort, aes(x = IBS0, y = Kinship, col=location_pair)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  theme_bw(base_size = 14) + ylim(0,0.51)+ xlim(0,0.05)+
+  labs(
+    title = "IBS0 vs Kinship (KING estimates)",
+    x = "IBS0 (proportion sites with 0 shared alleles)",
+    y = "Kinship coefficient"
+  )
+
+# Save dataframe and plot
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/ibs0_vs_kinship_col_locations_merged3_subshort.png", plot = p, width = 7, height = 6, dpi = 300)
+
+
+
+
+
+# ---- Plot IBS0 vs Kinship ----
+p <- ggplot(merged3_subshort, aes(x = IBS0, y = Kinship, col=location_pair)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  theme_bw(base_size = 14) + ylim(0,0.51)+ xlim(0,0.005)+
+  labs(
+    title = "IBS0 vs Kinship (KING estimates)",
+    x = "IBS0 (proportion sites with 0 shared alleles)",
+    y = "Kinship coefficient"
+  )
+
+# Save dataframe and plot
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/ibs0_vs_kinship_col_locations_merged3_subshort_005.png", plot = p, width = 7, height = 6, dpi = 300)

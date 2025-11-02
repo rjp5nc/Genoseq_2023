@@ -9,13 +9,13 @@
 #SBATCH -e /scratch/rjp5nc/err/FilterVCFs.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-109%50
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 
 # This script will remove SNPS within 10 base pairs of indels by a chromosome basis using bcftools
 # Also filters out only SNPs using gatk
+###SBATCH --array=1-109%50
 
 # Modules to load
 module load bcftools/1.17
@@ -25,9 +25,9 @@ module load gatk/4.6.0.0
 
 #need to do us pulex, us ambigua
 
-species=eupulex_vcf
-ref=/scratch/rjp5nc/Reference_genomes/post_kraken/totalHiCwithallbestgapclosed.fa
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_eupulex.txt"
+species=usobtusa_vcf
+ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
+intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usobtusa.txt"
 
 wd=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/10bp_vcf/$species
 
@@ -39,7 +39,7 @@ WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf/$species
 # Parameters
 JAVAMEM=10G
 CPU=4
-
+SLURM_ARRAY_TASK_ID=80
 
 # Chromosome
 chrom=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )

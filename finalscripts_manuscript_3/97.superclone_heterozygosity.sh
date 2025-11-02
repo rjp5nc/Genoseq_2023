@@ -14,8 +14,7 @@
 
 module load vcftools
 
-cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygote2
-
+cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/heterozygoteall
 
 vcftools --gzvcf /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_filtered_two_of_each.vcf.gz \
   --het \

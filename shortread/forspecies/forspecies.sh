@@ -53,7 +53,6 @@ bwa mem \
 ${L4_1}.trimmed1.fq.gz ${L4_2}.trimmed2.fq.gz |
 samtools view -@ 10 -Sbh -q 20 -F 0x100 - > ${outputdir}/${sample_name}.L4.bam
 
-
 java -jar $EBROOTPICARD/picard.jar MergeSamFiles \
     -I ${outputdir}/${sample_name}.L3.bam \
     -I ${outputdir}/${sample_name}.L4.bam \
