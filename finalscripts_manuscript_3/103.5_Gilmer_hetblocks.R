@@ -52,6 +52,7 @@ het_mergedcont3_005 <- subset(het_mergedcont3, het_prop >= 0.01)
 
 
 
+
 "
 contig win_start win_end
 JAACYE010000003.1   2500000 2599999
