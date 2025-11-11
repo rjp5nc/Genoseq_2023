@@ -350,3 +350,6 @@ ggplot(hetcollapsed_graph, aes(x = contig_block, y = norm_het_c, color = signatu
         text = element_text(size = 14))
 
 dev.off()
+
+
+write.csv(hetcollapsed_graph, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_A_het_blocks_signature.csv")

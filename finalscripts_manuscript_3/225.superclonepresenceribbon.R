@@ -13,7 +13,7 @@ library(data.table)
 metadata_with_clone <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/metadata_with_clone.csv", header = TRUE)
 metadata_with_clone <- subset(metadata_with_clone, clone !="Blank" & clone !="BLANK")
 mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")
-genomic_types <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
+genomic_types <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types_v2.csv")
 
 
 
@@ -59,6 +59,10 @@ genomic_types_clean <- genomic_types_filtered %>%
 superclone_counts <- genomic_types_clean %>%
   group_by(superclone, accuratelocation, date) %>%
   summarise(count = n(), .groups = "drop")
+
+
+  subset(genomic_types_clean, superclone == "G" & accuratelocation == "P62")
+  subset(genomic_types_clean, superclone == "N" & accuratelocation == "P66")
 
 # Count (sum) by mitotype and date
 mitotype_counts <- genomic_types_clean %>%
@@ -259,6 +263,72 @@ ggplot(superclone_counts,
 
 dev.off()
 
+
+
+superclone_counts <- genomic_types_clean %>%
+  mutate(
+    date = as.Date(date, format = "%m/%d/%Y"),
+    year = format(date, "%Y")
+  ) %>%
+  group_by(superclone, accuratelocation, year) %>%
+  summarise(count = n(), .groups = "drop")
+
+# Filter out ponds (accuratelocation) that have no samples in each year
+superclone_counts_filtered <- superclone_counts %>%
+  group_by(year) %>%
+  filter(sum(count) > 0) %>%  # ensures this year has any data
+  group_by(year, accuratelocation) %>%
+  filter(sum(count) > 0) %>%  # ensures this pond has any data in this year
+  ungroup()
+
+# Consistent factor ordering *within each year* (alphabetical)
+superclone_counts_filtered <- superclone_counts_filtered %>%
+  group_by(year) %>%
+  mutate(accuratelocation = factor(accuratelocation, levels = unique(sort(accuratelocation)))) %>%
+  ungroup()
+
+# Order rows for stable flow layout
+plot_df <- superclone_counts_filtered %>%
+  arrange(year, superclone, accuratelocation)
+
+# Identify OO* vs others
+oo_clones    <- unique(plot_df$superclone[grepl("^OO", plot_df$superclone)])
+other_clones <- sort(setdiff(unique(plot_df$superclone), oo_clones))  # alphabetically sorted
+fill_colors <- c(
+  setNames(rep("grey80", length(oo_clones)), oo_clones),
+  setNames(viridis(length(other_clones), option = "C"), other_clones)
+)
+
+
+
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/superclone_counts_overponds_byyear.png",
+    res = 600, width = 5000, height = 5000)
+
+ggplot(plot_df,
+       aes(x = accuratelocation,
+           stratum = superclone,
+           alluvium = superclone,
+           y = count,
+           fill = superclone,
+           label = superclone)) +
+  geom_flow(stat = "flow", aes.flow = "forward",
+            alpha = 0.5, width = 0.3, knot.pos = 0.4) +
+  geom_stratum(width = 0.3, color = "grey30") +
+  geom_text(stat = "stratum", size = 3) +
+  scale_fill_manual(values = fill_colors, breaks = other_clones) +
+  facet_wrap(~ year, scales = "free_x") +
+  labs(title = "Superclones Across Ponds by Year",
+       x = "Pond", y = "Count") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.background = element_rect(fill = "grey90"),
+    strip.text = element_text(size = 12, face = "bold")
+  )
+
+dev.off()
 
 
 

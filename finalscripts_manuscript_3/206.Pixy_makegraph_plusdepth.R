@@ -2,14 +2,15 @@
 #module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
 #R
 
-#14642bp
-
 library(data.table)
 library(ggplot2)
-
+library(dplyr)
 library(vcfR)
 
 vcf <- read.vcfR("/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_subset.vcf.gz")
+dxy_raw <- read.table("/scratch/rjp5nc/UK2022_2024/allsites_mito/pixy_mito_whole/pixy_14601_incSRR_dxy.txt",header = TRUE,sep = "\t")
+genomic_types <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
+mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")
 
 dp <- extract.gt(vcf, element = "DP", as.numeric = TRUE)
 avg_depth <- colMeans(dp, na.rm = TRUE)
@@ -26,13 +27,12 @@ print(avg_depth_df)
 
 
 
-dxy_raw <- read.table("/scratch/rjp5nc/UK2022_2024/allsites_mito/pixy_mito_whole/pixy_14601_incSRR_dxy.txt",header = TRUE,sep = "\t")
-
 
 # Clean up
 dxy_clean <- na.omit(dxy_raw)
 
 dxy_clean$avg_dxy   <- as.numeric(dxy_clean$avg_dxy)
+
 
 mu_min <- 1.37e-7   # lower rate
 mu_max <- 1.73e-7   # upper rate
@@ -45,27 +45,6 @@ dxy_clean$T_max_gen <- dxy_clean$avg_dxy / (2 * mu_min)   # generations, older b
 dxy_clean$T_min_yrs <- dxy_clean$T_min_gen / 6
 dxy_clean$T_max_yrs <- dxy_clean$T_max_gen / 6
 
-
-# Save plot as PNG
-png("/scratch/rjp5nc/UK2022_2024/allsites_mito/dxy_hist.png",
-    width = 3000, height = 2000, res = 300)
-ggplot(dxy_clean, aes(x = avg_dxy)) +
-  geom_histogram(color = "black", fill = "steelblue", bins = 30) +
-  theme_classic(base_size = 14) +
-  labs(
-    x = expression("Average D"[XY]),
-    y = "Number of pairwise comparisons",
-    title = "Distribution of average pairwise divergence (dxy)"
-  ) 
-dev.off()
-
-
-
-genomic_types <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")
-mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv")
-
-
-library(dplyr)
 
 # Rename columns
 genomic_types <- genomic_types %>%
@@ -89,10 +68,27 @@ dxy_annot <- dxy_clean %>%
   left_join(mitotypes, by = c("pop2" = "sample")) %>%
   rename(mitotype_pop2 = mitotype)
 
+avg_depth_df <- avg_depth_df %>%
+  tibble::rownames_to_column("sample") %>%
+  rename(mean_depth = mean_depth)
+
+# Join depth for both populations
+dxy_depth_joined <- dxy_annot %>%
+  left_join(avg_depth_df, by = c("pop1" = "sample")) %>%
+  rename(depth_pop1 = mean_depth) %>%
+  left_join(avg_depth_df, by = c("pop2" = "sample")) %>%
+  rename(depth_pop2 = mean_depth)
+
+head(dxy_depth_joined)
+
+
+
+dxy_depth_joined_highdp <- subset(dxy_depth_joined, depth_pop1 >= 30 & depth_pop2 >= 30)
+
 # Check the first few rows
 head(dxy_annot)
 
-dxy_filtered <- dxy_annot %>%
+dxy_filtered <- dxy_depth_joined_highdp %>%
   filter(
     # Keep if both annotations exist
     (!is.na(superclone_pop1) & !is.na(superclone_pop2) &
@@ -347,15 +343,15 @@ png("/scratch/rjp5nc/UK2022_2024/allsites_mito/dxy_hist_div_major3.png",
 
 ggplot(
   subset(div_times, !is.na(T_mid_yrs) & !is.na(mito_pair) & !grepl("XX", mito_pair) & !grepl("E", mito_pair) & !grepl("F", mito_pair)),
-  aes(x = mito_pair, y = T_mid_yrs, color=location_pair)
+  aes(x = mito_pair, y = avg_dxy, color=location_pair)
 ) +
   geom_jitter(width = 0.15, height = 0, alpha = 0.35) +
   geom_boxplot(fill = NA, color = "black", outlier.shape = NA) +
   theme_classic(base_size = 14) +
   labs(
     x = "Mitotype pair",
-    y = "Divergence time (years)",
-    title = "Divergence times between lineages by mitotype pair (no SRR/XX)"
+    y = "Divergence (Dxy)",
+    title = "Divergence between lineages by mitotype pair (no SRR/XX)"
   )
 
 dev.off()
@@ -382,6 +378,25 @@ ggplot(
 
 dev.off()
 
+
+
+png("/scratch/rjp5nc/UK2022_2024/allsites_mito/dxy_hist_div_major3_SRR_dxy_30x.png",
+    width = 5000, height = 2000, res = 300)
+
+ggplot(
+  subset(div_times, !is.na(T_mid_yrs) & !is.na(mito_pair) & !grepl("E", mito_pair) & !grepl("F", mito_pair)),
+  aes(x = mito_pair, y = avg_dxy, color=location_pair)
+) +
+  geom_jitter(width = 0.15, height = 0, alpha = 0.35) +
+  geom_boxplot(fill = NA, color = "black", outlier.shape = NA) +
+  theme_classic(base_size = 14) +
+  labs(
+    x = "Mitotype pair",
+    y = "Divergence (Dxy)",
+    title = "Divergence between lineages by mitotype pair"
+  )
+
+dev.off()
 
 subset(div_times, mito_pair == "A_XX" & T_mid_yrs <= 10000)
 
@@ -425,5 +440,94 @@ ggplot(
     y = "Divergence time (years)",
     title = "Divergence times between lineages by mitotype pair (A_A)"
   )
+
+dev.off()
+
+
+
+
+png("/scratch/rjp5nc/UK2022_2024/allsites_mito/dxy_hist_div_AA_dxy.png",
+    width = 5000, height = 2000, res = 300)
+
+ggplot(
+  subset(div_times, mito_pair == "A_A"),
+  aes(x = location_pair, y = avg_dxy, color=location_pair)
+) +
+  geom_jitter(width = 0.15, height = 0, alpha = 0.35) +
+  geom_boxplot(fill = NA, color = "black", outlier.shape = NA) +
+  theme_classic(base_size = 14) +
+  labs(
+    x = "Mitotype pair",
+    y = "Divergence (Dxy)",
+    title = "Divergence between lineages by mitotype pair (A_A)"
+  )
+
+dev.off()
+
+
+
+
+png("/scratch/rjp5nc/UK2022_2024/allsites_mito/dxy_hist_self_Gilmer_AA.png",
+    width = 3000, height = 2000, res = 300)
+
+ggplot(subset(div_times, mito_pair == "A_A" & location_comparison == "Gilmer_Gilmer"), aes(x = avg_dxy)) +
+  geom_histogram(color = "black", fill = "steelblue", bins = 20) +
+  theme_classic(base_size = 14) + xlim(-0.0001,0.001)+
+  labs(
+    x = expression("Average D"[XY]),
+    y = "Frequency",
+    title = "Distribution of average pairwise divergence (dxy)"
+  ) 
+
+dev.off()
+
+  subset(div_times, mito_pair == "A_A" & location_comparison == "Gilmer_Gilmer")
+
+table(subset(div_times, mito_pair == "A_A" & location_comparison == "Gilmer_Gilmer")$pop1,subset(div_times, mito_pair == "A_A" & location_comparison == "Gilmer_Gilmer")$pop2 )
+
+
+  table(  subset(div_times, mito_pair == "A_A" & location_comparison == "Gilmer_Gilmer")$count_diffs)
+    table(  subset(div_times, mito_pair == "A_A" & location_comparison == "Gilmer_Gilmer")$avg_dxy)
+
+
+
+df <- subset(div_times, mito_pair == "A_A" & location_comparison == "Gilmer_Gilmer")
+
+# Keep only needed columns
+df_heat <- df %>% select(pop1, pop2, avg_dxy)
+
+# --- Make it symmetric ---
+# Add the reverse of every pair so both A→B and B→A exist
+df_sym <- bind_rows(
+  df_heat,
+  df_heat %>% rename(pop1 = pop2, pop2 = pop1)
+)
+
+# Convert pop names to factors with consistent order
+all_pops <- sort(unique(c(df_sym$pop1, df_sym$pop2)))
+df_sym$pop1 <- factor(df_sym$pop1, levels = all_pops)
+df_sym$pop2 <- factor(df_sym$pop2, levels = all_pops)
+
+
+
+
+png("/scratch/rjp5nc/UK2022_2024/allsites_mito/dxy_heatmap_self_Gilmer_AA.png",
+    width = 3000, height = 2000, res = 300)
+
+ggplot(df_sym, aes(x = pop1, y = pop2, fill = avg_dxy)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(
+    low = "white",
+    high = "red",
+    name = expression("Average D"[XY])
+  ) +
+  coord_equal() +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+    axis.title = element_blank(),
+    panel.grid = element_blank()
+  ) +
+  ggtitle("Pairwise divergence (Dxy) among Gilmer A_A pairs")
 
 dev.off()

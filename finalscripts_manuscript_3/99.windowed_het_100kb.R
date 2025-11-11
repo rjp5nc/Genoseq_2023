@@ -16,6 +16,27 @@ metadata_with_clone <- subset(metadata_with_clone, clone !="Blank")
 metadata_with_clone <- subset(metadata_with_clone, clone !="BLANK")
 
 
+clones_to_update <- c(
+  "Rockpool1_D12", "Rockpool1_D8",
+  "Rockpool1_C1", "Rockpool1_C2", "Rockpool1_C3",
+  "Rockpool2_A1", "Rockpool2_A10", "Rockpool2_A11", "Rockpool2_A12",
+  "Rockpool2_A2", "Rockpool2_A3", "Rockpool2_A4", "Rockpool2_A5",
+  "Rockpool2_A6", "Rockpool2_A7", "Rockpool2_A8", "Rockpool2_A9",
+  "Rockpool2_B1", "Rockpool2_B10", "Rockpool2_B11", "Rockpool2_B12",
+  "Rockpool2_B2", "Rockpool2_B3", "Rockpool2_B4", "Rockpool2_B5",
+  "Rockpool2_B6", "Rockpool2_B7", "Rockpool2_B8", "Rockpool2_B9",
+  "Rockpool2_C2"
+)
+
+# add "_2" to Group where CloneA is in the list
+genomic_types$Group[genomic_types$CloneA %in% clones_to_update] <-
+  paste0(genomic_types$Group[genomic_types$CloneA %in% clones_to_update], "_2")
+
+
+write.csv(genomic_types, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types_v2.csv")
+
+
+
 
 
 # Folder where all per-contig het files are
@@ -519,6 +540,75 @@ dev.off()
 #unsupervised clustering 
 #use as many dimensions of the pca as you want/can
 #
+
+
+
+
+
+
+for (g in unique(het_merged$Group)) {
+  # Subset data for this group
+  group_data <- subset(het_merged, Group == g)
+
+  # Open PDF for this group
+  pdf(paste0("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/het_window_100k_", g, ".pdf"),
+      width = 25, height = 2)
+
+  # Loop through each sample in this group
+  for (s in unique(group_data$sample)) {
+    sample_info <- group_data %>% filter(sample == s) %>% slice(1)
+    depth <- round(sample_info$meanDepth, 2)
+
+    p <- ggplot(filter(group_data, sample == s),
+                aes(x = win_start, y = het_prop)) +
+      geom_point(size = 0.4, alpha = 0.6, color = "darkgreen") +
+      facet_grid(~contig, scales = "free_x") +
+      labs(
+        title = paste0("Windowed heterozygosity (100kb): ", s,
+                       " | Group: ", g, " | meanDepth: ", depth),
+        x = "Genomic position (window start)",
+        y = "Observed heterozygosity (Ho)"
+      ) +
+      ylim(0, 0.05) +
+      theme_bw(base_size = 12) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.minor = element_blank()
+      )
+
+    print(p)
+  }
+
+  dev.off()
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Plot
