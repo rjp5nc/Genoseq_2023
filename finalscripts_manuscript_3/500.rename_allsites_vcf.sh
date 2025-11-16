@@ -18,6 +18,8 @@ module load bcftools
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/
 
+cp trimmed10bp_allsites_usobtusa.vcf.gz trimmed10bp_allsites_usobtusa2.vcf.gz
+
 bcftools annotate --rename-chrs contigmap.txt trimmed10bp_allsites_usobtusa.vcf.gz -Oz -o trimmed10bp_allsites_usobtusa_renamed.vcf.gz
 bcftools index trimmed10bp_allsites_usobtusa_renamed.vcf.gz
 
