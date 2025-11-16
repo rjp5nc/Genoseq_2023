@@ -23,3 +23,57 @@ cp trimmed10bp_allsites_usobtusa.vcf.gz trimmed10bp_allsites_usobtusa2.vcf.gz
 bcftools annotate --rename-chrs contigmap.txt trimmed10bp_allsites_usobtusa.vcf.gz -Oz -o trimmed10bp_allsites_usobtusa_renamed.vcf.gz
 bcftools index trimmed10bp_allsites_usobtusa_renamed.vcf.gz
 
+# awk -v MAP="contigmap.txt" '
+#   BEGIN{
+#     # read map; split on ANY whitespace
+#     while ((getline line < MAP) > 0) {
+#       if (line ~ /^[[:space:]]*$/) continue
+#       n = split(line, a, /[[:space:]]+/)
+#       if (n >= 2) m[a[1]] = a[2]
+#     }
+#     close(MAP)
+#   }
+#   # For FASTA
+#   /^>/{
+#     hdr = substr($0,2)                 # drop ">"
+#     id  = hdr
+#     if (match(hdr, /^[^[:space:]]+/))  # first token = true ID
+#       id = substr(hdr, RSTART, RLENGTH)
+#     rest = substr(hdr, length(id)+1)   # preserve description
+#     if (id in m) id = m[id]
+#     print ">" id rest
+#     next
+#   }
+#   { print }                            # sequence lines
+# ' /scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa > US_obtusa_onlydaps.renamed.fa
+# cat US_obtusa_onlydaps.renamed.fa | head -n 5
+
+
+# awk '/^>/{sub(/_LG[0-9]+/,""); print; next} {print}' US_obtusa_onlydaps.renamed.fa > US_obtusa_onlydaps.nolgs.fa
+# samtools faidx US_obtusa_onlydaps.renamed.fa
+
+
+# conda create -n gfftools -c bioconda -c conda-forge gffread samtools bcftools bedtools
+# conda activate gfftools
+# gffread Daphnia_obtusa_FS6_genome.gtf -E -o Daphnia_obtusa_FS6_genome.gff3
+
+# awk 'BEGIN{FS=OFS="\t"}
+# /^#/ {print; next}
+# {sub(/_LG[0-9]+$/, "", $1); print}' \
+# Daphnia_obtusa_FS6_genome.gff3 > Daphnia_obtusa_FS6_genome.nolgs.gff3
+
+# ( grep '^#' Daphnia_obtusa_FS6_genome.nolgs.gff3
+#   grep -v '^#' Daphnia_obtusa_FS6_genome.nolgs.gff3 \
+#     | sort -t $'\t' -k1,1 -k4,4n -k5,5n
+# ) | bgzip > Daphnia_obtusa_FS6_genome.nolgs.sorted.gff3.gz
+
+# Index it
+# tabix -p gff Daphnia_obtusa_FS6_genome.nolgs.sorted.gff3.gz
+
+bcftools csq \
+  -f US_obtusa_onlydaps.renamed.fa \
+  -g Daphnia_obtusa_FS6_genome.nolgs.sorted.gff3.gz \
+  -Oz -o trimmed10bp_allsites_usobtusa_csq.vcf.gz \
+  trimmed10bp_allsites_usobtusa_renamed.vcf.gz
+
+bcftools index trimmed10bp_allsites_usobtusa_csq.vcf.gz
