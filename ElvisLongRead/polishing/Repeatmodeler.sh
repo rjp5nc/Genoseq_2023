@@ -11,13 +11,6 @@
 #SBATCH --account berglandlab
 
 
-#conda create -n quast_env python=3.9
-#conda activate quast_env
-#conda install -c bioconda quast
-
-#quast.py /scratch/rjp5nc/assemblecontigs/dap.contigs.fasta -o /scratch/rjp5nc/assemblecontigs
-
-
 #conda create -n repeatmodeler_env -c bioconda -c conda-forge repeatmodeler perl=5.22.0
 conda activate repeatmodeler_new
 
