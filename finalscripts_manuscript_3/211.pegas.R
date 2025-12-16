@@ -1,28 +1,39 @@
 library(SeqArray)
 library(pegas)
 library(ape)
+library(data.table)
 
 gds_path <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.annot2.ALL.gds"
+out_dir  <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/pegas_outputs"
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
+## -----------------------
+## Open GDS and extract data
+## -----------------------
 g <- seqOpen(gds_path)
 
-# pull data
 pos     <- seqGetData(g, "position")
 samples <- seqGetData(g, "sample.id")
-gt      <- seqGetData(g, "genotype")     # [ploidy, sample, variant]
-gt1     <- gt[1, , ]                     # haploid mito: [sample, variant]
+gt      <- seqGetData(g, "genotype")   # [ploidy, sample, variant]
 
-# recode SeqArray coding -> 0/1/NA (0=ref, 1=alt)
+# haploid mito
+gt1 <- gt[1, , ]   # [sample, variant]
+
+# recode to 0/1/NA
 x <- gt1
-x[x == 0] <- NA                          # missing
-x[!is.na(x)] <- as.integer(x[!is.na(x)] != 1)  # 1 (ref) -> 0, >=2 (alt) -> 1
+x[x == 0] <- NA
+x[!is.na(x)] <- as.integer(x[!is.na(x)] != 1)
 
-# keep variable sites only (recommended)
+## -----------------------
+## Keep variable sites only
+## -----------------------
 keep_non_na <- colSums(!is.na(x)) > 0
 var_sites <- vapply(seq_len(ncol(x)), function(j) {
-  v <- x[, j]; v <- v[!is.na(v)]
+  v <- x[, j]
+  v <- v[!is.na(v)]
   length(unique(v)) >= 2
 }, logical(1))
+
 keep <- keep_non_na & var_sites
 
 x <- x[, keep, drop = FALSE]
@@ -30,31 +41,73 @@ pos_use <- pos[keep]
 
 seqClose(g)
 
-# build a DNAbin alignment for pegas:
-# 0 -> "A" (placeholder), 1 -> "G" (placeholder), NA -> "n"
-# (For haplotypes, the actual nucleotide identity is not required; consistency is.)
-mat <- matrix("n", nrow = nrow(x), ncol = ncol(x),
-              dimnames = list(samples, paste0("p", pos_use)))
+## -----------------------
+## Build DNAbin for pegas
+## -----------------------
+# placeholder bases: ref="a", alt="g", missing="n"
+dna_mat <- matrix(
+  "n",
+  nrow = nrow(x),
+  ncol = ncol(x),
+  dimnames = list(samples, paste0("pos_", pos_use))
+)
 
-mat[x == 0] <- "a"
-mat[x == 1] <- "g"
+dna_mat[x == 0] <- "a"
+dna_mat[x == 1] <- "g"
 
-dna <- as.DNAbin(mat)
+dna <- as.DNAbin(dna_mat)
 
-# pegas haplotypes
-haps <- haplotype(dna)          # unique haplotypes
-hap_assign <- with(stack(setNames(attr(haps, "index"), rownames(haps))), data.frame(sample = values, hap = ind))
+## -----------------------
+## pegas haplotypes + network
+## -----------------------
+haps <- haplotype(dna)
+net  <- haploNet(haps)
 
-# haplotype network
-net <- haploNet(haps)
+## -----------------------
+## Save reusable R objects
+## -----------------------
+saveRDS(dna,  file.path(out_dir, "mito_dna_dnabin.rds"))
+saveRDS(haps, file.path(out_dir, "mito_haplotypes.rds"))
+saveRDS(net,  file.path(out_dir, "mito_haplotype_network.rds"))
+saveRDS(pos_use, file.path(out_dir, "mito_variable_positions.rds"))
 
-# plot network (sizes proportional to hap counts)
-hap_freq <- table(attr(haps, "index"))
-sizes <- as.numeric(hap_freq)
+## -----------------------
+## Save tabular summaries
+## -----------------------
+
+# sample → haplotype assignment
+hap_assign <- data.table(
+  sample = unlist(attr(haps, "index")),
+  hap_id = rep(seq_along(attr(haps, "index")),
+               lengths(attr(haps, "index")))
+)
+
+fwrite(hap_assign,
+       file.path(out_dir, "sample_to_haplotype.csv"))
+
+# haplotype frequencies
+hap_freq <- hap_assign[, .N, by = hap_id][order(-N)]
+fwrite(hap_freq,
+       file.path(out_dir, "haplotype_frequencies.csv"))
+
+message("Saved pegas haplotype outputs to: ", out_dir)
+
+library(pegas)
+
+out_dir <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/pegas_outputs"
+
+haps <- readRDS(file.path(out_dir, "mito_haplotypes.rds"))
+net  <- readRDS(file.path(out_dir, "mito_haplotype_network.rds"))
+
+hap_freq <- read.csv(file.path(out_dir, "haplotype_frequencies.csv"))
+sizes <- hap_freq$N
 
 png("/scratch/rjp5nc/UK2022_2024/allsites_mito/mito_haplotype_network_pegas.png",
     width = 2000, height = 2000, res = 300)
 
-plot(net, size = sizes, scale.ratio = 0.6, show.mutation = 1)
+plot(net,
+     size = sizes,
+     scale.ratio = 0.6,
+     show.mutation = 1)
 
 dev.off()
