@@ -1,5 +1,5 @@
 #ijob -A berglandlab -c10 -p standard --mem=40G
-#module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
+#module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1; R
 #R
 
 #14642bp
@@ -297,6 +297,254 @@ hist <- ggplot(win_df, aes(x = compared)) +
 
 ggsave(file.path(out_dir, "hist.png"),
        hist, width = 10, height = 4, dpi = 300)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bed <- read.delim(
+  "/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_annotation/usdobtusa.bed",
+  header = FALSE, sep = "\t",
+  col.names = c("chr","start","end","name","score","strand"),
+  stringsAsFactors = FALSE
+)
+
+# Feature type (for optional styling/labeling)
+bed$type <- ifelse(grepl("^trn", bed$name), "tRNA",
+                   ifelse(grepl("^rrn", bed$name), "rRNA", "protein_coding"))
+# Only label non-tRNA features to reduce overlap
+bed$label <- ifelse(bed$type == "tRNA", NA, bed$name)
+
+# Match your facet order
+bed$chr <- factor(bed$chr, levels = chr_levels)
+
+# ---- Helper to add annotations to an existing plot ----
+add_mito_annots <- function(p, ann = bed) {
+  p +
+    # Light bands spanning the y-range for each annotated interval
+    geom_rect(
+      data = ann,
+      aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf),
+      inherit.aes = FALSE,
+      fill = "grey60", alpha = 0.15, show.legend = FALSE
+    ) +
+    # Gene labels at the top margin (non-tRNA only)
+    geom_text(
+      data = subset(ann, !is.na(label)),
+      aes(x = (start + end) / 2, y = Inf, label = label),
+      inherit.aes = FALSE, vjust = 1.1, size = 2.6
+    ) +
+    # Let labels draw outside the panel a bit
+    coord_cartesian(clip = "off") +
+    theme(plot.margin = margin(14, 12, 14, 12))
+}
+
+# ---- Apply to your plots and save ----
+p_tracks_ann <- add_mito_annots(p_tracks)
+p_group_ann  <- add_mito_annots(p_group)
+
+ggsave(file.path(out_dir, paste0("tracks_across_genome_vs_",
+       make.names(ref_sample), "_", window_size/1000, "kb.with_annots.png")),
+       p_tracks_ann, width = 10, height = max(4, length(chr_levels) * 1.2), dpi = 300)
+
+ggsave(file.path(out_dir, paste0("groupmean_across_genome_vs_",
+       make.names(ref_sample), "_", window_size/1000, "kb.with_annots.png")),
+       p_group_ann, width = 10, height = max(4, length(chr_levels) * 1.2), dpi = 300)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+  library(GenomicRanges)
+})
+
+# --- BED (already loaded earlier) ---
+# Ensure genomic order
+bed <- bed %>%
+  arrange(chr, start) %>%
+  mutate(
+    type = case_when(
+      grepl("^trn", name) ~ "tRNA",
+      grepl("^rrn", name) ~ "rRNA",
+      TRUE ~ "protein_coding"
+    ),
+    gene = name
+  )
+
+# Factor level order = genomic order
+gene_levels <- bed$gene
+
+# --- Build GRanges for BED ---
+gr_bed <- GRanges(
+  seqnames = bed$chr,
+  ranges   = IRanges(start = bed$start + 1, end = bed$end),
+  gene     = bed$gene,
+  type     = bed$type
+)
+
+window_size = 1
+
+# --- Windows (use existing start/end if present; else derive from mid & window_size) ---
+if (!all(c("start","end") %in% names(win_df))) {
+  win_df <- win_df %>%
+    mutate(
+      start = pmax(1L, floor(mid - window_size / 2)),
+      end   = ceiling(mid + window_size / 2)
+    )
+}
+
+# Keep chr order consistent
+win_df$chr <- factor(win_df$chr, levels = chr_levels)
+
+gr_win <- GRanges(
+  seqnames = win_df$chr,
+  ranges   = IRanges(start = win_df$start, end = win_df$end)
+)
+
+# --- Assign each window to the gene with MAX overlap ---
+hits <- findOverlaps(gr_win, gr_bed)
+if (length(hits) == 0L) stop("No window ↔ gene overlaps found. Check chr names and coordinates.")
+
+ov <- tibble(
+  wid  = queryHits(hits),
+  gid  = subjectHits(hits),
+  ovw  = width(pintersect(gr_win[queryHits(hits)], gr_bed[subjectHits(hits)]))
+) %>%
+  group_by(wid) %>% slice_max(ovw, n = 1, with_ties = FALSE) %>% ungroup()
+
+joined <- bind_cols(
+  win_df[ov$wid, , drop = FALSE],
+  as.data.frame(mcols(gr_bed[ov$gid]))
+)
+
+# Order gene factor by genome order
+joined$gene <- factor(joined$gene, levels = gene_levels)
+
+# --- Data frames for plotting ---
+df_all    <- joined
+df_notrna <- joined %>% filter(type != "tRNA")
+
+# ------------------ PLOTS ------------------
+
+# A) All features
+p_boxes_all <- ggplot(df_all, aes(x = gene, y = prop_diff)) +
+  geom_boxplot(outlier.size = 0.4) +
+  facet_wrap(~ chr, scales = "free_x", ncol = 1, strip.position = "left") +
+  labs(
+    title = paste0("Differences vs ", ref_sample, " by gene region (", window_size/1000, " kb windows)"),
+    x = "Gene / Feature",
+    y = "Proportion different"
+  ) +
+  theme_bw(base_size = 10) +
+  theme(
+    panel.spacing.y   = unit(0.4, "lines"),
+    strip.background  = element_rect(fill = "grey90"),
+    strip.placement   = "outside",
+    axis.text.x       = element_text(angle = 45, hjust = 1)
+  )
+
+ggsave(file.path(out_dir, paste0("boxplots_by_gene_all_vs_",
+       make.names(ref_sample), "_", window_size/1000, "kb.png")),
+       p_boxes_all, width = 12, height = max(4, length(chr_levels) * 2), dpi = 300)
+
+# B) Non-tRNA
+p_boxes_notrna <- ggplot(df_notrna, aes(x = gene, y = prop_diff)) +
+  geom_boxplot(outlier.size = 0.4) +
+  facet_wrap(~ chr, scales = "free_x", ncol = 1, strip.position = "left") +
+  labs(
+    title = paste0("Differences vs ", ref_sample, " by gene region (non-tRNA; ",
+                   window_size/1000, " kb windows)"),
+    x = "Gene",
+    y = "Proportion different"
+  ) +
+  theme_bw(base_size = 10) +
+  theme(
+    panel.spacing.y   = unit(0.4, "lines"),
+    strip.background  = element_rect(fill = "grey90"),
+    strip.placement   = "outside",
+    axis.text.x       = element_text(angle = 45, hjust = 1)
+  )
+
+ggsave(file.path(out_dir, paste0("boxplots_by_gene_notRNA_vs_",
+       make.names(ref_sample), "_", window_size/1000, "kb.png")),
+       p_boxes_notrna, width = 12, height = max(4, length(chr_levels) * 2), dpi = 300)
+
+# C) Optional: by Group (only if present)
+if ("group" %in% names(df_notrna)) {
+  p_boxes_bygroup <- ggplot(df_notrna, aes(x = gene, y = prop_diff, fill = group)) +
+    geom_boxplot(outlier.size = 0.3, position = position_dodge(width = 0.75)) +
+    facet_wrap(group ~ chr, scales = "free_x", ncol = 1, strip.position = "left") +
+    labs(
+      title = paste0("Differences vs ", ref_sample, " by gene region and group (non-tRNA)"),
+      x = "Gene",
+      y = "Proportion different",
+      fill = "Group"
+    ) +
+    theme_bw(base_size = 10) +
+    theme(
+      panel.spacing.y   = unit(0.4, "lines"),
+      strip.background  = element_rect(fill = "grey90"),
+      strip.placement   = "outside",
+      axis.text.x       = element_text(angle = 45, hjust = 1)
+    )
+
+  ggsave(file.path(out_dir, paste0("boxplots_by_gene_notRNA_bygroup_vs_",
+         make.names(ref_sample), "_", window_size/1000, "kb.png")),
+         p_boxes_bygroup, width = 12, height = max(4, length(chr_levels) * 15), dpi = 300)
+}
+
+
+
+
+
+
+
+
 
 
 
