@@ -35,6 +35,8 @@ cd "$OUTDIR"
 echo "Downloading $SRA..."
 prefetch --max-size 200G "$SRA"
 
+SLURM_CPUS_PER_TASK=10
+
 # Convert to FASTQ
 echo "Converting $SRA to FASTQ..."
 fasterq-dump "${OUTDIR}/${SRA}/${SRA}.sra" \
