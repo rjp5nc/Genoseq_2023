@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
-#SBATCH --array=1-21
+#SBATCH --array=22-286
 
 # Load modules
 module load picard
@@ -23,7 +23,7 @@ wd="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/final_mitobam_rg3"
 # Extract sample name
 samp=`sed -n ${SLURM_ARRAY_TASK_ID}p $parameterFile`
 out2=`echo $samp | sed 's/_finalmap.bam//'`
-out=$(echo "$out2" | sed 's#/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/final_mitobam_rg3/##')
+out=$(echo "$out2" | sed 's#/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/bam/##')
 
 echo "Adding read groups -" "Sample:" $SLURM_ARRAY_TASK_ID
 
