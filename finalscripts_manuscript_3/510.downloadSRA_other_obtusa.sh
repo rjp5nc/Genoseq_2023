@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH -J BEAST # A single job name for the array
+#SBATCH -J downloadSRA # A single job name for the array
 #SBATCH --ntasks-per-node=10 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 2-0:00:00 ### 15 seconds
@@ -13,7 +13,7 @@
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 
-###sbatch --array=1-286%40 510.downloadSRA_other_obtusa.sh
+###sbatch --array=3-286%40 510.downloadSRA_other_obtusa.sh
 
 module load gcc/11.4.0 sratoolkit/3.1.1
 
@@ -37,10 +37,10 @@ prefetch --max-size 200G "$SRA"
 
 # Convert to FASTQ
 echo "Converting $SRA to FASTQ..."
-fasterq-dump "$SRA" \
+fasterq-dump "${OUTDIR}/${SRA}/${SRA}.sra" \
   --split-files \
   --threads "${SLURM_CPUS_PER_TASK}" \
-  --outdir "$OUTDIR" \
+  --outdir "${OUTDIR}/${SRA}" \
   --progress
 
 # Compress
