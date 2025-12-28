@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
-#SBATCH --array=22-286
+#SBATCH --array=1-286
 
 # Load modules
 module load picard
