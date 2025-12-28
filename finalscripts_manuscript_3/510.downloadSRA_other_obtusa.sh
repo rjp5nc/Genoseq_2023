@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
-#
-#SBATCH -J downloadSRA
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=5
-#SBATCH -N 1
-#SBATCH -t 0-48:00
-#SBATCH --mem=20G
-#SBATCH -o /scratch/rjp5nc/err/downloadsra.%A_%a.out
-#SBATCH -e /scratch/rjp5nc/err/downloadsra.%A_%a.err
+
+#SBATCH -J BEAST # A single job name for the array
+#SBATCH --ntasks-per-node=10 # one core
+#SBATCH -N 1 # on one node
+#SBATCH -t 2-0:00:00 ### 15 seconds
+#SBATCH --mem 20G
+#SBATCH -o /scratch/rjp5nc/err/downloadsra.%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/err/downloadsra.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
+#SBATCH --mail-type=END               # Send email at job completion
+#SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 
-###sbatch --array=1-286 510.downloadSRA_other_obtusa.sh
+###sbatch --array=1-286%40 510.downloadSRA_other_obtusa.sh
 
 module load gcc/11.4.0 sratoolkit/3.1.1
 
