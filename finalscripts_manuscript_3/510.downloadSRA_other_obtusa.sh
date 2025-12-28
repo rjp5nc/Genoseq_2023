@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=10 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 2-0:00:00 ### 15 seconds
-#SBATCH --mem 20G
+#SBATCH --mem 40G
 #SBATCH -o /scratch/rjp5nc/err/downloadsra.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/downloadsra.%A_%a.err # Standard error
 #SBATCH -p standard
@@ -12,6 +12,7 @@
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
+###sbatch --array=1-2 510.downloadSRA_other_obtusa.sh
 
 ###sbatch --array=3-286%40 510.downloadSRA_other_obtusa.sh
 
