@@ -9,13 +9,11 @@
 #SBATCH -o /scratch/rjp5nc/err/downloadsra.%A_%a.out
 #SBATCH -e /scratch/rjp5nc/err/downloadsra.%A_%a.err
 #SBATCH -p standard
-#SBATCH --account berglandlab
 #SBATCH --array=1-$(wc -l < /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/sra_USobtusa.txt)
+#SBATCH --account berglandlab
 
 module purge
 module load gcc/11.4.0 sratoolkit/3.1.1
-
-set -euo pipefail
 
 # Paths
 SRA_LIST="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/sra_USobtusa.txt"
