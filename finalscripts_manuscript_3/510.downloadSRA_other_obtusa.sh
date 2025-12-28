@@ -9,8 +9,10 @@
 #SBATCH -o /scratch/rjp5nc/err/downloadsra.%A_%a.out
 #SBATCH -e /scratch/rjp5nc/err/downloadsra.%A_%a.err
 #SBATCH -p standard
-#SBATCH --array=1-$(wc -l < /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/sra_USobtusa.txt)
 #SBATCH --account berglandlab
+
+
+###sbatch --array=1-286 510.downloadSRA_other_obtusa.sh
 
 module load gcc/11.4.0 sratoolkit/3.1.1
 
