@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
 #SBATCH --account=berglandlab
-#SBATCH --array=1-21   # Adjust based on the number of samples
+#SBATCH --array=1-289%40   # Adjust based on the number of samples
 
 # Load necessary modules
 module load gcc htslib
@@ -19,25 +19,22 @@ module load bwa
 module load samtools
 module load picard
 
-#SRR5012770
-#SRR5012773
-# 3387565_19 
 
 # Define working directories
-infq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR"
-outfq="/scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR_mito2"
-outbam="/scratch/rjp5nc/UK2022_2024/mapped_bam_newmito_newref"
+infq="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta_assembled"
+outfq="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta_mito2"
+outbam="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/bam"
 
 # Ensure output directories exist
 mkdir -p "${outfq}" "${outbam}" "${infq}"
 
 # Read sample ID and reference path from CSV
-CSV_FILE="/scratch/rjp5nc/UK2022_2024/forref2_mito.csv"
+CSV_FILE="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/sra_metadata_filtered.csv"
 line=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" ${CSV_FILE})
 
 # Extract fields (assuming CSV format: sample_id,reference_path)
-samp=$(echo "$line" | cut -d',' -f4)
-ref_path=$(echo "$line" | cut -d',' -f5)
+samp=$(echo "$line" | cut -d',' -f1)
+ref_path=$(echo "$line" | cut -d',' -f3)
 ref_path=$(echo "${ref_path}" | tr -d '\r')
 
 #samp=SRR14370492
@@ -51,10 +48,10 @@ fi
 
 echo "Processing sample: ${samp} with reference: ${ref_path}"
 
-chmod u+w /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR/${samp}/${samp}.*.fastq
+chmod u+w /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta_assembled/${samp}.*.fastq
 
 # Map to reference genome (assembled reads)
-bwa mem -t 10 -K 100000000 -Y ${ref_path} ${infq}/${samp}/${samp}.assembled.fastq | \
+bwa mem -t 10 -K 100000000 -Y ${ref_path} ${infq}/${samp}.assembled.fastq | \
 samtools view -Suh -q 20 -F 0x100 | \
 samtools sort --threads 10 -o ${outfq}/${samp}.sort.bam
 samtools index ${outfq}/${samp}.sort.bam
@@ -87,6 +84,6 @@ java -jar $EBROOTPICARD/picard.jar MarkDuplicates \
 cp ${outfq}/${samp}_finalmap* ${outbam}/
 
 # Remove intermediate files
-#rm -f ${outfq}/${samp}.*
+rm -f ${outfq}/${samp}.*
 
 echo "Finished processing ${samp}"

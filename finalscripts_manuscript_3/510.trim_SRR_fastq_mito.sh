@@ -10,7 +10,8 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-###sbatch --array=1-287 510.trim_SRR_fastq_mito.sh
+###sbatch --array=1-287%100 510.trim_SRR_fastq_mito.sh
+
 
 PARENT_DIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta"
 
@@ -47,5 +48,5 @@ mv /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta/${SRA}.assembled.fastq /scratch
 mv /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta/${SRA}.unassembled*.fastq /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta_assembled
 mv /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta/${SRA}.disc*.fastq /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta_assembled
 
-rm /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta/${SRA}*
+rm -rf /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta/${SRA}*
 
