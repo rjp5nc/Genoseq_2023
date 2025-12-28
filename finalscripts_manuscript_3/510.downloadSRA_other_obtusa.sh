@@ -27,7 +27,7 @@ SRA=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$SRA_LIST")
 echo "Processing $SRA on task ${SLURM_ARRAY_TASK_ID}"
 
 # Create output directory
-OUTDIR="${BASE_OUTDIR}/${SRA}"
+OUTDIR="${BASE_OUTDIR}"
 mkdir -p "$OUTDIR"
 cd "$OUTDIR"
 
@@ -40,7 +40,7 @@ echo "Converting $SRA to FASTQ..."
 fasterq-dump "${OUTDIR}/${SRA}/${SRA}.sra" \
   --split-files \
   --threads "${SLURM_CPUS_PER_TASK}" \
-  --outdir "${OUTDIR}/${SRA}" \
+  --outdir "${OUTDIR}" \
   --progress
 
 # Compress
