@@ -30,8 +30,6 @@ mkdir -p "$OUTDIR"
 VCF_OUT="$OUTDIR/usdobtusa_mito_allsites_all.diploid.dpgt30.diffslt500.vcf.gz"
 BAMLIST="$OUTDIR/bams.dpgt30.diffslt500.txt"
 
-rm $OUTDIR/usdobtusa_mito_allsites_all.diploid.dpgt30.diffslt500.vcf.gz
-
 # -----------------------
 # Reference index
 # -----------------------
