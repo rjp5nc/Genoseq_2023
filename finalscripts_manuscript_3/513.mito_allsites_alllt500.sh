@@ -30,6 +30,8 @@ mkdir -p "$OUTDIR"
 VCF_OUT="$OUTDIR/usdobtusa_mito_allsites_all.diploid.dpgt30.diffslt500.vcf.gz"
 BAMLIST="$OUTDIR/bams.dpgt30.diffslt500.txt"
 
+rm $OUTDIR/usdobtusa_mito_allsites_all.diploid.dpgt30.diffslt500.vcf.gz
+
 # -----------------------
 # Reference index
 # -----------------------
@@ -39,7 +41,8 @@ BAMLIST="$OUTDIR/bams.dpgt30.diffslt500.txt"
 # Build sample list: (DP>30) ∩ (diffs<500)
 # -----------------------
 awk '$2 > 30 {print $1}' "$DP" | sort -u > "$OUTDIR/dp_gt30.samples"
-awk -F',' 'NR>1 {gsub(/"/,"",$0); if ($3 < 500) print $2}' "$DIFFCSV" | sort -u > "$OUTDIR/diffs_lt500.samples"
+awk -F',' 'NR>1 {gsub(/"/,"",$0); if ($3 < 600 && $4 > 10000) print $2}' "$DIFFCSV" \
+  | sort -u > "$OUTDIR/diffs_lt500.samples"
 comm -12 "$OUTDIR/dp_gt30.samples" "$OUTDIR/diffs_lt500.samples" > "$OUTDIR/keep.samples"
 
 echo "Keeping samples: $(wc -l < "$OUTDIR/keep.samples")"
@@ -63,6 +66,7 @@ head "$BAMLIST"
 # -----------------------
 # Call diploid VCF using only those BAMs
 # -----------------------
+
 bcftools mpileup \
   -f "$REF" \
   -q 20 -Q 20 \
