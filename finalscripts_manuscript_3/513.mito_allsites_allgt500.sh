@@ -40,7 +40,7 @@ BAMLIST="$OUTDIR/bams.dpgt30.diffsgt500.txt"
 # -----------------------
 awk '$2 > 30 {print $1}' "$DP" | sort -u > "$OUTDIR/dp_gt30.samples"
 awk -F',' 'NR>1 {gsub(/"/,"",$0); if ($3 > 600 && $4 > 10000) print $2}' "$DIFFCSV" \
-  | sort -u > "$OUTDIR/diffs_lt500.samples"
+  | sort -u > "$OUTDIR/diffs_gt500.samples"
   comm -12 "$OUTDIR/dp_gt30.samples" "$OUTDIR/diffs_gt500.samples" > "$OUTDIR/keep.samples"
 
 echo "Keeping samples: $(wc -l < "$OUTDIR/keep.samples")"

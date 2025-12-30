@@ -12,43 +12,65 @@
 
 
 cd /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/
-module load bcftools samtools
+module load htslib bcftools samtools
 
-reference="/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_mito.fasta"
-outdir="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito"
-vcf="${outdir}/usdobtusa_mito_allsites_all.diploid.vcf.gz"
+# -----------------------
+# Inputs
+# -----------------------
+BAMDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/final_mitobam_rg3"
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_mito.fasta"
 
-mkdir -p "$outdir"
-[ -f "${reference}.fai" ] || samtools faidx "$reference"
+DP="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/usdobtusa_mito_avg_DP_per_sample.txt"
+DIFFCSV="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types_diff_df.csv"
 
-# Build BAM list (skip CSV header)
-# awk -F, 'NR>1 {gsub(/[^a-zA-Z0-9_]/,"",$6); if ($6=="usdobtusa_mito") print $1 "finalmap_RG.bam"}' \
-#   "$meta" > usdobtusa_bams.txt
+OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/vcf_split_by_diffs"
+mkdir -p "$OUTDIR"
 
+VCF_OUT="$OUTDIR/usdobtusa_mito_allsites_all.diploid.dpgt30.diffs_all.vcf.gz"
+BAMLIST="$OUTDIR/bams.dpgt30.diffall500.txt"
 
-find /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/final_mitobam_rg3/ \
-  -name "*finalmap_RG.bam" \
-| xargs -n 1 basename \
-| sort \
-> /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/usdobtusa_bams.txt
+# -----------------------
+# Reference index
+# -----------------------
+[ -f "${REF}.fai" ] || samtools faidx "$REF"
 
+# -----------------------
+# Build sample list: (DP>30) ∩ (diffs<500)
+# -----------------------
+awk '$2 > 30 {print $1}' "$DP" | sort -u > "$OUTDIR/dp_gt30.samples"
+awk -F',' 'NR>1 {gsub(/"/,"",$0); if ($4 > 10000) print $2}' "$DIFFCSV" \
+  | sort -u > "$OUTDIR/diffs_500.samples"
+  comm -12 "$OUTDIR/dp_gt30.samples" "$OUTDIR/diffs_500.samples" > "$OUTDIR/keep.samples"
 
+echo "Keeping samples: $(wc -l < "$OUTDIR/keep.samples")"
 
-# Multi-sample call in one go, haploid, keep all covered sites
-cd /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/final_mitobam_rg3/
+# -----------------------
+# Turn sample list into BAM list (FULL PATHS), only if BAM exists
+# -----------------------
+: > "$BAMLIST"
+while read -r s; do
+  bam="${BAMDIR}/${s}finalmap_RG.bam"
+  if [ -f "$bam" ]; then
+    echo "$bam" >> "$BAMLIST"
+  else
+    echo "WARN missing BAM for sample: $s ($bam)" >&2
+  fi
+done < "$OUTDIR/keep.samples"
+
+echo "BAMs found: $(wc -l < "$BAMLIST")"
+head "$BAMLIST"
+
+# -----------------------
+# Call diploid VCF using only those BAMs
+# -----------------------
 bcftools mpileup \
-  -f "$reference" \
+  -f "$REF" \
   -q 20 -Q 20 \
   -a FORMAT/DP,FORMAT/AD \
-  -Ou -b /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/usdobtusa_bams.txt \
-| bcftools call -m -A --ploidy 2 -Oz -o "$vcf"
+  -Ou \
+  -b "$BAMLIST" \
+| bcftools call -m -A --ploidy 2 -Oz -o "$VCF_OUT"
 
-
-
-
-
-
-
-
-bcftools index -t "$vcf"
-echo "Wrote haploid all-sites multi-sample VCF -> $vcf"
+bcftools index -f "$VCF_OUT"
+echo "Wrote -> $VCF_OUT"
+echo "VCF sample count: $(bcftools query -l "$VCF_OUT" | wc -l)"
