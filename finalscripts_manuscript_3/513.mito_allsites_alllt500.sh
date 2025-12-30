@@ -13,7 +13,7 @@
 
 
 cd /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/
-module load bcftools samtools
+module load htslib bcftools samtools
 
 # -----------------------
 # Inputs
