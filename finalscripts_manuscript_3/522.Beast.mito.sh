@@ -23,6 +23,19 @@ conda activate beast2-277
 
 cd /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snapp5/
 
+
+XML="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf/snapp.mito_dip.xml"
+
+grep -n 'logEvery=' "$XML" | head -50
+grep -n 'logEvery="0"' "$XML"
+
+sed -i 's/logEvery="0 mode="tree"/logEvery="0" mode="tree"/' "$XML"
+
+# 2) Set logEvery from 0 to something sane (e.g., 1000) for both file loggers
+sed -i 's/logEvery="0"/logEvery="1000"/g' "$XML"
+sed -i 's/storeEvery="0"/storeEvery="1000"/g' "$XML"
+
+
 #/scratch/rjp5nc/beast/beast/bin/packagemanager -add SNAPP
 
 /scratch/rjp5nc/beast/beast/bin/beast -java -seed 12354 -threads 25 /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf/snapp.mito_dip.xml

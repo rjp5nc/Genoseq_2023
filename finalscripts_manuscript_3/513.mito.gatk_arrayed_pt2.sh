@@ -109,7 +109,7 @@ ruby /scratch/rjp5nc/snapp5/snapp_prep.rb \
   -x "$OUTDIR/snapp.mito_dip.xml" \
   -o "$OUTDIR/snapp.mito" \
   -m 10000 \
-  -l 1000
+  -l 10000
 
 
 #Haploid
