@@ -21,12 +21,10 @@ conda activate beast2-277
 
 #conda install -c bioconda libbeagle
 
-cd /scratch/rjp5nc/snapp5/
+cd /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snapp5/
 
 #/scratch/rjp5nc/beast/beast/bin/packagemanager -add SNAPP
 
-/scratch/rjp5nc/beast/beast/bin/beast -java -seed 12354 -threads 25 /scratch/rjp5nc/snapp5/snapp.mito.xml
-
-#Ran treeannotator locally with increased RAM.
+/scratch/rjp5nc/beast/beast/bin/beast -java -seed 12354 -threads 25 /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf/snapp.mito_hap.xml
 
 

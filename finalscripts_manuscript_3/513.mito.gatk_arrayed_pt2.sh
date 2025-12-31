@@ -106,7 +106,7 @@ ruby /scratch/rjp5nc/snapp5/snapp_prep.rb \
   -v "$CLEAN" \
   -t "$MAP2COL" \
   -c "$CONSTRAINTS" \
-  -x "$OUTDIR/snapp.mitoltdip.xml" \
+  -x "$OUTDIR/snapp.mito_dip.xml" \
   -o "$OUTDIR/snapp.mito" \
   -m 10000 \
   -l 1000
