@@ -3,8 +3,8 @@
 #SBATCH --ntasks=1        # Single task per job
 #SBATCH --cpus-per-task=10 # Number of CPU cores per task
 #SBATCH -N 1              # Run on one node
-#SBATCH -t 1-20:00        # 10 hours runtime
-#SBATCH --mem=100G        # Memory per node
+#SBATCH -t 1:20:00        # 10 hours runtime
+#SBATCH --mem=20G        # Memory per node
 #SBATCH -o /scratch/rjp5nc/outputerrors/down.%A_%a.out  # Standard output
 #SBATCH -e /scratch/rjp5nc/outputerrors/down.%A_%a.err  # Standard error
 #SBATCH -p standard       # Partition
