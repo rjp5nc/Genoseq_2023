@@ -32,10 +32,10 @@
 
 module load gatk samtools
 
-OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_hap"
 BAMLIST="$OUTDIR/bams.sitesgt10000.list"
 REF="/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_mito.fasta"
-PLOIDY=2   # set to 1 if you want haploid mito
+PLOIDY=1   # set to 1 if you want haploid mito
 
 mkdir -p "$OUTDIR/gvcf" "$OUTDIR/logs" "$OUTDIR/tmp"
 
@@ -81,45 +81,3 @@ echo "Wrote $outg"
 
 
 
-
-# module load gatk bcftools htslib samtools
-
-# OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf"
-# REF="/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_mito.fasta"
-
-# mkdir -p "$OUTDIR/tmp"
-
-# # Ensure dict exists
-# DICT="${REF%.fasta}.dict"
-# [ -f "$DICT" ] || gatk CreateSequenceDictionary -R "$REF" -O "$DICT"
-
-# # Build a file-of-filenames list for CombineGVCFs
-# ls -1 "$OUTDIR/gvcf/"*.g.vcf.gz > "$OUTDIR/gvcfs.list"
-# echo "gVCFs: $(wc -l < "$OUTDIR/gvcfs.list")"
-
-# COMBINED="$OUTDIR/usdobtusa_mito_combined_from_bams.g.vcf.gz"
-# JOINT="$OUTDIR/usdobtusa_mito_joint.vcf.gz"
-# BI="$OUTDIR/usdobtusa_mito_biallelic.vcf.gz"
-# CLEAN="$OUTDIR/usdobtusa.mito.biallelic.clean.vcf"
-
-# # CombineGVCFs (fine for mito-sized data)
-# gatk --java-options "-Xmx24g -Djava.io.tmpdir=$OUTDIR/tmp" CombineGVCFs \
-#   -R "$REF" \
-#   $(awk '{print "-V", $1}' "$OUTDIR/gvcfs.list") \
-#   -O "$COMBINED"
-
-# # Joint genotype
-# gatk --java-options "-Xmx24g -Djava.io.tmpdir=$OUTDIR/tmp" GenotypeGVCFs \
-#   -R "$REF" \
-#   -V "$COMBINED" \
-#   -O "$JOINT"
-
-# # Biallelic SNPs
-# bcftools view --threads "$SLURM_CPUS_PER_TASK" -m2 -M2 -v snps -Oz -o "$BI" "$JOINT"
-# bcftools index -f "$BI"
-
-# # Clean ALT="*"
-# bcftools view -e 'ALT="*"' -m2 -M2 -Ov -o "$CLEAN" "$BI"
-
-# echo "Final clean VCF -> $CLEAN"
-# echo "Samples: $(bcftools query -l "$CLEAN" | wc -l)"
