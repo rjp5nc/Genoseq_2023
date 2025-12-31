@@ -110,3 +110,12 @@ ruby /scratch/rjp5nc/snapp5/snapp_prep.rb \
   -o "$OUTDIR/snapp.mito" \
   -m 10000 \
   -l 1000
+
+
+#Haploid
+#
+# WARNING: The maximum number of SNPs has been set to 10000, which is greater
+#     than the number of bi-allelic SNPs with sufficient information (371) for SNAPP.
+# WARNING: Excluded 1691 sites with only missing data in one or more species.
+
+# INFO: Retained 371 bi-allelic sites.
