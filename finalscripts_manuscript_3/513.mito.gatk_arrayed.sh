@@ -13,13 +13,23 @@
 
 
 
-# OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf"
-# mkdir -p "$OUTDIR"
+
+
+module load gatk samtools
+
+OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_hap"
+BAMLIST="$OUTDIR/bams.sitesgt10000.list"
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_mito.fasta"
+PLOIDY=1   
+
+mkdir -p "$OUTDIR/gvcf" "$OUTDIR/logs" "$OUTDIR/tmp"
+
+
 
 # DIFFCSV="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types_diff_df.csv"
 # BAMDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/final_mitobam_rg3"
 
-# awk -F',' 'NR>1 {gsub(/"/,"",$0); if ($4 > 10000) print $2}' "$DIFFCSV" | sort -u > "$OUTDIR/keep.samples"
+# awk -F',' 'NR>1 {gsub(/"/,"",$0); if ($4 > 1000) print $2}' "$DIFFCSV" | sort -u > "$OUTDIR/keep.samples"
 
 # : > "$OUTDIR/bams.sitesgt10000.list"
 # while read -r s; do
@@ -28,16 +38,6 @@
 # done < "$OUTDIR/keep.samples"
 
 
-
-
-module load gatk samtools
-
-OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_hap"
-BAMLIST="$OUTDIR/bams.sitesgt10000.list"
-REF="/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_mito.fasta"
-PLOIDY=1   # set to 1 if you want haploid mito
-
-mkdir -p "$OUTDIR/gvcf" "$OUTDIR/logs" "$OUTDIR/tmp"
 
 # Grab this task's BAM
 bam="$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$BAMLIST")"
