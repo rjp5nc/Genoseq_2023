@@ -35,7 +35,7 @@ module load gatk samtools
 OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf"
 BAMLIST="$OUTDIR/bams.sitesgt10000.list"
 REF="/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_mito.fasta"
-PLOIDY=1   # set to 1 if you want haploid mito
+PLOIDY=2   # set to 1 if you want haploid mito
 
 mkdir -p "$OUTDIR/gvcf" "$OUTDIR/logs" "$OUTDIR/tmp"
 
