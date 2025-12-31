@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #SBATCH -J treeannotator # A single job name for the array
-#SBATCH --ntasks-per-node=30 # one core
+#SBATCH --ntasks-per-node=20 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 1-0:00:00 ### 15 seconds
+#SBATCH -t 5:00:00 ### 15 seconds
 #SBATCH --mem 120G
 #SBATCH -o /scratch/rjp5nc/erroroutputs/beast.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/erroroutputs/beast.%A_%a.err # Standard error
@@ -21,8 +21,9 @@ conda activate beast2-277
 
 #conda install -c bioconda libbeagle
 
-cd /scratch/rjp5nc/snapp5/
+cd /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/
 
+ls /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/
 
 # Open resutls with Tracer
 #/home/rjp5nc/tracer/bin/tracer
