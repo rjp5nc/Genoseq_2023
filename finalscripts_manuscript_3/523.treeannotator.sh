@@ -34,6 +34,6 @@ cd /scratch/rjp5nc/snapp5/
 -burnin 10 \
 -height mean \
 -topology MCC \
-/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/snapp.mito.trees \
+/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/snapp.mito.top3.trees \
 /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/snapp.mito.highest1.tree
 
