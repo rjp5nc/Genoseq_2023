@@ -18,8 +18,9 @@ metadata_file  <- "/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/m
 samples_file   <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species_merged_20251227.csv"
 mitotypes_file <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types.csv"
 
-mcc_file     <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/snapp.mito.highest1.tree"
-out_png_fan  <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/usobtusa_mito_tree_beastcirc.png"
+mcc_file     <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3_plusA/snapp.mito.highest1.tree"
+out_png_fan  <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3_plusA/usobtusa_mito_tree_beastcirc.png"
+out_pdf_fan  <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3_plusA/usobtusa_mito_tree_beastcirc.pdf"
 outgroup_tip <- "Gilmer5_F2_clone"
 
 ## ------------------------
@@ -92,8 +93,7 @@ node_df <- p0$data %>%
   dplyr::filter(!isTip, !is.na(posterior))
 
 p <- p0 +
-  geom_tippoint(aes(color = mitotype), size = 5, alpha = 0.9) +
-  geom_tiplab(aes(label = tip_label), size = 6, offset = 0.005) +
+  geom_tiplab(aes(label = tip_label, color = mitotype), size = 6, offset = 0.005) +
   theme_tree2() +
   labs(color = "Mitotype") +
   theme(
@@ -114,3 +114,4 @@ p <- p0 +
 ## Save
 ## ------------------------
 ggsave(out_png_fan, plot = p, width = 14, height = 14, dpi = 300)
+ggsave(out_pdf_fan, plot = p, width = 14, height = 14, dpi = 300)
