@@ -21,7 +21,7 @@ conda activate beast2-277
 
 #conda install -c bioconda libbeagle
 
-cd /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3
+cd /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3_plusA
 
 
 #/scratch/rjp5nc/beast/beast/bin/packagemanager -add SNAPP
