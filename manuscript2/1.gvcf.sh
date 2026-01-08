@@ -15,7 +15,6 @@
 
 module load gatk
 
-REF=/scratch/rjp5nc/Reference_genomes/orig_ref/eu_pulex_totalHiCwithallbestgapclosed.clean.fa
 
 cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulex_indv/gvcf/
 
@@ -26,9 +25,14 @@ cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulex_indv/gvcf/
 
 SCAF=$(sed -n "${SLURM_ARRAY_TASK_ID}p" scaffolds.txt)
 
+REF=/scratch/rjp5nc/Reference_genomes/orig_ref/eu_pulex_totalHiCwithallbestgapclosed.clean.fa
+SCAF=$(sed -n "${SLURM_ARRAY_TASK_ID}p" scaffolds.txt)
+
 IN_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/eupulex_chr/${SCAF}
 OUT_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulex_indv/gvcf/genomicsdb/${SCAF}
-mkdir -p "$OUT_DIR"
+
+mkdir -p "$OUT_DIR/tmp" "$OUT_DIR/db"
+
 
 # list inputs for this scaffold
 find "$IN_DIR" -name "*.g.vcf.gz" > ${SCAF}.gvcfs.list
