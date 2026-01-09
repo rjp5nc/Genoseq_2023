@@ -12,7 +12,7 @@
 #SBATCH --array=1-56   # Adjust the range based on the number of folders
 
 
- OUT="/scratch/rjp5nc/rawdata/mysamps_ids_dobtusa_europe.txt"
+#  OUT="/scratch/rjp5nc/rawdata/mysamps_ids_dobtusa_europe.txt"
 
 # awk -F',' '
 #   NR>1 {
@@ -42,16 +42,6 @@ mkdir -p "${trimdir}" "${bamdir}" "${mergedir}" "${sortdir}" "${repdir}"
 # 1) Build SRR list: European D. obtusa (bash only)
 # -----------------------
 IDFILE="/scratch/rjp5nc/rawdata/mysamps_ids_dobtusa_europe.txt"
-
-awk -F',' '
-  NR>1 {
-    srr=$2; sp=$5; cont=$8
-    gsub(/"/,"",srr); gsub(/"/,"",sp); gsub(/"/,"",cont)
-    if (srr ~ /^SRR/ && sp=="Daphnia obtusa" && cont=="Europe") print srr
-  }
-' "$PHYLO_CSV" | sort -u > "$IDFILE"
-
-echo "[$(date)] Wrote SRR list: $IDFILE ($(wc -l < "$IDFILE") runs)"
 
 # -----------------------
 # 2) Map SRRs -> sample directories under SAMPLE_PARENT
