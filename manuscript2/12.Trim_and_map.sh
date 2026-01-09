@@ -27,7 +27,7 @@
 # head "$OUT"
 
 SAMPLE_PARENT="/scratch/rjp5nc/rawdata/mysamples"
-REF="/project/berglandlab/daphnia_ref/totalHiCwithallbestgapclosed.fa"
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
 
 outroot="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/mysamps"
 trimdir="${outroot}/trimmed_fastq"
