@@ -36,22 +36,30 @@ awk -F',' 'NR>1 && $2=="Daphnia obtusa" && $3=="Europe" {print $1}' "$META" \
 # 2) Build BAM list for those accessions by searching BAMDIR
 #    (matches anywhere in filename)
 # ------------------------------------------------------------
-> bams.list
-while read -r acc; do
-  # grab first matching bam (if you expect exactly one)
-  bam=$(ls "$BAMDIR"/*"$acc"*".bam" 2>/dev/null | head -n 1)
-  if [[ -n "$bam" ]]; then
-    echo "$bam" >> bams.list
-  else
-    echo "MISSING_BAM $acc" >> missing_bams.txt
-  fi
-done < EU_Daphnia_obtusa_accessions.txt
+# > bams.list
+# while read -r acc; do
+#   # grab first matching bam (if you expect exactly one)
+#   bam=$(ls "$BAMDIR"/*"$acc"*".bam" 2>/dev/null | head -n 1)
+#   if [[ -n "$bam" ]]; then
+#     echo "$bam" >> bams.list
+#   else
+#     echo "MISSING_BAM $acc" >> missing_bams.txt
+#   fi
+# done < EU_Daphnia_obtusa_accessions.txt
 
-# If you want the job to fail when anything is missing:
-if [[ -f missing_bams.txt ]]; then
-  echo "Found missing BAMs (see $OUTDIR/missing_bams.txt). Failing." >&2
-  exit 2
-fi
+# # If you want the job to fail when anything is missing:
+# if [[ -f missing_bams.txt ]]; then
+#   echo "Found missing BAMs (see $OUTDIR/missing_bams.txt). Failing." >&2
+#   exit 2
+# fi
+
+
+# cd /scratch/rjp5nc/UK2022_2024/euobtusa_mito/allsites_mito/gatk_gvcf
+
+# # remove empty/whitespace-only lines + deduplicate while preserving order
+# awk 'NF' bams.list | awk '!seen[$0]++' > bams.list.clean
+# mv bams.list.clean bams.list
+
 
 # ------------------------------------------------------------
 # 3) Array size helper (print this once, then set --array accordingly)
