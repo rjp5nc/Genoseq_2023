@@ -11,7 +11,7 @@
 #SBATCH --account berglandlab
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
-#SBATCH --array=1-42
+#SBATCH --array=1-43
 
 
 module load gatk samtools
@@ -64,7 +64,7 @@ awk -F',' 'NR>1 && $2=="Daphnia obtusa" && $3=="Europe" {print $1}' "$META" \
 # ------------------------------------------------------------
 # 3) Array size helper (print this once, then set --array accordingly)
 # ------------------------------------------------------------
-# echo "N_BAMS=$(wc -l < bams.list)" >&2
+# echo "N_BAMS=$(wc -l < /scratch/rjp5nc/UK2022_2024/euobtusa_mito/allsites_mito/gatk_gvcf/bams.list)" >&2
 
 # ------------------------------------------------------------
 # 4) Grab this task's BAM
