@@ -17,7 +17,7 @@
 module load gatk samtools
 
 META=/scratch/rjp5nc/UK2022_2024/touseforDBI_mito_fullref.csv
-BAMDIR=/scratch/rjp5nc/UK2022_2024/final_bam_rg2
+BAMDIR=/scratch/rjp5nc/UK2022_2024/final_mitobam_rg2
 
 OUTDIR=/scratch/rjp5nc/UK2022_2024/euobtusa_mito/allsites_mito/gatk_gvcf
 REF=/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta
