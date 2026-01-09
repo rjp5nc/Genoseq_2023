@@ -19,9 +19,9 @@ module load gatk samtools
 META=/scratch/rjp5nc/UK2022_2024/touseforDBI_mito_fullref.csv
 BAMDIR=/scratch/rjp5nc/UK2022_2024/final_mitobam_rg2
 
-OUTDIR=/scratch/rjp5nc/UK2022_2024/euobtusa_mito/allsites_mito/gatk_gvcf
+OUTDIR=/scratch/rjp5nc/UK2022_2024/euobtusa_mito/allsites_mito/gatk_gvcf_hap
 REF=/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta
-PLOIDY=2
+PLOIDY=1
 
 mkdir -p "$OUTDIR/gvcf" "$OUTDIR/logs" "$OUTDIR/tmp"
 cd "$OUTDIR" || exit 1
@@ -69,6 +69,10 @@ awk -F',' 'NR>1 && $2=="Daphnia obtusa" && $3=="Europe" {print $1}' "$META" \
 # ------------------------------------------------------------
 # 4) Grab this task's BAM
 # ------------------------------------------------------------
+
+
+
+
 bam="$(sed -n "${SLURM_ARRAY_TASK_ID}p" bams.list)"
 if [[ -z "${bam:-}" ]]; then
   echo "ERROR: No BAM at line ${SLURM_ARRAY_TASK_ID} in bams.list" >&2
@@ -104,13 +108,12 @@ echo "Wrote $outg"
 
 
 
-
-# OUTDIR="/scratch/rjp5nc/UK2022_2024/euobtusa_mito/allsites_mito/gatk_gvcf"
-# cd "$OUTDIR"
-# find gvcf -name "*.g.vcf.gz" | sort > gvcfs.list
-# REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
-# gatk --java-options "-Xmx32g" CombineGVCFs \
-#   -R "$REF" \
-#   $(sed 's/^/-V /' gvcfs.list) \
-#   -O euobtusa_mito.all_samples.g.vcf.gz
-# tabix -p vcf euobtusa_mito.all_samples.g.vcf.gz
+OUTDIR="/scratch/rjp5nc/UK2022_2024/euobtusa_mito/allsites_mito/gatk_gvcf"
+cd "$OUTDIR"
+find gvcf -name "*.g.vcf.gz" | sort > gvcfs.list
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
+gatk --java-options "-Xmx32g" CombineGVCFs \
+  -R "$REF" \
+  $(sed 's/^/-V /' gvcfs.list) \
+  -O euobtusa_mito.all_samples.hap.g.vcf.gz
+tabix -p vcf euobtusa_mito.all_samples.hap.g.vcf.gz
