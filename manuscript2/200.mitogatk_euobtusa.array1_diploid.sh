@@ -37,23 +37,23 @@ ACC_TXT="$OUTDIR/EU_Daphnia_obtusa_accessions.txt"
 BAMLIST="$OUTDIR/bams.list"
 MISSING="$OUTDIR/missing_bams.txt"
 
-awk -F',' 'NR>1 && $2=="Daphnia obtusa" && $3=="Europe" {print $1}' "$META" \
-  | sort -u > "$ACC_TXT"
+# awk -F',' 'NR>1 && $2=="Daphnia obtusa" && $3=="Europe" {print $1}' "$META" \
+#   | sort -u > "$ACC_TXT"
 
-: > "$BAMLIST"
-: > "$MISSING"
-while read -r acc; do
-  bam=$(ls "$BAMDIR"/*"${acc}"*".bam" 2>/dev/null | head -n 1 || true)
-  if [[ -n "${bam:-}" ]]; then
-    echo "$bam" >> "$BAMLIST"
-  else
-    echo "$acc" >> "$MISSING"
-  fi
-done < "$ACC_TXT"
+# : > "$BAMLIST"
+# : > "$MISSING"
+# while read -r acc; do
+#   bam=$(ls "$BAMDIR"/*"${acc}"*".bam" 2>/dev/null | head -n 1 || true)
+#   if [[ -n "${bam:-}" ]]; then
+#     echo "$bam" >> "$BAMLIST"
+#   else
+#     echo "$acc" >> "$MISSING"
+#   fi
+# done < "$ACC_TXT"
 
-# remove empty/whitespace-only lines + deduplicate while preserving order
-awk 'NF' "$BAMLIST" | awk '!seen[$0]++' > "$BAMLIST.clean"
-mv "$BAMLIST.clean" "$BAMLIST"
+# # remove empty/whitespace-only lines + deduplicate while preserving order
+# awk 'NF' "$BAMLIST" | awk '!seen[$0]++' > "$BAMLIST.clean"
+# mv "$BAMLIST.clean" "$BAMLIST"
 
 # If you want the array to HARD FAIL when any BAM is missing, uncomment:
 # if [[ -s "$MISSING" ]]; then

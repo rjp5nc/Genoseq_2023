@@ -13,7 +13,6 @@
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 #SBATCH --array=1-43
 
-
 module load gatk samtools
 
 META=/scratch/rjp5nc/UK2022_2024/touseforDBI_mito_fullref.csv
@@ -61,6 +60,7 @@ awk -F',' 'NR>1 && $2=="Daphnia obtusa" && $3=="Europe" {print $1}' "$META" \
 # mv bams.list.clean bams.list
 
 
+
 # ------------------------------------------------------------
 # 3) Array size helper (print this once, then set --array accordingly)
 # ------------------------------------------------------------
@@ -69,8 +69,6 @@ awk -F',' 'NR>1 && $2=="Daphnia obtusa" && $3=="Europe" {print $1}' "$META" \
 # ------------------------------------------------------------
 # 4) Grab this task's BAM
 # ------------------------------------------------------------
-
-
 
 
 bam="$(sed -n "${SLURM_ARRAY_TASK_ID}p" bams.list)"
@@ -108,7 +106,7 @@ echo "Wrote $outg"
 
 
 
-OUTDIR="/scratch/rjp5nc/UK2022_2024/euobtusa_mito/allsites_mito/gatk_gvcf"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/euobtusa_mito/allsites_mito/gatk_gvcf_hap"
 cd "$OUTDIR"
 find gvcf -name "*.g.vcf.gz" | sort > gvcfs.list
 REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
@@ -117,3 +115,5 @@ gatk --java-options "-Xmx32g" CombineGVCFs \
   $(sed 's/^/-V /' gvcfs.list) \
   -O euobtusa_mito.all_samples.hap.g.vcf.gz
 tabix -p vcf euobtusa_mito.all_samples.hap.g.vcf.gz
+
+
