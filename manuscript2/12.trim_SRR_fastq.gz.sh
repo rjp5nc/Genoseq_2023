@@ -38,15 +38,6 @@ REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fas
 
 
 
-# cd /scratch/rjp5nc/rawdata/sra_metadata_out
-
-# awk -F'\t' '
-#   NR>1 &&
-#   $1 ~ /^SRR/ &&
-#   $6 == "Daphnia pulex"
-#   { print $1 }
-# ' sra_merged.tsv | sort -u > ../sra_ids_dpulex.txt
-
 
 
 OUTBASE="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/SRR"
@@ -58,6 +49,7 @@ mkdir -p "${OUTBASE}/trimmed_fastq" \
 # -----------------------
 # GET SRR FOR THIS TASK
 # -----------------------
+
 samp=$(awk -v n="${SLURM_ARRAY_TASK_ID}" 'NR==n{gsub(/\r/,""); print $1; exit}' "${IDFILE}")
 
 if [[ -z "${samp}" ]]; then

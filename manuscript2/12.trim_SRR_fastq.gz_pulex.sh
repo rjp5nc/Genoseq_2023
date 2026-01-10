@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J trimSRA # A single job name for the array
-#SBATCH --ntasks-per-node=10 # one core
+#SBATCH --cpus-per-task=10 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-10:00 # 10 hours
 #SBATCH --mem 100G
@@ -18,18 +18,15 @@
 
 
 
-
-
-
 module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5
 
 # -----------------------
 # CONFIG
 # -----------------------
 #IDFILE="/scratch/rjp5nc/rawdata/sra_ids.txt"
-IDFILE="/scratch/rjp5nc/rawdata/sra_metadata_out/sra_ids_dobtusa.txt"
+IDFILE="/scratch/rjp5nc/rawdata/sra_metadata_out/sra_ids_dpulex.txt"
 RAWBASE="/scratch/rjp5nc/rawdata/SRRsamps"
-REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/"
 
 
 # cd /scratch/rjp5nc/rawdata/sra_metadata_out
@@ -37,13 +34,12 @@ REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fas
 # awk -F'\t' '
 #   NR>1 &&
 #   $1 ~ /^SRR/ &&
-#   $6 == "Daphnia obtusa"
+#   $6 == "Daphnia pulex"
 #   { print $1 }
-# ' sra_merged.tsv | sort -u > ../sra_ids_dobtusa.txt
+# ' sra_merged.tsv | sort -u > ./sra_ids_dpulex.txt
 
 
-
-OUTBASE="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/SRR"
+OUTBASE="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/SRR"
 mkdir -p "${OUTBASE}/trimmed_fastq" \
          "${OUTBASE}/sortedbams" \
          "${OUTBASE}/sortedbamsdedup" \
@@ -52,7 +48,8 @@ mkdir -p "${OUTBASE}/trimmed_fastq" \
 # -----------------------
 # GET SRR FOR THIS TASK
 # -----------------------
-samp=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "${IDFILE}" | tr -d '\r' | tr -d ' ')
+samp=$(awk -v n="${SLURM_ARRAY_TASK_ID}" 'NR==n{gsub(/\r/,""); print $1; exit}' "${IDFILE}")
+
 if [[ -z "${samp}" ]]; then
   echo "Error: empty SRR at task ${SLURM_ARRAY_TASK_ID}"
   exit 1
@@ -107,7 +104,7 @@ samtools index "${sortedbam}"
 # -----------------------
 # MARK DUPLICATES (remove PCR dups)
 # -----------------------
-dedupbam="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/sortedbamsdedup/${samp}.sort.dedup.bam"
+dedupbam="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/sortedbamsdedup_pulex/${samp}.sort.dedup.bam"
 metrics="${OUTBASE}/sortedbamsreport/${samp}.mark_duplicates_report.txt"
 
 java -jar "$EBROOTPICARD/picard.jar" MarkDuplicates \
@@ -119,6 +116,3 @@ java -jar "$EBROOTPICARD/picard.jar" MarkDuplicates \
   -CREATE_INDEX true
 
 echo "[$(date)] Finished ${samp}"
-
-
-# samtools stats /scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/sortedbamsdedup/${samp}.sort.dedup.bam > /scratch/rjp5nc/"${samp}.stats.txt" 
