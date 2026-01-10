@@ -25,6 +25,7 @@
 # echo "Wrote: $OUT"
 # wc -l "$OUT"
 # head "$OUT"
+module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5
 
 SAMPLE_PARENT="/scratch/rjp5nc/rawdata/mysamples"
 REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
