@@ -58,7 +58,8 @@ mkdir -p "${OUTBASE}/trimmed_fastq" \
 # -----------------------
 # GET SRR FOR THIS TASK
 # -----------------------
-samp=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "${IDFILE}" | tr -d '\r' | tr -d ' ')
+samp=$(awk -v n="${SLURM_ARRAY_TASK_ID}" 'NR==n{gsub(/\r/,""); print $1; exit}' "${IDFILE}")
+
 if [[ -z "${samp}" ]]; then
   echo "Error: empty SRR at task ${SLURM_ARRAY_TASK_ID}"
   exit 1
