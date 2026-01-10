@@ -88,7 +88,7 @@ mkdir -p "$outroot"
 module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5
 
 SAMPLE_PARENT="/scratch/rjp5nc/rawdata/mysamples"
-REF="/scratch/rjp5nc/Reference_genomes/mito_reference/"
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudpulex_mito.fasta"
 
 outroot="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/mysamps"
 trimdir="${outroot}/trimmed_fastq"
