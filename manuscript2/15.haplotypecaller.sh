@@ -12,111 +12,124 @@
 #SBATCH --array=1-9999%150
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
+#SBATCH --array=1-651%60   # Adjust the range based on the number of folders
 
-# grep '^>' your_file.fasta | sed 's/^>//'
-# grep '^>' assembly.hap2_onlydaps.fasta | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/assembly.hap2_onlydaps_chr.txt
-# grep '^>' Daphnia_ambigua_Q001_genome.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/ambigua_chr.txt
-# grep '^>' eu_pulex_totalHiCwithallbestgapclosed.clean.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/eu_pulex_chr.txt
-# grep '^>' US_obtusa_onlydaps.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/us_obtusa_chr.txt
-# grep '^>' us_pulex_ref_kap4.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/us_pulex_chr.txt
-# grep '^>' eu_pulex_totalHiCwithallbestgapclosed.fa | sed 's/^>//' > /scratch/rjp5nc/UK2022_2024/eu_pulex_all_chr.txt
 
-#gatk CreateSequenceDictionary -R Daphnia_ambigua_Q001_genome.fa
-#gatk CreateSequenceDictionary -R totalHiCwithallbestgapclosed.fa
 
-#gatk CreateSequenceDictionary -R assembly.hap2_onlydaps.fasta
-#gatk CreateSequenceDictionary -R us_pulex_ref_kap4.fa
 
-#cut -f1,2 eu_pulex_totalHiCwithallbestgapclosed.clean.fai | awk '{print $1"\t0\t"$2}' > your.bed
 
-#while read -r line; do
-#    chrom=$(echo "$line" | cut -f1)
-#    length=$(echo "$line" | cut -f2)
-#    echo -e "${chrom}\t0\t${length}" > "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/bed/${chrom}.bed"
-#done < "eu_pulex_totalHiCwithallbestgapclosed.clean.fa.fai"
-
-#grep "^>h2tg000002l" assembly.hap2_onlydaps.fasta
-
-# Load modules
 module load gatk/4.6.0.0
+module load samtools/1.17
+module load gcc/14.2.0 htslib/1.17
 module load tabix/0.2.6
 
-# Parameters     find /project/berglandlab/connor -type f -name "SRA_paramList_1"
-
-#parameterFile=/scratch/rjp5nc/UK2022_2024/robert_paramfile.txt
-# wc -l /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt
-# total lines : 101136
-
-#sed -n '1,9999p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param1_9999.txt
-#sed -n '10000,19998p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10000_19998.txt
-#sed -n '19999,29997p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param3.txt
-#sed -n '29998,39996p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param4.txt
-#sed -n '39997,49995p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param5.txt
-#sed -n '49996,59994p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param6.txt
-#sed -n '59995,69993p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param7.txt
-#sed -n '69994,79992p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param8.txt
-#sed -n '79993,89991p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param9.txt
-#sed -n '89992,99990p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param10.txt
-#sed -n '99991,101136p' /scratch/rjp5nc/UK2022_2024/robert_paramfile.txt > /scratch/rjp5nc/UK2022_2024/param11.txt
-
-#finished param10
-
-parameterFile=/scratch/rjp5nc/UK2022_2024/param11.txt
-wd="/scratch/rjp5nc/UK2022_2024/daphnia_phylo"
-
-#dos2unix "$parameterFile"
-  
-# Extract sample name
-
-#changed these for pulex file
-id=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $7}' "$parameterFile")
-samp=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $2}' "$parameterFile")
-chrom=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $6}' "$parameterFile")
-ref=$(awk -F',' -v task_id="$SLURM_ARRAY_TASK_ID" 'NR == task_id {print $5}' "$parameterFile")
+THREADS="${SLURM_CPUS_PER_TASK:-1}"
+echo "[$(date)] JOB=${SLURM_JOB_ID:-NA} TASK=${SLURM_ARRAY_TASK_ID:-NA} THREADS=$THREADS"
+which gatk bgzip tabix samtools || true
 
 
-wd=$(echo $wd | tr -d '\r')
-chrom=$(echo $chrom | tr -d '\r')
-samp=$(echo $samp | tr -d '\r')
-id=$(echo $id | tr -d '\r')
+# -----------------------
+# CONFIG
+# -----------------------
 
 
+# OUT="/scratch/rjp5nc/rawdata/dobtusa_all_ids.txt"
 
+# cat \
+#   /scratch/rjp5nc/rawdata/sra_metadata_out/sra_ids_dobtusa.txt \
+#   /scratch/rjp5nc/rawdata/mysamps_ids_dobtusa_europe.txt \
+# | sed 's/\r//g' \
+# | awk 'NF{print $1}' \
+# | sort -u \
+# > "$OUT"
 
-echo "Haplotype calling -" "Sample:" $SLURM_ARRAY_TASK_ID
-echo "Chromosome:" ${chrom}
+# echo "Wrote: $OUT"
+# wc -l "$OUT"
+# head "$OUT"
 
-# Create folder for chromosome
-if [[ -d "${wd}/gvcf/${chrom}" ]]
-then
-	echo "Working chromosome folder exist"
-	echo "lets move on"
-	date
-else
-	echo "folder doesnt exist. lets fix that"
-	mkdir ${wd}/gvcf/${chrom}
-	date
+IDFILE="/scratch/rjp5nc/rawdata/dobtusa_all_ids.txt"
+
+# input BAMs from your previous pipeline
+BAMDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/sortedbamsdedup_obtusa"
+
+# IMPORTANT: reference to call against (mito reference, since these are mito-mapped BAMs)
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
+
+# output gvcfs
+OUTROOT="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/gvcf_obtusa"
+mkdir -p "$OUTROOT"
+
+# -----------------------
+# GET SRR FOR THIS TASK
+# -----------------------
+samp=$(awk -v n="${SLURM_ARRAY_TASK_ID}" 'NR==n{gsub(/\r/,""); print $1; exit}' "${IDFILE}")
+
+if [[ -z "${samp}" ]]; then
+  echo "ERROR: empty SRR at task ${SLURM_ARRAY_TASK_ID} from ${IDFILE}" >&2
+  echo "Not a SRR"
+fi
+if [[ ! "${samp}" =~ ^SRR[0-9]+$ ]]; then
+  echo "ERROR: samp is not SRR-like: [$samp]" >&2
+  echo "Line ${SLURM_ARRAY_TASK_ID}:" >&2
+  sed -n "${SLURM_ARRAY_TASK_ID}p" "${IDFILE}" | cat -A >&2
+  echo "working on $samp" 
 fi
 
+INBAM="${BAMDIR}/${samp}.sort.dedup.bam"
+if [[ ! -s "$INBAM" ]]; then
+  echo "ERROR: input BAM missing: $INBAM" >&2
+  ls -lh "$BAMDIR" | head -n 30 >&2 || true
+fi
 
-#gatk CreateSequenceDictionary -R "$ref"
-#samtools faidx "$ref"
+# -----------------------
+# Ensure REF indexes exist
+# -----------------------
+if [[ ! -s "$REF" ]]; then
+  echo "ERROR: REF missing: $REF" >&2
+fi
 
+if [[ ! -s "${REF}.fai" ]]; then
+  echo "[$(date)] samtools faidx $REF"
+  samtools faidx "$REF"
+fi
 
-# Haplotype Calling
-gatk HaplotypeCaller \
--R $ref \
--I /scratch/rjp5nc/UK2022_2024/final_bam_rg2/${samp}finalmap_RG.bam \
--O ${wd}/gvcf/${chrom}/${samp}.${chrom}.${id}.g.vcf \
--L ${wd}/bed/${chrom}.bed \
--ERC GVCF
+DICT="${REF%.*}.dict"
+# If REF ends with .fasta, this makes .dict with same base name.
+if [[ ! -s "$DICT" ]]; then
+  echo "[$(date)] gatk CreateSequenceDictionary -R $REF"
+  gatk CreateSequenceDictionary -R "$REF"
+fi
 
-# Bgzip
-module load gcc/14.2.0 htslib/1.17
+# -----------------------
+# HaplotypeCaller -> gVCF
+# -----------------------
+OUTVCF="${OUTROOT}/${samp}.g.vcf"
+OUTGZ="${OUTVCF}.gz"
 
-# Compress and index with Tabix
-bgzip ${wd}/gvcf/${chrom}/${samp}.${chrom}.${id}.g.vcf
-tabix -p vcf ${wd}/gvcf/${chrom}/${samp}.${chrom}.${id}.g.vcf.gz
+echo "[$(date)] Calling gVCF"
+echo "  SAMPLE: $samp"
+echo "  INBAM:  $INBAM"
+echo "  REF:    $REF"
+echo "  OUT:    $OUTVCF"
 
-# Finish
-echo "Complete -" "Sample:" $SLURM_ARRAY_TASK_ID
+gatk --java-options "-Xmx24g" HaplotypeCaller \
+  -R "$REF" \
+  -I "$INBAM" \
+  -O "$OUTVCF" \
+  -ERC GVCF \
+  --native-pair-hmm-threads "$THREADS"
+
+# -----------------------
+# bgzip + tabix
+# -----------------------
+echo "[$(date)] Compressing + indexing"
+bgzip -f "$OUTVCF"
+tabix -f -p vcf "$OUTGZ"
+
+# quick sanity
+if [[ ! -s "$OUTGZ" || ! -s "${OUTGZ}.tbi" ]]; then
+  echo "ERROR: gVCF output missing after compress/index" >&2
+fi
+
+echo "[$(date)] Done: $samp"
+echo "  $OUTGZ"
