@@ -59,28 +59,28 @@ outroot="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/mysamps"
 DIRLIST="${outroot}/eu_dpulex_dirs.txt"
 mkdir -p "$outroot"
 
-# build new dirlist safely
-tmp="${DIRLIST}.tmp"
-: > "$tmp"
+# # build new dirlist safely
+# tmp="${DIRLIST}.tmp"
+# : > "$tmp"
 
-while read -r id; do
-  id=$(echo "$id" | tr -d '\r' | xargs)
-  [[ -z "$id" ]] && continue
+# while read -r id; do
+#   id=$(echo "$id" | tr -d '\r' | xargs)
+#   [[ -z "$id" ]] && continue
 
-  d=$(find "$SAMPLE_PARENT" -mindepth 1 -maxdepth 1 -type d -name "*${id}*" 2>/dev/null | sort | head -n 1 || true)
-  if [[ -n "$d" ]]; then
-    printf "%s\n" "$d" >> "$tmp"
-  else
-    echo "WARN: no directory for ID=$id" >&2
-  fi
-done < "$IDFILE"
+#   d=$(find "$SAMPLE_PARENT" -mindepth 1 -maxdepth 1 -type d -name "*${id}*" 2>/dev/null | sort | head -n 1 || true)
+#   if [[ -n "$d" ]]; then
+#     printf "%s\n" "$d" >> "$tmp"
+#   else
+#     echo "WARN: no directory for ID=$id" >&2
+#   fi
+# done < "$IDFILE"
 
-sort -u "$tmp" > "$DIRLIST"
-rm -f "$tmp"
+# sort -u "$tmp" > "$DIRLIST"
+# rm -f "$tmp"
 
-echo "Wrote: $DIRLIST"
-wc -l "$DIRLIST"
-head "$DIRLIST"
+# echo "Wrote: $DIRLIST"
+# wc -l "$DIRLIST"
+# head "$DIRLIST"
 
 
 
