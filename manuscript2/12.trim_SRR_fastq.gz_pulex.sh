@@ -11,7 +11,6 @@
 #SBATCH --account berglandlab
 #SBATCH --array=1-1207%50   # Adjust the range based on the number of folders
 
-
 #mv /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SR* /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR/
 
 
