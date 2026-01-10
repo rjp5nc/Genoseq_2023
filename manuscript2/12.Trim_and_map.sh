@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/outputerrors/download_%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-56   # Adjust the range based on the number of folders
+#SBATCH --array=1-29   # Adjust the range based on the number of folders
 
 
 #  OUT="/scratch/rjp5nc/rawdata/mysamps_ids_dobtusa_europe.txt"
@@ -25,6 +25,34 @@
 # echo "Wrote: $OUT"
 # wc -l "$OUT"
 # head "$OUT"
+
+# SAMPLE_PARENT="/scratch/rjp5nc/rawdata/mysamples"
+# IDFILE="/scratch/rjp5nc/rawdata/mysamps_ids_dobtusa_europe.txt"
+
+# tmp="${IDFILE}.tmp"
+# : > "$tmp"
+
+# while read -r id; do
+#   id=$(echo "$id" | tr -d '\r' | xargs)
+#   [[ -z "$id" ]] && continue
+
+#   d=$(find "$SAMPLE_PARENT" -mindepth 1 -maxdepth 1 -type d -name "*${id}*" 2>/dev/null | head -n 1 || true)
+#   if [[ -n "$d" ]]; then
+#     echo "$id" >> "$tmp"
+#   else
+#     echo "DROP (no dir): $id" >&2
+#   fi
+# done < "$IDFILE"
+
+# sort -u "$tmp" > "$IDFILE"
+# rm -f "$tmp"
+
+# echo "Cleaned IDFILE: $IDFILE"
+# wc -l "$IDFILE"
+# head "$IDFILE"
+
+
+
 module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5
 
 SAMPLE_PARENT="/scratch/rjp5nc/rawdata/mysamples"
@@ -68,7 +96,7 @@ echo "[$(date)] Directories to process: $(wc -l < "$DIRLIST")"
 # -----------------------
 # 3) PICK THIS SAMPLE DIR (ARRAY) from filtered list
 # -----------------------
-dir=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$DIRLIST" | tr -d '\r' | xargs)
+dir=$(awk -v n="${SLURM_ARRAY_TASK_ID}" 'NR==n{gsub(/\r/,""); print; exit}' "$DIRLIST")
 
 if [[ -z "${dir}" ]]; then
   echo "Error: could not resolve sample dir for task ${SLURM_ARRAY_TASK_ID}"
