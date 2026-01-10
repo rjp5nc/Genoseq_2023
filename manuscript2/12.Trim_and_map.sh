@@ -52,6 +52,38 @@
 # head "$IDFILE"
 
 
+# SAMPLE_PARENT="/scratch/rjp5nc/rawdata/mysamples"
+# IDFILE="/scratch/rjp5nc/rawdata/mysamps_ids_dobtusa_europe.txt"
+
+# outroot="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/mysamps"
+# DIRLIST="${outroot}/eu_dobtusa_dirs.txt"
+# mkdir -p "$outroot"
+
+# # build new dirlist safely
+# tmp="${DIRLIST}.tmp"
+# : > "$tmp"
+
+# while read -r id; do
+#   id=$(echo "$id" | tr -d '\r' | xargs)
+#   [[ -z "$id" ]] && continue
+
+#   d=$(find "$SAMPLE_PARENT" -mindepth 1 -maxdepth 1 -type d -name "*${id}*" 2>/dev/null | sort | head -n 1 || true)
+#   if [[ -n "$d" ]]; then
+#     printf "%s\n" "$d" >> "$tmp"
+#   else
+#     echo "WARN: no directory for ID=$id" >&2
+#   fi
+# done < "$IDFILE"
+
+# sort -u "$tmp" > "$DIRLIST"
+# rm -f "$tmp"
+
+# echo "Wrote: $DIRLIST"
+# wc -l "$DIRLIST"
+# head "$DIRLIST"
+
+
+
 
 module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5
 
@@ -77,30 +109,20 @@ IDFILE="/scratch/rjp5nc/rawdata/mysamps_ids_dobtusa_europe.txt"
 #    Assumption: directory name contains the SRR somewhere.
 #    (If not true on your system, tell me the naming pattern and I’ll adjust.)
 # -----------------------
-DIRLIST="${outroot}/eu_dobtusa_dirs.txt"
-: > "$DIRLIST"
+DIRLIST="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/mysamps/eu_dobtusa_dirs.txt"
 
-while read -r srr; do
-  # find first matching directory containing SRR in its name
-  d=$(find "$SAMPLE_PARENT" -mindepth 1 -maxdepth 1 -type d -name "*${srr}*" 2>/dev/null | sort | head -n 1 || true)
-  if [[ -n "$d" ]]; then
-    echo "$d" >> "$DIRLIST"
-  else
-    echo "[$(date)] WARN: no directory found for ${srr} under ${SAMPLE_PARENT}" >&2
-  fi
-done < "$IDFILE"
-
-sort -u "$DIRLIST" -o "$DIRLIST"
-echo "[$(date)] Directories to process: $(wc -l < "$DIRLIST")"
-
-# -----------------------
-# 3) PICK THIS SAMPLE DIR (ARRAY) from filtered list
-# -----------------------
+# pick this dir
 dir=$(awk -v n="${SLURM_ARRAY_TASK_ID}" 'NR==n{gsub(/\r/,""); print; exit}' "$DIRLIST")
 
 if [[ -z "${dir}" ]]; then
   echo "Error: could not resolve sample dir for task ${SLURM_ARRAY_TASK_ID}"
   echo "DIRLIST: $DIRLIST"
+  echo "DIRLIST lines: $(wc -l < "$DIRLIST")"
+  exit 1
+fi
+
+if [[ ! -d "$dir" ]]; then
+  echo "Error: dir not found on node: $dir"
   exit 1
 fi
 
