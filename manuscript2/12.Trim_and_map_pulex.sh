@@ -9,7 +9,7 @@
 #SBATCH -e /scratch/rjp5nc/outputerrors/download_%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-29   # Adjust the range based on the number of folders
+#SBATCH --array=1-54   # Adjust the range based on the number of folders
 
 
 #  OUT="/scratch/rjp5nc/rawdata/mysamps_ids_dpulex_europe.txt"
