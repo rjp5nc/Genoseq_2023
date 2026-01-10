@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J download # A single job name for the array
-#SBATCH --ntasks-per-node=10 # ten cores
+#SBATCH --cpus-per-task=10 # ten cores
 #SBATCH -N 1 # on one node
 #SBATCH -t 16:00:00 ### 8 hours
 #SBATCH --mem 60G

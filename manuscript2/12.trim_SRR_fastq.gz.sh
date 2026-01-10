@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J trimSRA # A single job name for the array
-#SBATCH --ntasks-per-node=10 # one core
+#SBATCH --cpus-per-task=10 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-10:00:00 # 10 hours
 #SBATCH --mem 100G
