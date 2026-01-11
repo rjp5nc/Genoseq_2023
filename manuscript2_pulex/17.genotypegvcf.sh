@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J genotypegvcf # A single job name for the array
-#SBATCH --ntasks-per-node=10 # one core
+#SBATCH --cpus-per-task=10 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 7:00:00 # 8 hours
 #SBATCH --mem 80G
@@ -13,77 +13,121 @@
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
-# This script will conduct genotype calling on the GenomeDBI object
-
-# Load Modules
 module load gatk/4.6.0.0
+module load samtools/1.17
 
-# Parameters
-JAVAMEM=80G
-CPU=10
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
+GVCFDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/gvcf_obtusa"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb"
+mkdir -p "$OUTDIR"
 
-SLURM_ARRAY_TASK_ID=80
-#NEED TO DO USPULEX/AMBIGUA
+SAMPLEMAP="${OUTDIR}/sample_map.tsv"
 
-# Working folder is core folder where this pipeline is being run.
-WORKING_FOLDER=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/vcf3
+ls -1 "${GVCFDIR}"/*.g.vcf.gz | sort \
+| awk -F'/' '{
+    f=$NF
+    sub(/\.g\.vcf\.gz$/,"",f)
+    print f "\t" $0
+  }' > "$SAMPLEMAP"
 
-# Reference genome
-REFERENCE=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
-
-# Intervals to analyze
-intervals="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/interval_DBI_paramList_usobtusa.txt"
-
-species="DBI_usobtusa"
-# This part of the pipeline will generate log files to record warnings and completion status
-
-# Move to working directory
-cd $WORKING_FOLDER
-
-# Chromosome
-i=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f2 )
-
-# Start
-start=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f3 )
-
-# Stop
-stop=$( cat ${intervals} | grep "^$SLURM_ARRAY_TASK_ID," | cut -d',' -f4 )
-
-# Create temp folder
-if [[ -d "TEMP_Daphnia_Genotype_${i}_${start}_${stop}" ]]
-then
-echo "Working TEMP_Daphnia_Genotype folder exist"
-echo "Lets move on"
-date
-else
-echo "Folder doesnt exist. Lets fix that"
-mkdir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
-date
-fi
-
-echo ${i}_${start}_${stop} "is being processed" $(date)
-
-# Identify the Genome database to genotyoe
-GenomeDB_path=`echo /scratch/rjp5nc/UK2022_2024/daphnia_phylo/$species/Daphnia_DBI_${i}_${start}_${stop}`
-
-JAVAMEM=40
-# Genotype call the samples in the DBI merged set
-gatk --java-options "-Xmx${JAVAMEM}" GenotypeGVCFs \
--R $REFERENCE \
--V gendb://$GenomeDB_path \
---tmp-dir $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop} \
--O $WORKING_FOLDER/${i}.${start}.${stop}.vcf.gz \
--L ${i}:${start}-${stop}
+echo "Wrote: $SAMPLEMAP"
+wc -l "$SAMPLEMAP"
+head "$SAMPLEMAP"
 
 
-#--genomicsdb-use-vcf-codec \
-
-# Remove temp folder
-rm -rf $WORKING_FOLDER/TEMP_Daphnia_Genotype_${i}_${start}_${stop}
-
-echo ${i} "done" $(date)
+awk -F'\t' '{print $2}' "$SAMPLEMAP" | while read -r f; do
+  [[ -s "${f}.tbi" ]] || echo "MISSING_TBI $f"
+done | head
 
 
-#find . -type f -name "*.vcf.gz" | sed 's|^\./||' > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/unmerged_eudobtusa_vcf_files.txt
+module load samtools/1.17
+samtools faidx "$REF"
+
+ALLBED="${OUTDIR}/all_sites.bed"
+cut -f1,2 "${REF}.fai" | awk '{print $1"\t0\t"$2}' > "$ALLBED"
+echo "Wrote: $ALLBED"
+head "$ALLBED"
 
 
+module load gatk/4.6.0.0
+module load samtools/1.17
+
+THREADS="${SLURM_CPUS_PER_TASK:-1}"
+
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb"
+SAMPLEMAP="${OUTDIR}/sample_map.tsv"
+ALLBED="${OUTDIR}/all_sites.bed"
+DB="${OUTDIR}/gendb_mito_obtusa"
+
+mkdir -p "$OUTDIR"
+
+# ensure dict + fai
+[[ -s "${REF}.fai" ]] || samtools faidx "$REF"
+DICT="${REF%.*}.dict"
+[[ -s "$DICT" ]] || gatk CreateSequenceDictionary -R "$REF"
+
+[[ -s "$SAMPLEMAP" ]] || { echo "ERROR: missing $SAMPLEMAP"; exit 1; }
+[[ -s "$ALLBED" ]] || { echo "ERROR: missing $ALLBED"; exit 1; }
+
+echo "[$(date)] Importing to GenomicsDB: $DB"
+echo "Samples: $(wc -l < "$SAMPLEMAP")"
+echo "Intervals: $ALLBED"
+
+gatk --java-options "-Xmx56g" GenomicsDBImport \
+  --genomicsdb-workspace-path "$DB" \
+  --sample-name-map "$SAMPLEMAP" \
+  -L "$ALLBED" \
+  --reader-threads "$THREADS" \
+  --batch-size 50
+
+echo "[$(date)] Done GenomicsDBImport"
+
+
+
+
+
+
+
+
+
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb"
+ALLBED="${OUTDIR}/all_sites.bed"
+DB="${OUTDIR}/gendb_mito_obtusa"
+
+VCF="${OUTDIR}/obtusa.mito.ALLSITES.vcf.gz"
+
+# ensure dict + fai
+[[ -s "${REF}.fai" ]] || samtools faidx "$REF"
+DICT="${REF%.*}.dict"
+[[ -s "$DICT" ]] || gatk CreateSequenceDictionary -R "$REF"
+
+[[ -d "$DB" ]] || { echo "ERROR: missing GenomicsDB workspace: $DB"; exit 1; }
+[[ -s "$ALLBED" ]] || { echo "ERROR: missing $ALLBED"; exit 1; }
+
+echo "[$(date)] Genotyping ALL SITES -> $VCF"
+
+gatk --java-options "-Xmx40g" GenotypeGVCFs \
+  -R "$REF" \
+  -V "gendb://$DB" \
+  -L "$ALLBED" \
+  --include-non-variant-sites \
+  -O "$VCF"
+
+echo "[$(date)] Done GenotypeGVCFs"
+ls -lh "$VCF"*
+
+
+
+
+
+
+module load bcftools || true
+
+REFLEN=$(awk '{s+=$2} END{print s}' "${REF}.fai")
+echo "Reference length sum: $REFLEN"
+
+# count VCF records (non-header)
+zcat /scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb/obtusa.mito.ALLSITES.vcf.gz \
+| grep -v '^#' | wc -l

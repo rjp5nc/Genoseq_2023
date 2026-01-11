@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J gatk_chrom # A single job name for the array
-#SBATCH --ntasks-per-node=1 # one core
+#SBATCH --cpus-per-task=10 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-10:00:00 # 8 hours
 #SBATCH --mem 25G
@@ -9,7 +9,6 @@
 #SBATCH -e /scratch/rjp5nc/err/gatk.chrom.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-9999%150
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 #SBATCH --array=1-676%60   # Adjust the range based on the number of folders
