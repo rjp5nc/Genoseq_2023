@@ -9,16 +9,16 @@
 #SBATCH -e /scratch/rjp5nc/err/genotypegvcf.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
-#SBATCH --array=1-112%50
+#SBATCH --array=1-669%50
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 module load gatk/4.6.0.0
 module load samtools/1.17
 
-REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
-GVCFDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/gvcf_obtusa"
-OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb"
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudpulex_mito.fasta"
+GVCFDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/gvcf_pulex"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb"
 mkdir -p "$OUTDIR"
 
 SAMPLEMAP="${OUTDIR}/sample_map.tsv"
@@ -54,11 +54,11 @@ module load samtools/1.17
 
 THREADS="${SLURM_CPUS_PER_TASK:-1}"
 
-REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
-OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb"
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudpulex_mito.fasta"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb"
 SAMPLEMAP="${OUTDIR}/sample_map.tsv"
 ALLBED="${OUTDIR}/all_sites.bed"
-DB="${OUTDIR}/gendb_mito_obtusa"
+DB="${OUTDIR}/gendb_mito_pulex"
 
 mkdir -p "$OUTDIR"
 
@@ -91,12 +91,12 @@ echo "[$(date)] Done GenomicsDBImport"
 
 
 
-REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudobtusa_mito_reverse.fasta"
-OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb"
+REF="/scratch/rjp5nc/Reference_genomes/mito_reference/eudpulex_mito.fasta"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb"
 ALLBED="${OUTDIR}/all_sites.bed"
-DB="${OUTDIR}/gendb_mito_obtusa"
+DB="${OUTDIR}/gendb_mito_pulex"
 
-VCF="${OUTDIR}/obtusa.mito.ALLSITES.vcf.gz"
+VCF="${OUTDIR}/pulex.mito.ALLSITES.vcf.gz"
 
 # ensure dict + fai
 [[ -s "${REF}.fai" ]] || samtools faidx "$REF"
@@ -129,5 +129,5 @@ REFLEN=$(awk '{s+=$2} END{print s}' "${REF}.fai")
 echo "Reference length sum: $REFLEN"
 
 # count VCF records (non-header)
-zcat /scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb/obtusa.mito.ALLSITES.vcf.gz \
+zcat /scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.vcf.gz \
 | grep -v '^#' | wc -l
