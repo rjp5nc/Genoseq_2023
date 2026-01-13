@@ -31,17 +31,17 @@ cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv
 
 # Directory with chromosome VCFs
 VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa_renamed_annotated.vcf.gz
-OUT_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000
+OUT_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000_withmitotype
 mkdir -p $OUT_DIR
 
 
 pixy --stats pi fst dxy \
     --vcf $VCF \
-    --populations /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed.txt \
+    --populations /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed_withmitotype.txt \
     --window_size 10000 \
     --n_cores 20 \
     --output_folder $OUT_DIR \
-    --output_prefix pixy_10000_
+    --output_prefix pixy_10000_mitotype
 
 
 # cat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy_chr/*_fst.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_fst.txt
