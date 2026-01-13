@@ -37,7 +37,7 @@ mkdir -p $OUT_DIR
 
 pixy --stats pi fst dxy \
     --vcf $VCF \
-    --populations /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed_withmitotype.txt \
+    --populations /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed_withmitotype.pixy.txt \
     --window_size 10000 \
     --n_cores 20 \
     --output_folder $OUT_DIR \
