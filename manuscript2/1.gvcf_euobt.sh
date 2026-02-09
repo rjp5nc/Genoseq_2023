@@ -13,7 +13,7 @@
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 module load gatk
-cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulex_indv/gvcf
+cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eudobtusa_indv/gvcf
 
 
 find /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/eupulex_chr/Scaffold_* \

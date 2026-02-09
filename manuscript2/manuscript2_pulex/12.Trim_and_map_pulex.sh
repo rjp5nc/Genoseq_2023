@@ -12,6 +12,17 @@
 #SBATCH --array=1-54   # Adjust the range based on the number of folders
 
 
+
+#         7110069_53 standard-   pulex2   rjp5nc  R       9:45      1 udc-aw33-24c0
+# 7109399_[370-643%6 standard-  trimSRA   rjp5nc PD       0:00      1 (JobArrayTaskLimit)
+# 7110123_[64-1207%5 standard- trimSRA_   rjp5nc PD       0:00      1 (Priority)
+
+
+
+
+
+
+
 #  OUT="/scratch/rjp5nc/rawdata/mysamps_ids_dpulex_europe.txt"
 
 # awk -F',' '

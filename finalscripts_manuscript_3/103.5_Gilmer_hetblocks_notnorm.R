@@ -313,6 +313,10 @@ dev.off()
 
 
 
+
+
+
+
 hetcollapsed_graph <- as.data.frame(het_collapsed) %>%
   left_join(metadata_with_cloneA_label_no_NA_filtered, by = c("sample" = "Well")) 
 
@@ -351,6 +355,10 @@ dev.off()
 
 
 write.csv(hetcollapsed_graph, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_A_het_blocks_signature.csv")
+write.csv(metadata_with_cloneA_label_no_NA_filtered, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/Gilmer_A_het_blocks_all.csv")
+
+
+
 
 
 # Filter for signature 01111101
@@ -365,3 +373,233 @@ write.table(selected_individuals$sample, file = out_list,
             quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 cat("Saved sample list to:", out_list, "\n")
+
+
+
+
+
+subgroups_clean <- subgroups_count %>%
+  mutate(
+    signature = sprintf("%08s", signature),
+    signature = gsub(" ", "0", signature),
+    date      = as.Date(date)  # assumes YYYY-MM-DD or something parseable
+  )
+
+# 2) Split signature into bit1..bit8
+sub_bits <- subgroups_clean %>%
+  mutate(sig_split = strsplit(signature, "")) %>%
+  unnest_wider(sig_split, names_sep = "") %>%
+  rename(
+    bit1 = sig_split1,
+    bit2 = sig_split2,
+    bit3 = sig_split3,
+    bit4 = sig_split4,
+    bit5 = sig_split5,
+    bit6 = sig_split6,
+    bit7 = sig_split7,
+    bit8 = sig_split8
+  )
+
+bit_cols <- paste0("bit", 1:8)
+
+# 3) Long format: one row per (date, bit_position, bit_value)
+bit_long <- sub_bits %>%
+  pivot_longer(
+    cols      = all_of(bit_cols),
+    names_to  = "bit_position",
+    values_to = "bit_value"
+  ) %>%
+  mutate(
+    bit_position = as.numeric(gsub("bit", "", bit_position)),
+    bit_value    = as.numeric(bit_value)
+  )
+
+# 4) Aggregate counts and compute percentages
+bit_pct <- bit_long %>%
+  group_by(date, bit_position, bit_value) %>%
+  summarise(total_count = sum(count), .groups = "drop") %>%
+  group_by(date, bit_position) %>%
+  mutate(percentage = 100 * total_count / sum(total_count)) %>%
+  ungroup()
+
+# 5) Ensure both bit_value 0 and 1 exist for each (date, bit_position)
+bit_pct_full <- bit_pct %>%
+  mutate(bit_value = factor(bit_value, levels = c(0, 1))) %>%
+  complete(
+    date,
+    bit_position,
+    bit_value,
+    fill = list(total_count = 0, percentage = 0)
+  )
+
+
+  bit_totals <- bit_pct %>%
+  group_by(bit_position, bit_value) %>%       # ignore date
+  summarise(
+    total_count = sum(total_count),
+    .groups = "drop"
+  ) %>%
+  group_by(bit_position) %>%
+  mutate(
+    pct = 100 * total_count / sum(total_count)
+  ) %>%
+  ungroup()
+
+
+bit_totals$bit_value <- as.character(bit_totals$bit_value)
+
+  bitsovertime_time_total <- ggplot(
+  bit_totals,
+  aes(
+    x     = bit_position,
+    y     = total_count,
+    color = bit_value,
+    group = interaction(bit_value, bit_position)
+  )
+) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 2)
+  labs(
+    title = "Percentage of 0's and 1's per bit over time",
+    x     = "Sampling date",
+    y     = "Percentage (%)"
+  ) +
+  theme_bw() +
+  theme(
+    strip.text  = element_text(size = 12),
+    plot.title  = element_text(face = "bold", size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "top"
+  )
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/outbits_time_totalcount.png",
+  bitsovertime_time_total,
+  width  = 6,
+  height = 4,
+  dpi    = 300
+)
+
+
+
+
+
+
+
+  bitsovertime_time <- ggplot(
+  bit_pct_full,
+  aes(
+    x     = date,
+    y     = percentage,
+    color = bit_value,
+    group = interaction(bit_value, bit_position)
+  )
+) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 2) +
+  scale_color_manual(
+    values = c("0" = "dodgerblue3", "1" = "firebrick2"),
+    name   = "Bit value"
+  ) +
+  scale_x_date(date_labels = "%Y-%m-%d") +
+  facet_wrap(~ bit_position, ncol = 4) +
+  labs(
+    title = "Percentage of 0's and 1's per bit over time",
+    x     = "Sampling date",
+    y     = "Percentage (%)"
+  ) +
+  theme_bw() +
+  theme(
+    strip.text  = element_text(size = 12),
+    plot.title  = element_text(face = "bold", size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "top"
+  )
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/outbits_time.png",
+  bitsovertime_time,
+  width  = 12,
+  height = 8,
+  dpi    = 300
+)
+
+
+
+
+
+
+
+bit_pct_het <- subset(bit_pct_full, bit_value == 1)
+
+bit_pct_het$bit_position <- as.character(bit_pct_het$bit_position)
+
+  bitsovertime_het <- ggplot(
+  bit_pct_het,
+  aes(
+    x     = date,
+    y     = percentage,
+    color = bit_position,
+    group = bit_position
+  )
+) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 2) +
+  scale_x_date(date_labels = "%Y-%m-%d") +
+  labs(
+    title = "Percentage of 1's per bit over time (heterozygosity over time)",
+    x     = "Sampling date",
+    y     = "Percentage (%)"
+  ) +
+  theme_bw() 
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/outbits_time_together.png",
+  bitsovertime_het,
+  width  = 12,
+  height = 8,
+  dpi    = 300
+)
+
+
+
+
+
+
+bitsovertime_bydate <- ggplot(
+  bit_pct_full,
+  aes(
+    x     = bit_position,
+    y     = percentage,
+    color = bit_value,
+    group = bit_value
+  )
+) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 2) +
+  scale_x_continuous(breaks = 1:8) +
+  scale_color_manual(
+    values = c("0" = "dodgerblue3", "1" = "firebrick2"),
+    name   = "Bit value"
+  ) +
+  facet_wrap(~ date, ncol = 1) +
+  labs(
+    title = "Percentage of 0's and 1's across bit positions",
+    x     = "Bit position (1-8)",   # plain hyphen to avoid encoding warning
+    y     = "Percentage (%)"
+  ) +
+  theme_bw() +
+  theme(
+    strip.text  = element_text(size = 12),
+    plot.title  = element_text(face = "bold", size = 14),
+    legend.position = "top"
+  )
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/outbits_bydate.png",
+  bitsovertime_bydate,
+  width  = 10,
+  height = 12,
+  dpi    = 300
+)
+

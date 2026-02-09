@@ -55,6 +55,8 @@ tree2_pruned <- drop.tip(tree2, setdiff(tree2$tip.label, common_tips))
 # association: one-to-one, same labels
 assoc <- cbind(tree1_pruned$tip.label, tree1_pruned$tip.label)
 
+
+
 # save bigger PNG
 png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/tree_cophylo_bold_only2.png",
     width = 6000, height = 12000, res = 300)

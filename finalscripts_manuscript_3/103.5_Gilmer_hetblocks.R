@@ -165,6 +165,13 @@ block_means <- het_collapsed %>%
     .groups = "drop"
   )
 
+block_means <- het_collapsed %>%
+  group_by(contig, block, contig_block) %>%
+  summarise(
+    mean_norm_het_c = mean(norm_het_c, na.rm = TRUE)/10,
+    .groups = "drop")
+
+
 # --- 4) Plot (one value per contiguous block per sample) + red mean line/points ---
 pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/norm_het_contig_blocks.pdf",
     width = 15, height = 10)
@@ -194,10 +201,56 @@ ggplot(het_collapsed, aes(x = contig_block, y = norm_het_c, color = sample, grou
 
 dev.off()
 
+
+
+
+
+
+
+
+block_means <- het_collapsed %>%
+  group_by(contig, block, contig_block) %>%
+  summarise(
+    mean_norm_het_c = mean(mean_het_prop, na.rm = TRUE)/5,
+    .groups = "drop")
+
+
+# --- 4) Plot (one value per contiguous block per sample) + red mean line/points ---
+pdf("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/NOTNORM_het_contig_blocks.pdf",
+    width = 15, height = 10)
+
+ggplot(het_collapsed, aes(x = contig_block, y = mean_het_prop, color = sample, group = sample)) +
+  geom_line(alpha = 0.7) +
+  geom_point(size = 2) +
+  # red mean line per contig (segments between blocks of same contig)
+  geom_line(
+    data = block_means,
+    aes(x = contig_block, y = mean_norm_het_c, group = contig),
+    color = "red", linewidth = 1.2, inherit.aes = FALSE
+  ) +
+    geom_point(
+    data = block_means,
+    aes(x = contig_block, y = mean_norm_het_c),
+    color = "red", size = 3, inherit.aes = FALSE
+  ) +
+  labs(
+    x = "Contig (contiguous block)",
+    y = "Mean het_prop (within contiguous window block)",
+    title = "Collapsed het across contiguous blocks (red = per-block mean)"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        text = element_text(size = 14))
+
+dev.off()
+
+
+
+
 # --- 5) Above/below-mean flag (per contiguous block) ---
 df_c <- het_collapsed %>%
   left_join(block_means, by = c("contig", "block", "contig_block")) %>%
-  mutate(above_mean = if_else(norm_het_c > mean_norm_het_c, 1L, 0L))
+  mutate(above_mean = if_else(mean_het_prop > mean_norm_het_c, 1L, 0L))
 
 # --- 6) Similarity matrix over contiguous blocks (rows) × samples (cols) ---
 bin_mat_c <- df_c %>%

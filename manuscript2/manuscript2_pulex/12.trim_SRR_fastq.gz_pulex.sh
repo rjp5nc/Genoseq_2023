@@ -13,8 +13,6 @@
 
 #mv /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SR* /scratch/rjp5nc/UK2022_2024/allshortreads/01.RawData/SRR/
 
-/scratch/rjp5nc/erroroutputs/down.7109890
-
 
 
 module load cutadapt gcc/11.4.0 bwa/0.7.17 samtools/1.17 picard/2.27.5

@@ -50,13 +50,17 @@ $CONDA_PREFIX/bin/bcftools query -l  /scratch/rjp5nc/UK2022_2024/daphnia_phylo/u
 
 grep -Ff vcf_samples.txt pops_filtered_withmitotype.txt > pops_both.txt
 
-awk '$2 != "PBO66_A"' pops_filtered_withmitotype.txt > pops_filtered_withmitotype2.txt
+awk '$2 !~ /^PBO/' pops_filtered_withmitotype.txt > pops_fixed_withmitotype.noPBO.txt
 
-grep -Ff <($CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz2.vcf.gz) pops_filtered_withmitotype2.txt > pops_fixed_withmitotype.txt
+grep -Ff <($CONDA_PREFIX/bin/bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa_renamed_annotated.vcf.gz) pops_fixed_withmitotype.noPBO.txt > pops_fixed_withmitotype2.txt
 
 
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa_renamed_annotated.vcf.gz"
-POPS="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed_withmitotype.txt"
+POPS="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed_withmitotype2.txt"
+
+awk 'BEGIN{OFS="\t"} {print $1,$2}' pops_fixed_withmitotype2.txt \
+  > pops_fixed_withmitotype.pixy.txt
+
 
 # --- Output directory ---
 OUTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000_withmitotype"

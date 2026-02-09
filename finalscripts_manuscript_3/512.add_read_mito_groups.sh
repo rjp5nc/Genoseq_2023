@@ -45,5 +45,5 @@ java -jar $EBROOTPICARD/picard.jar BuildBamIndex \
 
 
 
-#cp /scratch/rjp5nc/UK2022_2024/final_mitobam_rg3/*.b /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/final_mitobam_rg3/
+#cp /scratch/rjp5nc/UK2022_2024/final_mitobam_rg2/*.b* /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/final_mitobam_rg3/
 

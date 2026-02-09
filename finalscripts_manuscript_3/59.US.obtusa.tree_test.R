@@ -1,6 +1,5 @@
-##module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
+##module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1;R
 
-#R
 
 # Load required packages
 library(SeqArray)
@@ -151,6 +150,9 @@ tip_color_dt <- data.table(
 )
 
 phylo_tree <- merged_data2@phylo
+
+
+
 write.tree(phylo_tree, file = "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usdobtusa_tree_genomic.nwk")
 
 png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups.png", res = 300, width = 4000, height = 9000)
@@ -178,7 +180,289 @@ legend("topleft",                   # position
 
 dev.off()
 
-write.csv(unique_clones, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")  # Save as CSV
+#write.csv(unique_clones, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types.csv")  # Save as CSV
+
+
+superclonesv2 <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/genomic_types_v2.csv")
+
+phylo_tree <- root(phylo_tree, outgroup = "SRR5012393", resolve.root = TRUE)
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups.png", res = 300, width = 4000, height = 9000)
+#png("/scratch/rjp5nc/UK2022_2024/mito_vcf/tree_usobtusa_circ.png", width = 1200, height = 2000)
+
+# Plot the tree
+plot.phylo(phylo_tree,
+           type = "fan",
+#           type = "fan",
+           cex = 0.8,
+           label.offset = 0.01,
+           no.margin = TRUE,
+           tip.color = tip_colors,
+           main = "Rooted NJ Tree (root = P759)")
+
+# Add legend
+legend("topleft",                   # position
+       legend = unique(tip_color_dt$sample),     # group names
+       col = unique(tip_color_dt$color),        # matching colors
+       pch = 19,                   # solid circle
+       pt.cex = 1.5,               # point size
+       cex = 1,                    # text size
+       bty = "n",                  # no box
+       title = "Sample Group")
+
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(readr)
+  library(tidytree)
+  library(ggtree)
+  library(ggplot2)
+  library(scales)
+})
+
+# ----------------------------
+# Inputs
+# ----------------------------
+# merged_data2: treedata object
+# superclonesv2: data frame with columns CloneA, Group
+
+out_png <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups_ggtree.png"
+out_pdf <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups_ggtree.pdf"
+
+# Extract annotation table from treedata
+td <- as_tibble(merged_data2)
+
+# Build mapping: CloneA -> superclone
+sc_map <- superclonesv2 %>%
+  transmute(label = as.character(CloneA),
+            superclone = as.character(Group))
+
+# Join superclone + build tip label text
+tip_set <- merged_data2@phylo$tip.label
+
+td2 <- td %>%
+  left_join(sc_map, by = "label") %>%
+  mutate(
+    superclone = ifelse(is.na(superclone) | superclone == "", "Unknown", superclone),
+    is_tip = label %in% tip_set,
+    tip_text = ifelse(
+      is_tip,
+      ifelse(is.na(accuratelocation) | accuratelocation == "", label, accuratelocation),
+      NA_character_
+    )
+  )
+
+# Colors for superclone
+groups <- sort(unique(td2$superclone))
+pal <- setNames(hue_pal()(length(groups)), groups)
+
+# ----------------------------
+# Plot (fan) with auto-rotated labels
+# ----------------------------
+p <- ggtree(merged_data2, layout = "fan") %<+% td2 +
+  geom_tippoint(aes(color = superclone), size = 1.3, alpha = 0.9) +
+  geom_tiplab2(
+    aes(label = tip_text, color = superclone),
+    size = 2.2,
+    offset = 0.002,     # increase if labels sit on the tree
+    align = FALSE
+  ) +
+  scale_color_manual(values = pal, name = "Superclone") +
+  theme_tree2() +
+  ggtitle("Rooted NJ Tree")
+
+ggsave(out_png, p, width = 10, height = 10, dpi = 300)
+ggsave(out_pdf, p, width = 10, height = 10, dpi = 300)
+
+
+
+
+
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(tibble)
+  library(ape)
+  library(ggtree)
+  library(ggplot2)
+})
+
+out_png <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups_ggtree.png"
+out_pdf <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups_ggtree.pdf"
+
+phy <- merged_data2@phylo
+tip_set <- phy$tip.label
+
+# Map tips -> superclone
+tip_to_group <- tibble(label = tip_set) %>%
+  left_join(
+    superclonesv2 %>%
+      transmute(label = as.character(CloneA),
+                superclone = as.character(Group)),
+    by = "label"
+  ) %>%
+  mutate(
+    superclone = ifelse(is.na(superclone) | superclone == "" | superclone == "Unknown",
+                         "OO", superclone)
+  )
+
+# ---- selection logic ----
+# keep ALL OO
+oo_tips <- tip_to_group %>%
+  filter(superclone == "OO") %>%
+  pull(label)
+
+# keep ONE representative per non-OO superclone
+rep_tips <- tip_to_group %>%
+  filter(superclone != "OO") %>%
+  arrange(superclone, label) %>%
+  group_by(superclone) %>%
+  slice(1) %>%
+  ungroup()
+
+keep_tips <- c(oo_tips, rep_tips$label)
+
+# prune tree
+phy2 <- drop.tip(phy, setdiff(tip_set, keep_tips))
+
+new_labels <- tip_to_group %>%
+  filter(label %in% phy2$tip.label) %>%
+  mutate(final_label = superclone) %>%   # OO stays OO
+  select(label, final_label)
+
+label_map <- setNames(new_labels$final_label, new_labels$label)
+phy2$tip.label <- unname(label_map[phy2$tip.label])
+
+# ---- plot: no colors ----
+p <- ggtree(phy2, layout = "fan", open.angle = 0) +
+  geom_tippoint(size = 2.0) +
+  geom_tiplab2(size = 3.0, offset = 0.02) +
+  theme_tree() +
+  ggtitle("Rooted NJ Tree (1 per superclone; all OO retained)")
+
+ggsave(out_png, p, width = 5, height = 5, dpi = 300)
+ggsave(out_pdf, p, width = 10, height = 10, dpi = 300)
+
+
+sc_counts <- tip_to_group %>%
+  count(superclone, name = "n")
+
+plot_df <- tibble(label = phy2$tip.label) %>%
+  left_join(sc_counts, by = c("label" = "superclone")) %>%
+  mutate(
+    n = ifelse(label == "OO", 1, n)
+  )
+
+p <- ggtree(phy2, layout = "fan", open.angle = 0) %<+% plot_df +
+  geom_tippoint(
+    aes(size = n),
+    alpha = 0.9
+  ) +
+  geom_tiplab2(size = 3.0, offset = 0.02) +
+  scale_size_continuous(
+    name = "Individuals per superclone",
+    breaks = c(1, 5, 25, 60)   
+  ) +
+  theme_tree() +
+  ggtitle("Rooted Genome NJ Tree")
+
+ggsave(out_png, p, width = 7, height = 5, dpi = 300)
+ggsave(out_pdf, p, width = 7, height = 5, dpi = 300)
+
+p2 <- p 
+
+save(
+  p, 
+  file = file.path(out_dir, "superclones_slimmed.RData")
+)
+
+
+
+
+
+
+
+
+library(ape)
+library(dplyr)
+library(tidytree)
+library(scales)
+
+# ---- Extract phylo + annotation ----
+phylo_tree <- merged_data2@phylo
+td <- as_tibble(merged_data2)
+
+# ---- Superclone map (CloneA -> superclone) ----
+sc_map <- superclonesv2 %>%
+  transmute(CloneA = as.character(CloneA),
+            superclone = as.character(Group))
+
+# ---- Tip metadata in phylo tip order ----
+tip_dt <- tibble(CloneA = phylo_tree$tip.label) %>%
+  left_join(td %>% select(label, accuratelocation), by = c("CloneA" = "label")) %>%
+  left_join(sc_map, by = "CloneA") %>%
+  mutate(
+    superclone = ifelse(is.na(superclone) | superclone == "", "Unknown", superclone),
+    tip_label  = ifelse(is.na(accuratelocation) | accuratelocation == "", CloneA, accuratelocation)
+  )
+
+# ---- Colors by superclone ----
+groups <- sort(unique(tip_dt$superclone))
+group_cols <- setNames(hue_pal()(length(groups)), groups)
+tip_colors <- unname(group_cols[tip_dt$superclone])
+
+
+
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups.png",
+    res = 600, width = 4000, height = 4000)
+
+plot.phylo(phylo_tree,
+           type = "fan",
+           show.tip.label = FALSE,
+           label.offset = 0.015,
+           no.margin = TRUE,
+           main = "Rooted NJ Tree")
+
+# colored tip points
+tiplabels(pch = 19, col = tip_colors, cex = 0.7)
+
+# rotated labels (fan layout): srt = 0 makes them follow the circle
+tiplabels(text = tip_dt$tip_text,
+          frame = "none",
+          cex = 0.6,
+          srt = 0,
+          adj = c(0, 0.5),
+          col = tip_colors)   # change to "black" if you want black text
+
+legend("topleft",
+       legend = names(group_cols),
+       col = unname(group_cols),
+       pch = 19,
+       pt.cex = 1.5,
+       cex = 1,
+       bty = "n",
+       title = "Superclone")
+
+dev.off()
+
+
+
+
 
 
 
@@ -186,187 +470,6 @@ write.csv(unique_clones, "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_in
 
 merged_data3 <- left_join(merged_data2, mitotypes, by = c("label" = "CloneA"))
 
-
-p <- ggtree(merged_data3, options(ignore.negative.edge = TRUE)) +
-  geom_tiplab(aes(label = clone, color = Group), size = 3) +   # <- use clone + location
-  theme_tree() +
-  labs(title = "Rooted NJ Tree root SRR") 
-
-ggsave(
-  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups2.png",
-  plot = p,
-  width = 10, height = 40, dpi = 300
-)
-
-
-
-p <- ggtree(merged_data3, options(ignore.negative.edge = TRUE), layout="circular") +
-  geom_tiplab(aes(label = clone, color = Group), size = 3) +   # <- use clone + location
-  theme_tree() +
-  labs(title = "Rooted NJ Tree root SRR") 
-
-ggsave(
-  "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_groups2_fan.png",
-  plot = p,
-  width = 20, height = 20, dpi = 300
-)
-
-
-
-
-
-# ---- Step 4: Build neighbor-joining tree ----
-tree <- nj(as.dist(dist_matrix))
-
-# ---- Step 5 (Optional): Relabel tips from metadata CSV ----
-# CSV should have columns: Sample_ID and Label (or Well, Clone, etc.)
-tree_rooted <- root(tree, outgroup = "SRR5012394", resolve.root = TRUE)
-
-label_map <- setNames(mitotypes$CloneA, mitotypes$Group)
-
-# Apply labels (optional: fallback to Sample_ID if label is missing)
-tree$tip.label <- label_map[tree$tip.label]
-tree$tip.label[is.na(tree$tip.label)] <- names(label_map)[is.na(tree$tip.label)]
-
-group_colors <- setNames(rainbow(length(unique(mitotypes$Group))), unique(mitotypes$Group))
-
-# Assign color to each tip
-
-tip_colors <- group_colors[mitotypes$Group]
-
-tip_color_dt <- data.table(mitotypes$Group, mitotypes$CloneA)
-
-final_valid_samples2 <- as.data.frame(final_valid_samples)
-
-final_valid_samples3 <- left_join(final_valid_samples2, tip_color_dt, by= c("final_valid_samples"="V2"))
-
-tip_colors <- group_colors[final_valid_samples3$V1]
-
-
-tip_color_dt <- data.table(
-  sample = names(tip_colors),
-  color  = as.vector(tip_colors)
-)
-
-
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_genomicxmitogroups.png", res = 300, width = 4000, height = 9000)
-#png("/scratch/rjp5nc/UK2022_2024/mito_vcf/tree_usobtusa_circ.png", width = 1200, height = 2000)
-
-# Plot the tree
-plot.phylo(tree_rooted,
-           type = "phylogram",
-#           type = "fan",
-           cex = 0.8,
-           label.offset = 0.01,
-           no.margin = TRUE,
-           tip.color = tip_colors,
-           main = "Rooted NJ Tree (root = P759)")
-
-# Add legend
-legend("topleft",                   # position
-       legend = unique(tip_color_dt$sample),     # group names
-       col = unique(tip_color_dt$color),        # matching colors
-       pch = 19,                   # solid circle
-       pt.cex = 1.5,               # point size
-       cex = 1,                    # text size
-       bty = "n",                  # no box
-       title = "Sample Group")
-
-dev.off()
-
-
-
-
-
-
-
-
-
-# ---- Step 4: Build neighbor-joining tree ----
-tree <- nj(as.dist(dist_matrix))
-
-# ---- Step 5 (Optional): Relabel tips from metadata CSV ----
-# CSV should have columns: Sample_ID and Label (or Well, Clone, etc.)
-tree_rooted <- root(tree, outgroup = "Gilmer5_E2", resolve.root = TRUE)
-
-label_map <- setNames(metadata_with_clone$clone, metadata_with_clone$Well)
-
-# Apply labels (optional: fallback to Sample_ID if label is missing)
-tree$tip.label <- label_map[tree$tip.label]
-tree$tip.label[is.na(tree$tip.label)] <- names(label_map)[is.na(tree$tip.label)]
-
-group_colors <- setNames(rainbow(length(unique(metadata_with_clone$date))), unique(metadata_with_clone$date))
-
-# Assign color to each tip
-
-tip_colors <- group_colors[metadata_with_clone$date]
-
-tip_color_dt <- data.table(metadata_with_clone$date, metadata_with_clone$Well)
-
-final_valid_samples2 <- as.data.frame(final_valid_samples)
-
-final_valid_samples3 <- left_join(final_valid_samples2, tip_color_dt, by= c("final_valid_samples"="V2"))
-
-tip_colors <- group_colors[final_valid_samples3$V1]
-
-
-tip_color_dt <- data.table(
-  sample = names(tip_colors),
-  color  = as.vector(tip_colors)
-)
-
-
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_genomic.png", res = 300, width = 4000, height = 9000)
-#png("/scratch/rjp5nc/UK2022_2024/mito_vcf/tree_usobtusa_circ.png", width = 1200, height = 2000)
-
-# Plot the tree
-plot.phylo(tree_rooted,
-           type = "phylogram",
-#           type = "fan",
-           cex = 0.8,
-           label.offset = 0.01,
-           no.margin = TRUE,
-           tip.color = tip_colors,
-           main = "Rooted NJ Tree (root = P759)")
-
-# Add legend
-legend("topleft",                   # position
-       legend = unique(tip_color_dt$sample),     # group names
-       col = unique(tip_color_dt$color),        # matching colors
-       pch = 19,                   # solid circle
-       pt.cex = 1.5,               # point size
-       cex = 1,                    # text size
-       bty = "n",                  # no box
-       title = "Sample Group")
-
-dev.off()
-
-
-
-
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_genomic_rooted_by_SRR.png", res = 300, width = 4000, height = 4000)
-#png("/scratch/rjp5nc/UK2022_2024/mito_vcf/tree_usobtusa_circ.png", width = 1200, height = 2000)
-
-# Plot the tree
-plot.phylo(tree_rooted,
-           type = "fan",
-           cex = 0.8,
-           label.offset = 0.01,
-           no.margin = TRUE,
-           tip.color = tip_colors,
-           main = "Rooted NJ Tree")
-
-# Add legend
-legend("topleft",                   # position
-       legend = unique(tip_color_dt$sample),     # group names
-       col = unique(tip_color_dt$color),        # matching colors
-       pch = 19,                   # solid circle
-       pt.cex = 1.5,               # point size
-       cex = 1,                    # text size
-       bty = "n",                  # no box
-       title = "Sample Group")
-
-dev.off()
 
 
 metadata_sub <- metadata %>%
@@ -892,3 +995,18 @@ final_plot <- patchwork::wrap_plots(pond_plots, ncol = 1)
 # Save
 ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap_eachpond_Genomic_freexy.png",
        plot = final_plot, width = 20, height = 6 * length(ponds), dpi = 300, limitsize = FALSE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -217,8 +217,8 @@ samples2 <- read.csv(samples_file) %>%
 
 mitotypes <- read.csv(mitotypes_file) %>%
   mutate(
-    sampleA = trimws(sampleA),
-    Group   = trimws(Group),
+    sampleA = trimws(sample),
+    Group   = trimws(mitotype),
     clone   = paste0(sampleA, "_clone")
   ) %>%
   select(clone, mitotype = Group)

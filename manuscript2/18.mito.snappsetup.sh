@@ -15,7 +15,19 @@ module load bcftools htslib samtools ruby
 # -----------------------
 # CONFIG (EU obtusa all-sites cohort VCF)
 # -----------------------
-IN_ALLSITES="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb/obtusa.mito.ALLSITES.rmMissGT0.3.vcf.gz"
+IN_ALLSITES_all="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb/obtusa.mito.ALLSITES.rmMissGT0.3.vcf.gz"
+
+IN_ALLSITES="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb/obtusa.mito.ALLSITES.onlyobtusa.vcf.gz"
+SAMPLES="/scratch/rjp5nc/rawdata/sra_metadata_out/final_valid_samples_obtusa.txt"
+
+bcftools view \
+  -S "$SAMPLES" \
+  -Oz \
+  -o "$IN_ALLSITES" \
+  "$IN_ALLSITES_all"
+
+bcftools index "$IN_ALLSITES"
+
 
 OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/snapp_from_allsites"
 mkdir -p "$OUTDIR"
@@ -100,19 +112,29 @@ sed 's/$/_clone/' "$SAMPLES" | paste -sd, - >> "$CONSTRAINTS"
 
 awk '{print $1 "_clone", $1}' "$SAMPLES" > "$MAP2COL"
 
+XML_OUT=${OUTDIR}/snapp.mito0.3obtusaonly.xml
+PREFIX_OUT=snapp.mito0.3
 
+echo "CLEAN=$CLEAN"
+echo "MAP2COL=$MAP2COL"
+echo "CONSTRAINTS=$CONSTRAINTS"
+echo "XML_OUT=$XML_OUT"
+echo "PREFIX_OUT=$PREFIX_OUT"
 
+# hard fail if any are empty
+: "${CLEAN:?CLEAN is empty}"
+: "${MAP2COL:?MAP2COL is empty}"
+: "${CONSTRAINTS:?CONSTRAINTS is empty}"
+: "${XML_OUT:?XML_OUT is empty}"
+: "${PREFIX_OUT:?PREFIX_OUT is empty}"
 
-# ----------------------------
-# (4) Run snapp_prep.rb -> SNAPP XML
-# ----------------------------
-XML_OUT="$OUTDIR/snapp.mito.euobtusa.xml"
-PREFIX_OUT="$OUTDIR/snapp.mito.euobtusa"
+# and make sure the input files exist
+ls -lh "$CLEAN" "$MAP2COL" "$CONSTRAINTS"
 
 ruby /scratch/rjp5nc/snapp5/snapp_prep.rb \
-  -v "$CLEAN_VCF" \
-  -t "$MAP_2COL" \
-  -c "$CONSTR" \
+  -v "$CLEAN" \
+  -t "$MAP2COL" \
+  -c "$CONSTRAINTS" \
   -x "$XML_OUT" \
   -o "$PREFIX_OUT" \
   -m 10000 \

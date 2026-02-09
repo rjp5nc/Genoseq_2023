@@ -109,6 +109,7 @@ echo "Samples: $(bcftools query -l "$CLEAN" | wc -l)"
 # ----------------------------
 vcftools --vcf "$CLEAN" --missing-indv --out miss
 head miss.imiss
+tail miss.imiss
 
 # ----------------------------
 # 6) SNAPP prep

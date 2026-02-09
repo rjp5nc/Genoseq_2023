@@ -15,9 +15,24 @@ module load bcftools htslib samtools ruby
 # -----------------------
 # CONFIG (EU obtusa all-sites cohort VCF)
 # -----------------------
-IN_ALLSITES="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb/obtusa.mito.ALLSITES.rmMissGT0.3.vcf.gz"
+IN_ALLSITES_all="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.rmMissGT0.3.vcf.gz"
 
-OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/snapp_from_allsites"
+
+
+
+IN_ALLSITES="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.onlypulex.vcf.gz"
+SAMPLES="/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudpulex_mito_reverse_out_all/locset_n38__beavercreek-birdhut-cafe__etc/representatives_top3_per_mitotype_plus1_per_localLoc_plus1_per_sraLoc.txt"
+
+bcftools view \
+  -S "$SAMPLES" \
+  -Oz \
+  -o "$IN_ALLSITES" \
+  "$IN_ALLSITES_all"
+
+bcftools index "$IN_ALLSITES"
+
+
+OUTDIR="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/snapp_from_allsites"
 mkdir -p "$OUTDIR"
 cd "$OUTDIR"
 
@@ -42,7 +57,7 @@ echo "Samples: $(bcftools query -l "$IN_ALLSITES" | wc -l)"
 # 1) Keep only biallelic SNPs (variant sites only)
 #    NOTE: this drops invariant sites, which is what SNAPP wants.
 # -----------------------
-BI="${OUTDIR}/euobtusa_mito_biallelic.vcf.gz"
+BI="${OUTDIR}/eupulex_mito_biallelic.vcf.gz"
 bcftools view \
   --threads "${SLURM_CPUS_PER_TASK:-1}" \
   -m2 -M2 -v snps \
@@ -54,7 +69,7 @@ bcftools index -f "$BI"
 # 2) Convert haploid GT (0 or 1) to diploid (0/0 or 1/1)
 #    (only touches GT field; keeps the rest)
 # -----------------------
-DIP="${OUTDIR}/euobtusa_mito_biallelic.diploidGT.vcf.gz"
+DIP="${OUTDIR}/eupulex_mito_biallelic.diploidGT.vcf.gz"
 
 zcat "$BI" | awk 'BEGIN{OFS="\t"}
   /^#/ {print; next}
@@ -76,7 +91,7 @@ tabix -f -p vcf "$DIP"
 # -----------------------
 # 3) Remove ALT="*" and keep biallelic SNPs (again, just to be safe)
 # -----------------------
-CLEAN="${OUTDIR}/euobtusa_mito_biallelic.diploidGT.clean.vcf"
+CLEAN="${OUTDIR}/eupulex_mito_biallelic.diploidGT.clean.vcf"
 bcftools view \
   -e 'ALT="*"' \
   -m2 -M2 -v snps \
@@ -89,30 +104,40 @@ echo "Samples: $(bcftools query -l "$CLEAN" | wc -l)"
 # -----------------------
 # 4) SNAPP prep
 # -----------------------
-SAMPLES="${OUTDIR}/samples_mito_EUobtusa_snapp_clean.txt"
+SAMPLES="${OUTDIR}/samples_mito_EUpulex_snapp_clean.txt"
 bcftools query -l "$CLEAN" > "$SAMPLES"
 
 CONSTRAINTS="${OUTDIR}/snapp_constraints.txt"
-MAP2COL="${OUTDIR}/samples_mito_EUobtusa_snapp_clean_2col.txt"
+MAP2COL="${OUTDIR}/samples_mito_EUpulex_snapp_clean_2col.txt"
 
 echo -n "monophyletic NA " > "$CONSTRAINTS"
 sed 's/$/_clone/' "$SAMPLES" | paste -sd, - >> "$CONSTRAINTS"
 
 awk '{print $1 "_clone", $1}' "$SAMPLES" > "$MAP2COL"
 
+XML_OUT=${OUTDIR}/snapp.mito0.3pulexonly.xml
+PREFIX_OUT=snapp.mito0.3
 
+echo "CLEAN=$CLEAN"
+echo "MAP2COL=$MAP2COL"
+echo "CONSTRAINTS=$CONSTRAINTS"
+echo "XML_OUT=$XML_OUT"
+echo "PREFIX_OUT=$PREFIX_OUT"
 
+# hard fail if any are empty
+: "${CLEAN:?CLEAN is empty}"
+: "${MAP2COL:?MAP2COL is empty}"
+: "${CONSTRAINTS:?CONSTRAINTS is empty}"
+: "${XML_OUT:?XML_OUT is empty}"
+: "${PREFIX_OUT:?PREFIX_OUT is empty}"
 
-# ----------------------------
-# (4) Run snapp_prep.rb -> SNAPP XML
-# ----------------------------
-XML_OUT="$OUTDIR/snapp.mito.euobtusa.xml"
-PREFIX_OUT="$OUTDIR/snapp.mito.euobtusa"
+# and make sure the input files exist
+ls -lh "$CLEAN" "$MAP2COL" "$CONSTRAINTS"
 
 ruby /scratch/rjp5nc/snapp5/snapp_prep.rb \
-  -v "$CLEAN_VCF" \
-  -t "$MAP_2COL" \
-  -c "$CONSTR" \
+  -v "$CLEAN" \
+  -t "$MAP2COL" \
+  -c "$CONSTRAINTS" \
   -x "$XML_OUT" \
   -o "$PREFIX_OUT" \
   -m 10000 \

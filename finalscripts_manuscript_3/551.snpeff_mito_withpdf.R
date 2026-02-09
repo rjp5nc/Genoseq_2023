@@ -631,7 +631,7 @@ log_msg("Wrote: ", OUT_ALL_PS_PN_TSV)
 p_all_pspn <- ggplot(df_pspn_all, aes(x = nonsyn, y = syn, color = pond, shape = comparison)) +
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", linewidth = 0.6, color = "grey40") +
   geom_point(size = 2.6, alpha = 0.9, position = position_jitter(width = 0.05, height = 0.05)) +
-  facet_wrap(~ gene, scales = "free") +
+  facet_wrap(~ gene, scales = "free") + xlim(0,50)+ylim(0,50) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(), axis.text.x = element_text(angle = 0), legend.position = "right") +
   labs(
@@ -808,7 +808,7 @@ log_msg("Wrote: ", OUT_PAIRWISE_ALL_PNG)
 # ============================================================
 # Pairwise all-mitotypes, NA groups: save PNG + PDF
 # ============================================================
-NA2 <- c("A", "B", "C", "F")
+NA2 <- c("A", "B", "C")
 
 pairwise_all <- pairwise_all %>%
   mutate(
@@ -900,14 +900,14 @@ VCF_IN   <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff/output
 MITO_TSV <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types.csv"
 
 OUT_DIR  <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff"
-PREFIX   <- "biallelic.ABCF_vs_other"
+PREFIX   <- "biallelic.ABC_vs_other"
 
 dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 # -------------------------
 # Settings
 # -------------------------
-GROUP1 <- c("A","B","C","F")  # merge these into one group
+GROUP1 <- c("A","B","C")  # merge these into one group
 PSEUDO <- 0.5                 # pseudocount for PN/PS
 
 OUT_WITHIN_TSV <- file.path(OUT_DIR, paste0(PREFIX, ".within.PNPS.tsv"))
@@ -945,7 +945,7 @@ mito_df <- mito_df_raw %>%
 
 # Merge mitotypes into two groups
 mito_df <- mito_df %>%
-  mutate(group = ifelse(mitotype %in% GROUP1, "ABCF", "Other"))
+  mutate(group = ifelse(mitotype %in% GROUP1, "ABC", "Other"))
 
 # ============================================================
 # (2) Read VCF + keep BIALLELIC only (post-split or not)
@@ -968,7 +968,7 @@ gt <- gt[, keep_samples, drop = FALSE]
 mito_df <- mito_df %>% filter(sample %in% keep_samples)
 
 # Group sample indices by merged group
-group_levels <- c("ABCF", "Other")
+group_levels <- c("ABC", "Other")
 group_to_samples <- split(mito_df$sample, mito_df$group)
 group_to_samples <- group_to_samples[group_levels]  # keep order if both exist
 
@@ -1061,7 +1061,7 @@ for (j in seq_along(group_levels)) {
 }
 
 # Between-group fixed difference: both groups fixed and different
-fa <- fixed_by_group[, "ABCF"]
+fa <- fixed_by_group[, "ABC"]
 fb <- fixed_by_group[, "Other"]
 between_flags <- !is.na(fa) & !is.na(fb) & (fa != fb)
 
@@ -1098,7 +1098,7 @@ within_counts <- within_anno %>%
 # Between: fixed differences between the two groups (one row per variant)
 between_idx <- which(between_flags)
 between_anno <- var_anno[between_idx, , drop = FALSE] %>%
-  mutate(groupA="ABCF", groupB="Other") %>%
+  mutate(groupA="ABC", groupB="Other") %>%
   filter(!is.na(gene), effect %in% c("syn","nonsyn"))
 
 between_counts <- between_anno %>%
@@ -1112,7 +1112,7 @@ between_counts <- between_anno %>%
     pnps = (nonsyn + PSEUDO) / (syn + PSEUDO),
     log10_pnps = log10(pnps),
     category = "Between (fixed diffs)",
-    group = "ABCF vs Other"
+    group = "ABC vs Other"
   ) %>%
   arrange(gene)
 
@@ -1141,7 +1141,7 @@ p_within <- ggplot(within_counts %>% filter(total > 0),
     x = "Gene",
     y = paste0("PN/PS = (nonsyn+", PSEUDO, ")/(syn+", PSEUDO, ")"),
     color = "Group",
-    title = "Within-group PN/PS by gene (ABCF merged vs Other)",
+    title = "Within-group PN/PS by gene (ABC merged vs Other)",
     subtitle = "Within = polymorphic variants within each group (biallelic only)"
   )
 ggsave(OUT_WITHIN_PLOT, p_within, width = 14, height = 6, dpi = 300)
@@ -1156,7 +1156,7 @@ p_between <- ggplot(between_counts %>% filter(total > 0),
   labs(
     x = "Gene",
     y = paste0("PN/PS = (nonsyn+", PSEUDO, ")/(syn+", PSEUDO, ")"),
-    title = "Between-group PN/PS by gene (ABCF vs Other)",
+    title = "Between-group PN/PS by gene (ABC vs Other)",
     subtitle = "Between = fixed differences between groups (biallelic only)"
   )
 ggsave(OUT_BETWEEN_PLOT, p_between, width = 14, height = 6, dpi = 300)
@@ -1173,7 +1173,7 @@ p_compare <- ggplot(combined_pnps %>% filter(total > 0),
     y = paste0("log10(PN/PS) (pseudocount ", PSEUDO, ")"),
     color = "Category",
     shape = "Group",
-    title = "Within vs Between log10(PN/PS) by gene (ABCF merged vs Other)",
+    title = "Within vs Between log10(PN/PS) by gene (ABC merged vs Other)",
     subtitle = "Within = polymorphic; Between = fixed differences; biallelic only"
   )
 ggsave(OUT_COMPARE_PLOT, p_compare, width = 16, height = 7, dpi = 300)
@@ -1224,7 +1224,7 @@ dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 # -------------------------
 # Settings
 # -------------------------
-GROUP1 <- c("A","B","C","F")  # merged into ABCF
+GROUP1 <- c("A","B","C")  # merged into ABC
 PSEUDO <- 0.5
 
 OUT_PAIR_BETWEEN_TSV <- file.path(OUT_DIR, paste0(PREFIX, ".between_fixed.PNPS.tsv"))
@@ -1254,7 +1254,7 @@ mito_df <- mito_df_raw %>%
             mitotype = as.character(mitotype)) %>%
   filter(!is.na(sample), !is.na(mitotype)) %>%
   distinct() %>%
-  mutate(group = ifelse(mitotype %in% GROUP1, "ABCF", "Other"))
+  mutate(group = ifelse(mitotype %in% GROUP1, "ABC", "Other"))
 
 # ============================================================
 # (2) Read VCF + keep BIALLELIC only
@@ -1335,10 +1335,10 @@ var_anno <- fix2 %>% transmute(variant_index = seq_len(nrow(fix2)), gene, effect
 
 # ============================================================
 # (4A) Pairwise BETWEEN (fixed differences) between merged groups
-# Here it's just ONE comparison: ABCF vs Other, but we still plot per gene.
+# Here it's just ONE comparison: ABC vs Other, but we still plot per gene.
 # ============================================================
 # fixed allele per merged group
-group_levels <- c("ABCF","Other")
+group_levels <- c("ABC","Other")
 group_to_samples <- split(mito_df$sample, mito_df$group)[group_levels]
 
 fixed_by_group <- matrix(NA_integer_, nrow=nrow(allele_mat), ncol=2, dimnames=list(NULL, group_levels))
@@ -1350,12 +1350,12 @@ for (j in seq_along(group_levels)) {
   fixed_by_group[, j] <- vapply(aset, function(a) if (length(a)==1) a[1] else NA_integer_, integer(1))
 }
 
-fa <- fixed_by_group[, "ABCF"]
+fa <- fixed_by_group[, "ABC"]
 fb <- fixed_by_group[, "Other"]
 between_idx <- which(!is.na(fa) & !is.na(fb) & (fa != fb))
 
 pair_between <- var_anno[between_idx, , drop = FALSE] %>%
-  mutate(pair = "ABCF vs Other") %>%
+  mutate(pair = "ABC vs Other") %>%
   count(pair, gene, effect, name="n") %>%
   complete(pair, gene, effect, fill=list(n=0L)) %>%
   pivot_wider(names_from = effect, values_from = n, values_fill = 0L) %>%
@@ -1381,7 +1381,7 @@ p_between <- ggplot(pair_between, aes(x = pN, y = pS)) +
   labs(
     x = "pN (count of nonsyn fixed differences)",
     y = "pS (count of syn fixed differences)",
-    title = "Between merged groups (ABCF vs Other): pN vs pS by gene (biallelic)",
+    title = "Between merged groups (ABC vs Other): pN vs pS by gene (biallelic)",
     subtitle = "Each facet is a gene; one point per pair (only one pair here)"
   )
 
@@ -1389,7 +1389,7 @@ ggsave(OUT_PAIR_BETWEEN_PNG, p_between, width = 14, height = 10, dpi = 300)
 
 # ============================================================
 # (4B) Pairwise WITHIN (polymorphism) across pairs of ORIGINAL mitotypes,
-# then re-labeled by merged-group pair: ABCF vs ABCF, Other vs Other, ABCF vs Other.
+# then re-labeled by merged-group pair: ABC vs ABC, Other vs Other, ABC vs Other.
 # For each original pair, count variants where BOTH mitotypes are fixed but DIFFER (a divergence-like within pair),
 # OR (optional) count variants polymorphic within either mitotype (more "within" style).
 #
@@ -1404,7 +1404,7 @@ pair_df <- tibble(mitoA = pair_mat[,1], mitoB = pair_mat[,2]) %>%
   rename(groupB = group) %>%
   mutate(
     merged_pair = ifelse(groupA == groupB, paste0(groupA, " vs ", groupB),
-                         "ABCF vs Other")
+                         "ABC vs Other")
   )
 
 # fixed allele per ORIGINAL mitotype
@@ -1469,7 +1469,7 @@ p_within_pairs <- ggplot(pair_within, aes(x = pN, y = pS, color = merged_pair)) 
     color = "Merged pair label",
     size = "N (pN+pS)",
     title = "Pairwise comparisons among original mitotypes: pN vs pS by gene (biallelic)",
-    subtitle = "Each point = one mitotype pair; points colored by merged group-pair (ABCF vs Other, ABCF vs ABCF, Other vs Other)"
+    subtitle = "Each point = one mitotype pair; points colored by merged group-pair (ABC vs Other, ABC vs ABC, Other vs Other)"
   )
 
 ggsave(OUT_PAIR_WITHIN_PNG, p_within_pairs, width = 16, height = 10, dpi = 300)
@@ -1484,7 +1484,7 @@ message("Wrote:\n",
 
 
 pair_between <- var_anno[between_idx, , drop = FALSE] %>%
-  mutate(pair = "ABCF vs Other") %>%
+  mutate(pair = "ABC vs Other") %>%
   count(pair, gene, effect, name = "n") %>%
   complete(pair, gene, effect, fill = list(n = 0L)) %>%
   pivot_wider(names_from = effect, values_from = n, values_fill = 0L) %>%
@@ -1518,7 +1518,7 @@ p_between <- ggplot(pair_between, aes(x = pN_pct, y = pS_pct, color = gene)) +
     x = "pN (%) – nonsynonymous fixed differences",
     y = "pS (%) – synonymous fixed differences",
     color = "Gene",
-    title = "Between merged groups (ABCF vs Other): pN% vs pS% by gene (biallelic)",
+    title = "Between merged groups (ABC vs Other): pN% vs pS% by gene (biallelic)",
     subtitle = "Percentages within each gene; pN% + pS% = 100"
   )
 
@@ -1561,13 +1561,13 @@ MITO_TSV <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types.cs
 OUT_DIR  <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff"
 PREFIX   <- "biallelic.snp_lists"
 
-GROUP1 <- c("A","B","C","F")   # merged group ABCF
+GROUP1 <- c("A","B","C")   # merged group ABC
 
 dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 OUT_WITHIN_MITO_CSV   <- file.path(OUT_DIR, paste0(PREFIX, ".within_mitotypes.polymorphic.csv"))
 OUT_PAIR_FIXED_CSV    <- file.path(OUT_DIR, paste0(PREFIX, ".between_mitotypes.fixed_differences.csv"))
-OUT_GROUP_FIXED_CSV   <- file.path(OUT_DIR, paste0(PREFIX, ".between_groups.ABCF_vs_Other.fixed_differences.csv"))
+OUT_GROUP_FIXED_CSV   <- file.path(OUT_DIR, paste0(PREFIX, ".between_groups.ABC_vs_Other.fixed_differences.csv"))
 
 # ============================================================
 # (1) Load mitotype map (force first 2 cols if needed)
@@ -1589,7 +1589,7 @@ mito_df <- mito_df_raw %>%
             mitotype = as.character(mitotype)) %>%
   filter(!is.na(sample), !is.na(mitotype)) %>%
   distinct() %>%
-  mutate(group = ifelse(mitotype %in% GROUP1, "ABCF", "Other"))
+  mutate(group = ifelse(mitotype %in% GROUP1, "ABC", "Other"))
 
 # ============================================================
 # (2) Read VCF, subset to biallelic, subset samples
@@ -1741,21 +1741,21 @@ pair_fixed_snps <- bind_rows(pair_rows)
 write_csv(pair_fixed_snps, OUT_PAIR_FIXED_CSV)
 
 # ============================================================
-# (9) (C) SNPs FIXED DIFFERENCES between merged groups: ABCF vs Other
+# (9) (C) SNPs FIXED DIFFERENCES between merged groups: ABC vs Other
 # ============================================================
-group_levels <- c("ABCF","Other")
+group_levels <- c("ABC","Other")
 group_to_samples <- split(mito_df$sample, mito_df$group)[group_levels]
 
-fa_g <- fixed_allele(allele_mat, group_to_samples[["ABCF"]])
+fa_g <- fixed_allele(allele_mat, group_to_samples[["ABC"]])
 fb_g <- fixed_allele(allele_mat, group_to_samples[["Other"]])
 
 idx_g <- which(!is.na(fa_g) & !is.na(fb_g) & fa_g != fb_g)
 
 group_fixed_snps <- var_tbl[idx_g, ] %>%
   mutate(
-    groupA = "ABCF",
+    groupA = "ABC",
     groupB = "Other",
-    comparison = "ABCF vs Other",
+    comparison = "ABC vs Other",
     alleleA = fa_g[idx_g],
     alleleB = fb_g[idx_g]
   ) %>%
@@ -1795,11 +1795,11 @@ OUT_MERGED_CSV <- file.path(OUT_DIR, paste0(PREFIX, ".ALL_SNP_LISTS.merged.csv")
 OUT_POS_PNG    <- file.path(OUT_DIR, paste0(PREFIX, ".ALL_SNP_LISTS.position.png"))
 OUT_POS_PDF    <- sub("\\.png$", ".pdf", OUT_POS_PNG)
 
-GROUP1 <- c("A","B","C","F") # ABCF
+GROUP1 <- c("A","B","C") # ABC
 # If you already have mito_df$group from earlier, this will just re-derive consistently:
 if (!("group" %in% names(mito_df))) {
   mito_df <- mito_df %>%
-    mutate(group = if_else(mitotype %in% GROUP1, "ABCF", "Other"))
+    mutate(group = if_else(mitotype %in% GROUP1, "ABC", "Other"))
 }
 
 # ----------------------------
@@ -1894,19 +1894,19 @@ df_between_pairs <- bind_rows(pair_hits) %>%
   left_join(var_meta, by = "variant_index")
 
 # ----------------------------
-# (3) Fixed SNPs between ABCF vs Other (merged groups)
+# (3) Fixed SNPs between ABC vs Other (merged groups)
 # ----------------------------
-group_levels <- c("ABCF","Other")
+group_levels <- c("ABC","Other")
 group_to_samples <- split(mito_df$sample, mito_df$group)[group_levels]
 
-fa_g <- fixed_allele_vec(allele_mat, group_to_samples[["ABCF"]])
+fa_g <- fixed_allele_vec(allele_mat, group_to_samples[["ABC"]])
 fb_g <- fixed_allele_vec(allele_mat, group_to_samples[["Other"]])
 idx_g <- which(!is.na(fa_g) & !is.na(fb_g) & fa_g != fb_g)
 
 df_between_groups <- tibble(
   variant_index = idx_g,
   class = "between_groups_fixed",
-  comparison = "ABCF vs Other"
+  comparison = "ABC vs Other"
 ) %>%
   left_join(var_meta, by = "variant_index")
 
@@ -1947,7 +1947,7 @@ p_pos <- ggplot(all_snps, aes(x = POS, y = class, color = effect)) +
     y = "SNP class",
     color = "Effect",
     title = "Synonymous vs nonsynonymous SNPs by position",
-    subtitle = "Merged table: within-mitotype polymorphism, pairwise fixed differences, and ABCF vs Other fixed differences (biallelic)"
+    subtitle = "Merged table: within-mitotype polymorphism, pairwise fixed differences, and ABC vs Other fixed differences (biallelic)"
   )
 
 ggsave(OUT_POS_PNG, p_pos, width = 20, height = 15, dpi = 300)
@@ -1972,7 +1972,7 @@ freq_two_vars_dplyrnonsyn <- subset(freq_two_vars_dplyr, effect == "Nonsynonymou
 
 merged122 <- left_join(freq_one_var_dplyr, freq_two_vars_dplyrnonsyn, by = "gene")
 
-merged122$n.y[is.na(merged122$n.y)] <- 0.1
+merged122$n.y[is.na(merged122$n.y)] <- 0
 
 merged122$nonsynovertotal <- merged122$n.y/merged122$n.x
 merged122$synovertotal <- 1-(merged122$n.y/merged122$n.x)
@@ -1987,3 +1987,211 @@ p_pos_nonvssyn <- ggplot(merged122, aes(x = nonsynovertotal, y = synovertotal, c
   ) + xlim(0,1)+ylim(0,1)
 
 ggsave("/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff/nonsynoversyn.png", p_pos_nonvssyn, width = 9, height = 5, dpi = 300)
+
+
+merged122$pNpS <- merged122$n.y / (merged122$n.x - merged122$n.y)
+merged122$pN <- merged122$n.y 
+merged122$pS <- (merged122$n.x - merged122$n.y)
+
+merged122clean <- merged122
+
+merged122clean$gene <- sub("^cds_transcript_", "", merged122clean$gene)
+
+
+p_pos_nonvssyn2 <- ggplot(merged122clean, aes(x = gene, y = pNpS)) +
+  geom_point() +
+  geom_text(
+    aes(label = paste0("N=", pN, "  S=", pS)),
+    vjust = -0.6,
+    size = 3,
+    show.legend = FALSE
+  ) +
+  scale_x_discrete(expand = expansion(mult = c(0.05, 0.05))) +
+  theme_bw() + ylim(0,1)+
+  labs(
+    x = "Gene",
+    y = "pNpS"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff/ABCvOtherpNpS.png",
+  p_pos_nonvssyn2,
+  width = 11,
+  height = 4,
+  dpi = 300
+)
+
+
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff/ABCvOtherpNpS.pdf",
+  p_pos_nonvssyn2,
+  width = 11,
+  height = 4,
+  dpi = 300
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+between_mitotypes_fixed <- (subset(all_snps, class == "between_mitotypes_fixed"))
+
+
+freq_one_var_dplyr_mito <- between_mitotypes_fixed %>%
+  count(gene, comparison)
+print(freq_one_var_dplyr_mito)
+
+# Frequency by two variables
+freq_two_vars_dplyr_mito <- between_mitotypes_fixed %>%
+  count(gene, effect, comparison)
+print(freq_two_vars_dplyr_mito)
+
+freq_two_vars_dplyr_mitononsyn <- subset(freq_two_vars_dplyr_mito, effect == "Nonsynonymous")
+freq_two_vars_dplyr_mitosyn <- subset(freq_two_vars_dplyr_mito, effect == "Synonymous")
+
+colnames(freq_two_vars_dplyr_mitononsyn) <- c("gene", "effect", "comparison", "numbernonsyn")
+colnames(freq_two_vars_dplyr_mitosyn) <- c("gene", "effect", "comparison", "numbersyn")
+colnames(freq_one_var_dplyr_mito) <- c("gene", "comparison", "total")
+
+
+merged3 <- left_join(freq_one_var_dplyr_mito, freq_two_vars_dplyr_mitononsyn, by = c("gene", "comparison"))
+merged4 <- left_join(merged3, freq_two_vars_dplyr_mitosyn, by = c("gene", "comparison"))
+
+merged4$numbernonsyn[is.na(merged4$numbernonsyn)] <- 0
+merged4$numbersyn[is.na(merged4$numbersyn)] <- 0.5
+
+merged4$pNpS <- merged4$numbernonsyn/ merged4$numbersyn
+
+
+merged4$gene <- sub("^cds_transcript_", "", merged4$gene)
+
+
+p_pos_nonvssyn3 <- ggplot(merged4, aes(x = gene, y = pNpS)) +
+  geom_point() + facet_wrap(~comparison)+
+  geom_text(
+    aes(label = paste0("N=", numbernonsyn, "  S=", numbersyn)),
+    vjust = -0.6,
+    size = 3,
+    show.legend = FALSE
+  ) +
+  scale_x_discrete(expand = expansion(mult = c(0.05, 0.05))) +
+  theme_bw() + ylim(0,5)+
+  labs(
+    x = "Gene",
+    y = "pNpS"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff/ABCvOtherpNpS_comps.png",
+  p_pos_nonvssyn3,
+  width = 11,
+  height = 11,
+  dpi = 300
+)
+
+
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff/ABCvOtherpNpS.pdf",
+  p_pos_nonvssyn2,
+  width = 11,
+  height = 4,
+  dpi = 300
+)
+
+
+
+
+
+
+
+
+between_mitotypes_fixed <- (subset(all_snps, class == "between_mitotypes_fixed"))
+
+
+freq_one_var_dplyr_mito <- between_mitotypes_fixed %>%
+  count(comparison)
+print(freq_one_var_dplyr_mito)
+
+# Frequency by two variables
+freq_two_vars_dplyr_mito <- between_mitotypes_fixed %>%
+  count(effect, comparison)
+print(freq_two_vars_dplyr_mito)
+
+freq_two_vars_dplyr_mitononsyn <- subset(freq_two_vars_dplyr_mito, effect == "Nonsynonymous")
+freq_two_vars_dplyr_mitosyn <- subset(freq_two_vars_dplyr_mito, effect == "Synonymous")
+
+colnames(freq_two_vars_dplyr_mitononsyn) <- c("effect", "comparison", "numbernonsyn")
+colnames(freq_two_vars_dplyr_mitosyn) <- c("effect", "comparison", "numbersyn")
+colnames(freq_one_var_dplyr_mito) <- c("comparison", "total")
+
+
+merged3 <- left_join(freq_one_var_dplyr_mito, freq_two_vars_dplyr_mitononsyn, by = c("comparison"))
+merged4 <- left_join(merged3, freq_two_vars_dplyr_mitosyn, by = c("comparison"))
+
+merged4$numbernonsyn[is.na(merged4$numbernonsyn)] <- 0
+merged4$numbersyn[is.na(merged4$numbersyn)] <- 0.5
+
+merged4$pNpS <- merged4$numbernonsyn/ merged4$numbersyn
+
+
+merged4$gene <- sub("^cds_transcript_", "", merged4$gene)
+
+
+p_pos_nonvssyn4 <- ggplot(merged4, aes(x = comparison, y = pNpS)) +
+  geom_point()+
+  geom_text(
+    aes(label = paste0("N=", numbernonsyn, "  S=", numbersyn)),
+    vjust = -0.6,
+    size = 3,
+    show.legend = FALSE
+  ) +
+  scale_x_discrete(expand = expansion(mult = c(0.05, 0.05))) +
+  theme_bw() + ylim(0,5)+
+  labs(
+    x = "Gene",
+    y = "pNpS"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff/ABCvOtherpNpS_comps_nogene.png",
+  p_pos_nonvssyn4,
+  width = 11,
+  height = 11,
+  dpi = 300
+)
+
+
+
+ggsave(
+  "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/snpeff/ABCvOtherpNpS_comps_nogene",
+  p_pos_nonvssyn4,
+  width = 11,
+  height = 4,
+  dpi = 300
+)

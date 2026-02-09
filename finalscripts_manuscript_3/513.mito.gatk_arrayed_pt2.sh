@@ -16,6 +16,8 @@ module load gatk bcftools htslib samtools
 OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf"
 REF="/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_mito.fasta"
 
+
+
 mkdir -p "$OUTDIR/tmp"
 
 cd $OUTDIR
@@ -30,8 +32,10 @@ echo "gVCFs: $(wc -l < "$OUTDIR/gvcfs.list")"
 
 COMBINED="$OUTDIR/usdobtusa_mito_combined_from_bams.g.vcf.gz"
 JOINT="$OUTDIR/usdobtusa_mito_joint.vcf.gz"
+FULL="$OUTDIR/usdobtusa_mito_joint_Full.vcf.gz"
 BI="$OUTDIR/usdobtusa_mito_biallelic.vcf.gz"
 CLEAN="$OUTDIR/usdobtusa.mito.biallelic.clean.vcf"
+BIFULL="$OUTDIR/usdobtusa_mito_biallelic_FULL.vcf.gz"
 
 # CombineGVCFs (fine for mito-sized data)
 gatk --java-options "-Xmx24g -Djava.io.tmpdir=$OUTDIR/tmp" CombineGVCFs \
@@ -45,11 +49,28 @@ gatk --java-options "-Xmx24g -Djava.io.tmpdir=$OUTDIR/tmp" GenotypeGVCFs \
   -V "$COMBINED" \
   -O "$JOINT"
 
+# Joint genotype
+gatk --java-options "-Xmx24g -Djava.io.tmpdir=$OUTDIR/tmp" GenotypeGVCFs \
+  -R "$REF" \
+  -V "$COMBINED" \
+  --include-non-variant-sites \
+  -O "$FULL"
+
+
+
+
+
 # Biallelic SNPs
 bcftools view --threads "$SLURM_CPUS_PER_TASK" -m2 -M2 -v snps -Oz -o "$BI" "$JOINT"
 bcftools index -f "$BI"
 
+bcftools view --threads "$SLURM_CPUS_PER_TASK" \
+  -m1 -M2 \
+  -Oz -o "$BIFULL" "$FULL"
 
+bcftools index -f "$BIFULL"
+
+zcat $BIFULL | wc -l
 
 IN="$OUTDIR/usdobtusa_mito_biallelic.vcf.gz"
 OUT="$OUTDIR/usdobtusa_mito_biallelic.diploidGT.vcf.gz"

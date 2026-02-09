@@ -1,4 +1,4 @@
-#ijob -A berglandlab -c2 -p standard --mem=40G
+#ijob -A berglandlab -c10 -p standard --mem=40G
 #module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1
 #R
 

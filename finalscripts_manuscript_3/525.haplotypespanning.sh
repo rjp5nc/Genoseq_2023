@@ -1,6 +1,6 @@
 #ijob -A berglandlab -c10 -p standard --mem=40G
 
-module load bcftools samtools mafft
+module load bcftools samtools gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1 mafft/7.505
 
 REF="/scratch/rjp5nc/Reference_genomes/mito_reference/usdobtusa_mito.fasta"
 BAMDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/final_mitobam_rg3"

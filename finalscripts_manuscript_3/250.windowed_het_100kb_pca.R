@@ -725,3 +725,365 @@ dev.off()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+})
+
+# --------------------------
+# 1) Clean metadata and join
+# --------------------------
+metadata_with_clone <- read.csv(
+  "/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/metadata_with_clone.csv",
+  header = TRUE, stringsAsFactors = FALSE
+) %>%
+  filter(!(clone %in% c("Blank","BLANK")))
+
+# Optional: sanity-check overlap
+# sum(het_merged$sample %in% metadata_with_clone$Well)
+
+# --------------------------
+# 2) Per-sample genome-wide heterozygosity
+#    (mean across windows; tweak filters if needed)
+# --------------------------
+# Example quality filters (uncomment/tweak if you want):
+# het_merged <- het_merged %>%
+#   filter(missingRate <= 0.2, meanDepth >= 5)
+
+het_per_sample <- het_merged %>%
+  group_by(sample) %>%
+  summarise(
+    mean_het   = mean(het_prop, na.rm = TRUE),
+    median_het = median(het_prop, na.rm = TRUE),
+    n_windows  = sum(!is.na(het_prop)),
+    mean_depth = mean(meanDepth, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# --------------------------
+# 3) Merge with metadata
+# --------------------------
+merged <- het_per_sample %>%
+  left_join(
+    metadata_with_clone %>%
+      select(Well, date, location, accuratelocation, Plate, clone, sex),
+    by = c("sample" = "Well")
+  ) %>%
+  mutate(
+    pool = ifelse(!is.na(accuratelocation) & nzchar(accuratelocation),
+                  accuratelocation, location),
+    timepoint = as.character(date)  # if 'date' is a year; otherwise adapt parse
+  )
+
+# Optional: flag samples that failed to merge
+# merged %>% filter(is.na(pool)) %>% distinct(sample)
+
+# --------------------------
+# 4) Average per pool per timepoint
+# --------------------------
+pool_time_summary <- pool_time_summary %>%
+  mutate(
+    # Try to parse flexible date formats
+    parsed_time = suppressWarnings(mdy(timepoint)),           # handles "5/4/2024"
+    parsed_time = if_else(is.na(parsed_time),
+                          suppressWarnings(ymd(timepoint)),   # handles "2024-05-04"
+                          parsed_time),
+    parsed_time = if_else(is.na(parsed_time) & grepl("^\\d{4}$", timepoint),
+                          ymd(paste0(timepoint, "-06-30")),   # assume midyear for year-only
+                          parsed_time)
+  ) %>%
+  arrange(pool, parsed_time)
+
+
+pool_time_summary <- subset(pool_time_summary, timepoint != "2023" & timepoint != "2024" & pool != "Joanna_coll")
+
+# --- 2) Plot using parsed_time on x-axis ---
+p <- ggplot(pool_time_summary,
+            aes(x = parsed_time, y = mean_het, group = pool, color = pool)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = mean_het - se_het, ymax = mean_het + se_het),
+                width = 20) +   # width in days
+  scale_x_date(date_labels = "%b %Y", date_breaks = "3 months") +
+  labs(
+    x = "Sampling date",
+    y = "Mean heterozygosity (per-sample mean)",
+    color = "Pool",
+    title = "Average heterozygosity per pool over time"
+  ) +
+  theme_bw(base_size = 11) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid.minor = element_blank()
+  )
+
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/het_by_pool_timepoint_sorted.png",
+       plot = p, width = 12, height = 8, dpi = 300)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(lubridate)
+  library(ggplot2)
+    library(dplyr)
+
+})
+
+# --- Per-sample stats (carry Group & QC fields so we can pick representatives)
+het_per_sample <- het_merged %>%
+  group_by(sample) %>%
+  summarise(
+    mean_het     = mean(het_prop, na.rm = TRUE),
+    median_het   = median(het_prop, na.rm = TRUE),
+    n_windows    = sum(!is.na(het_prop)),
+    mean_depth   = mean(meanDepth, na.rm = TRUE),
+    mean_missing = mean(missingRate, na.rm = TRUE),
+    Group        = suppressWarnings(first(na.omit(Group))),  # one Group per sample
+    .groups = "drop"
+  )
+
+# --- Merge metadata and build pool + parsed timepoint
+md <- metadata_with_clone %>%
+  filter(!(clone %in% c("Blank","BLANK"))) %>%
+  mutate(pool_raw = ifelse(!is.na(accuratelocation) & nzchar(accuratelocation),
+                           accuratelocation, location))
+
+parse_to_date <- function(x) {
+  d <- suppressWarnings(mdy(x))
+  d <- ifelse(is.na(d), suppressWarnings(ymd(x)), d)
+  d <- as.Date(d, origin = "1970-01-01")
+  # year-only -> mid-year
+  only_year <- grepl("^\\d{4}$", x)
+  d[is.na(d) & only_year] <- ymd(paste0(x[is.na(d) & only_year], "-06-30"))
+  as.Date(d)
+}
+
+merged <- het_per_sample %>%
+  left_join(md, by = c("sample" = "Well")) %>%
+  mutate(
+    pool        = trimws(pool_raw),
+    timepoint   = as.character(date),
+    parsed_time = parse_to_date(timepoint)
+  )
+merged_slim <- merged %>%
+  as_tibble() %>%
+  transmute(
+    pool         = as.character(pool),
+    parsed_time  = as.Date(as.character(parsed_time)),
+    Group        = as.character(Group),
+    sample       = as.character(sample),
+    n_windows    = as.numeric(n_windows),
+    mean_depth   = as.numeric(mean_depth),
+    mean_missing = as.numeric(mean_missing),
+    mean_het     = as.numeric(mean_het),
+    timepoint    = as.character(timepoint)
+  ) %>%
+  filter(!is.na(pool), !is.na(parsed_time), !is.na(Group))
+
+# Pick ONE per (pool, parsed_time, Group)
+# Tiebreakers: n_windows ↓, mean_depth ↓, mean_missing ↑, sample ↑
+rep_one_per_group <- merged_slim %>%
+  arrange(
+    pool, parsed_time, Group,
+    desc(n_windows), desc(mean_depth), mean_missing, sample
+  ) %>%
+  distinct(pool, parsed_time, Group, .keep_all = TRUE)
+
+# (Optional) drop specific pools/timepoints
+rep_one_per_group <- rep_one_per_group %>%
+  filter(timepoint != "2023", timepoint != "2024", pool != "Joanna_coll")
+
+# Aggregate PER POOL × TIME using the representatives only
+pool_time_summary <- rep_one_per_group %>%
+  group_by(pool, parsed_time) %>%
+  summarise(
+    n_groups   = n(),
+    mean_het   = mean(mean_het, na.rm = TRUE),
+    sd_het     = ifelse(n_groups > 1, sd(mean_het, na.rm = TRUE), 0),
+    se_het     = ifelse(n_groups > 1, sd_het / sqrt(n_groups), NA_real_),
+    median_het = median(mean_het, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(pool, parsed_time)
+
+
+# --- Plot
+p <- ggplot(pool_time_summary,
+            aes(x = parsed_time, y = mean_het, group = pool, color = pool)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = mean_het - se_het, ymax = mean_het + se_het), width = 20) +
+  scale_x_date(date_labels = "%b %Y", date_breaks = "3 months") +
+  labs(
+    x = "Sampling date",
+    y = "Mean heterozygosity (1 per Group per pool/timepoint)",
+    color = "Pool",
+    title = "Average heterozygosity per pool over time (group-representative samples)"
+  ) +
+  theme_bw(base_size = 11) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.minor = element_blank())
+
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/het_by_pool_timepoint_grouprep.png",
+       plot = p, width = 12, height = 8, dpi = 300)
+
+
+
+
+
+
+
+
+
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(lubridate)
+  library(ggplot2)
+    library(dplyr)
+
+})
+
+# --- Per-sample stats (carry Group & QC fields so we can pick representatives)
+
+het_merged2 <- subset(het_merged, meanDepth >= 6)
+
+
+het_per_sample <- het_merged2 %>%
+  group_by(sample) %>%
+  summarise(
+    mean_het     = mean(het_prop, na.rm = TRUE),
+    median_het   = median(het_prop, na.rm = TRUE),
+    n_windows    = sum(!is.na(het_prop)),
+    mean_depth   = mean(meanDepth, na.rm = TRUE),
+    mean_missing = mean(missingRate, na.rm = TRUE),
+    Group        = suppressWarnings(first(na.omit(Group))),  # one Group per sample
+    .groups = "drop"
+  )
+
+# --- Merge metadata and build pool + parsed timepoint
+md <- metadata_with_clone %>%
+  filter(!(clone %in% c("Blank","BLANK"))) %>%
+  mutate(pool_raw = ifelse(!is.na(accuratelocation) & nzchar(accuratelocation),
+                           accuratelocation, location))
+
+parse_to_date <- function(x) {
+  d <- suppressWarnings(mdy(x))
+  d <- ifelse(is.na(d), suppressWarnings(ymd(x)), d)
+  d <- as.Date(d, origin = "1970-01-01")
+  # year-only -> mid-year
+  only_year <- grepl("^\\d{4}$", x)
+  d[is.na(d) & only_year] <- ymd(paste0(x[is.na(d) & only_year], "-06-30"))
+  as.Date(d)
+}
+
+merged <- het_per_sample %>%
+  left_join(md, by = c("sample" = "Well")) %>%
+  mutate(
+    pool        = trimws(pool_raw),
+    timepoint   = as.character(date),
+    parsed_time = parse_to_date(timepoint)
+  )
+merged_slim <- merged %>%
+  as_tibble() %>%
+  transmute(
+    pool         = as.character(pool),
+    parsed_time  = as.Date(as.character(parsed_time)),
+    Group        = as.character(Group),
+    sample       = as.character(sample),
+    n_windows    = as.numeric(n_windows),
+    mean_depth   = as.numeric(mean_depth),
+    mean_missing = as.numeric(mean_missing),
+    mean_het     = as.numeric(mean_het),
+    timepoint    = as.character(timepoint)
+  ) %>%
+  filter(!is.na(pool), !is.na(parsed_time), !is.na(Group))
+
+# Pick ONE per (pool, parsed_time, Group)
+# Tiebreakers: n_windows ↓, mean_depth ↓, mean_missing ↑, sample ↑
+rep_one_per_group <- merged_slim %>%
+  arrange(
+    pool, parsed_time, Group,
+    desc(n_windows), desc(mean_depth), mean_missing, sample
+  ) %>%
+  distinct(pool, parsed_time, Group, .keep_all = TRUE)
+
+# (Optional) drop specific pools/timepoints
+rep_one_per_group <- rep_one_per_group %>%
+  filter(timepoint != "2023", timepoint != "2024", pool != "Joanna_coll")
+
+# Aggregate PER POOL × TIME using the representatives only
+pool_time_summary <- rep_one_per_group %>%
+  group_by(pool, parsed_time) %>%
+  summarise(
+    n_groups   = n(),
+    mean_het   = mean(mean_het, na.rm = TRUE),
+    sd_het     = ifelse(n_groups > 1, sd(mean_het, na.rm = TRUE), 0),
+    se_het     = ifelse(n_groups > 1, sd_het / sqrt(n_groups), NA_real_),
+    median_het = median(mean_het, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(pool, parsed_time)
+
+
+# --- Plot
+p <- ggplot(pool_time_summary,
+            aes(x = parsed_time, y = mean_het, group = pool, color = pool)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = mean_het - se_het, ymax = mean_het + se_het), width = 20) +
+  scale_x_date(date_labels = "%b %Y", date_breaks = "3 months") +
+  labs(
+    x = "Sampling date",
+    y = "Mean heterozygosity (1 per Group per pool/timepoint)",
+    color = "Pool",
+    title = "Average heterozygosity per pool over time (group-representative samples)"
+  ) +
+  theme_bw(base_size = 11) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.minor = element_blank())
+
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/het_by_pool_timepoint_grouprep_6andup.png",
+       plot = p, width = 12, height = 8, dpi = 300)

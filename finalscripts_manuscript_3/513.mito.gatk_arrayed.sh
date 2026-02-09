@@ -12,7 +12,7 @@
 #SBATCH --array=1-426%100   # Adjust based on the number of samples
 
 
-
+#cat /scratch/rjp5nc/erroroutputs/beast.6896936_4294967294.out
 
 
 module load gatk samtools

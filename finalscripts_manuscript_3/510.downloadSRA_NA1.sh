@@ -5,30 +5,30 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-48:00  ### 48 hours
 #SBATCH --mem 20G
-#SBATCH -o /scratch/rjp5nc/downloadsra.out # Standard output
-#SBATCH -e /scratch/rjp5nc/downloadsra.err # Standard error
+#SBATCH -o /scratch/rjp5nc/err/downloadsra.out # Standard output
+#SBATCH -e /scratch/rjp5nc/err/downloadsra.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-SRA_ACCESSION="SRR10160568"
+module load gcc/11.4.0 sratoolkit/3.1.1
+
+SRA="SRR10160568"
 OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/fasta"
-
 mkdir -p "$OUTDIR"
-cd "$OUTDIR" || exit 1
+cd "$OUTDIR"
 
-echo "Downloading $SRA_ACCESSION..."
-prefetch --max-size 200G "$SRA_ACCESSION"
+echo "Tools:"
+which prefetch
+which fasterq-dump
 
-echo "Converting to FASTQ..."
-fasterq-dump "$SRA_ACCESSION" \
-  --split-files \
-  --threads 10 \
-  --outdir "$OUTDIR" \
-  --progress
+echo "Downloading $SRA..."
+prefetch --max-size 200G "$SRA"
 
-echo "Compressing FASTQ files..."
-gzip "${SRA_ACCESSION}"_*.fastq
+echo "Converting..."
+fasterq-dump "$SRA" --split-files --threads 10 --outdir "$OUTDIR" --progress
 
-echo "$SRA_ACCESSION completed."
+echo "Compressing..."
+gzip -f "${SRA}"_*.fastq
 
+echo "Done."
 

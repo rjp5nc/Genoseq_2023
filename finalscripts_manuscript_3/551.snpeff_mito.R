@@ -439,7 +439,7 @@ p <- ggplot(plot_df, aes(x = prop_nonsyn, y = prop_syn, color = mitotype)) +
   geom_point(size = 2, alpha = 0.9) +
   coord_equal(xlim = c(0,1), ylim = c(0,1)) +
   facet_wrap(~ gene) +
-  theme_bw() +
+  theme_bw() + xlim(0,1) + ylim(0,1)+
   theme(panel.grid.minor = element_blank()) +
   labs(
     x = "Proportion nonsynonymous (within mitotype)",
@@ -449,3 +449,5 @@ p <- ggplot(plot_df, aes(x = prop_nonsyn, y = prop_syn, color = mitotype)) +
   )
 
 ggsave(OUT_PNG, p, width = 14, height = 10, dpi = 300)
+
+

@@ -25,7 +25,7 @@ writeLines(keep_samples, list_file)
 cat("Saved sample list:", list_file, "\n")
 
 # ---- 2) VCF -> SNP GDS ----
-# gds_out <- paste0(out_prefix, ".gds")
+gds_out <- paste0(out_prefix, ".gds")
 # if (file.exists(gds_out)) file.remove(gds_out)
 
 # snpgdsVCF2GDS(vcf_in, gds_out, method = "biallelic.only", snpfirstdim = TRUE)
@@ -66,6 +66,7 @@ pca <- snpgdsPCA(
 )
 snpgdsClose(g)
 
+
 # ---- 5) save outputs ----
 pc_df <- tibble(
   sample = pca$sample.id,
@@ -77,9 +78,28 @@ pc_df <- tibble(
 out_csv <- paste0(out_prefix, "_PCA_scores.csv")
 write.csv(pc_df, out_csv, row.names = FALSE)
 
+
+depths <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/sampleStats_US_obtusa.csv")
+
+# Find a mean-depth column robustly and standardize names
+depth_col <- intersect(names(depths),
+                       c("meanDepth","mean_depth","MeanDepth","MEAN_DEPTH"))
+stopifnot(length(depth_col) >= 1)
+
+depth_df <- depths %>%
+  rename(sample = sampleId) %>%
+  transmute(sample, meanDepth = .data[[depth_col[1]]])
+
+# Merge into PCA scores
+pc_df_depth <- pc_df %>% left_join(depth_df, by = "sample")
+
+# Quick sanity check
+summary(pc_df_depth$meanDepth)
+
+
 # quick plot
 pct <- round(100 * pca$varprop[1:2], 2)
-p <- ggplot(pc_df, aes(PC1, PC2, label = sample)) +
+p <- ggplot(pc_df_depth, aes(PC1, PC2, label = sample, color = meanDepth)) +
   geom_point(size = 3) +
   ggrepel::geom_text_repel(size = 3, max.overlaps = 50) +
   theme_bw() +

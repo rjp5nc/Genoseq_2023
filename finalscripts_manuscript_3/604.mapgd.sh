@@ -10,40 +10,34 @@
 #SBATCH -p standard
 #SBATCH --account berglandlab
 
-#ls $VCF_DIR/*_filtsnps10bpindels_snps.vcf.gz | wc -l
-###SBATCH --array=1-347%50
 
-#conda create -n pixy -c conda-forge -c bioconda pixy -y
-# activate the environment
-conda init bash
-source ~/.bashrc  # or restart your shell
-conda activate pixy
-export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
-
-#conda install --yes -c conda-forge pixy
-#conda install -c conda-forge pixy=2.0.0.beta11
-
-#conda install -c bioconda htslib
-#conda install -c bioconda vcftools
-#conda install -c bioconda bcftools
-
-cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv
-
-# Directory with chromosome VCFs
 VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa_renamed_annotated.vcf.gz
-OUT_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000_withmitotype
-mkdir -p $OUT_DIR
+OUTDIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mapgd_relatedness
+mkdir -p "$OUTDIR"
 
 
-pixy --stats pi fst dxy \
-    --vcf $VCF \
-    --populations /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed_withmitotype.pixy.txt \
-    --window_size 10000 \
-    --n_cores 20 \
-    --output_folder $OUT_DIR \
-    --output_prefix pixy_10000_mitotype
+bcftools view -h "$VCF" | grep -E '^##FORMAT=<ID=(GL|PL)\b' || echo "No GL/PL header found"
+
+# Look at FORMAT + first few samples for a handful of variant lines
+bcftools view -H "$VCF" | head -n 5 | cut -f1-10
+bcftools query -r "$(bcftools query -f '%CHROM\t%POS\n' "$VCF" | head -n1 | awk '{print $1":"$2"-"$2}')" \
+  -f '%CHROM\t%POS\t%REF\t%ALT\t%FORMAT[\t%GL][\t%PL]\n' "$VCF" | head
 
 
-# cat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy_chr/*_fst.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_fst.txt
-# cat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy_chr/*_dxy.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_dxy.txt
-# cat /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy_chr/*_pi.txt > /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/usobtusa_pi.txt
+
+
+
+
+MAPGD=/scratch/rjp5nc/mapgd/MAPGD/bin/mapgd
+VCF=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa_renamed_annotated.vcf.gz
+OUTDIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mapgd
+PREFIX=usobtusa
+
+mkdir -p "$OUTDIR"
+
+
+
+cd $OUTDIR
+
+/scratch/rjp5nc/mapgd/MAPGD/bin/mapgd read --help
+/scratch/rjp5nc/mapgd/MAPGD/bin/mapgd allele $VCF 

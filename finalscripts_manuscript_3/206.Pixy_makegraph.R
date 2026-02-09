@@ -92,10 +92,15 @@ dxy_annot <- dxy_clean %>%
 # Check the first few rows
 head(dxy_annot)
 
+
+subset(dxy_annot, mitotype_pop1 == "C" & count_diffs <= 50 & count_comparisons >= 5000)
+
+
+
 dxy_filtered <- dxy_annot %>%
   filter(
     # Keep if both annotations exist
-    (!is.na(superclone_pop1) & !is.na(superclone_pop2) &
+    (#!is.na(superclone_pop1) & !is.na(superclone_pop2) &
      !is.na(mitotype_pop1) & !is.na(mitotype_pop2)) |
     # OR keep if either pop1 or pop2 starts with "SRR"
     grepl("^SRR", pop1) | grepl("^SRR", pop2)
@@ -177,6 +182,26 @@ dev.off()
 
 
 
+png("/scratch/rjp5nc/UK2022_2024/allsites_mito/dxy_nonself.png",
+    width = 3000, height = 2000, res = 300)
+
+ggplot(
+  subset(
+    dxy_filtered,
+    !(mito_pair %in% c("A_A", "B_B", "C_C", "D_D", "E_E"))
+  ),
+  aes(x = avg_dxy)
+) +
+  geom_histogram(color = "black", fill = "steelblue", bins = 30) +
+  theme_classic(base_size = 14) +
+  facet_wrap(~ mito_pair, scales = "free_y") +
+  labs(
+    x = expression("Average D"[XY]),
+    y = "Number of pairwise comparisons",
+    title = "Distribution of average pairwise divergence (dxy) between mitotypes"
+  )
+
+dev.off()
 
 
 

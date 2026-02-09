@@ -135,7 +135,50 @@ metadata_sub_sum <- metadata_sub %>%
 
 #FST overall between ponds
 
-pop_levels <- unique(metadata_sub$accuratelocation)
+
+
+
+mito <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_filtered_P66_withmitotype_rand_superclone.txt",
+                 stringsAsFactors = FALSE, sep = "\t", header = FALSE)  # sampleA, Group
+
+mito$mitotype <- paste(mito$V2, sep = "_")
+
+library(tidyverse)
+
+mito <- separate_wider_delim(
+  data = mito,
+  cols = V2,
+  delim = "_", # Regular expression for space, underscore, or pipe
+  names = c("Pond", "Group")
+)
+
+# mito <- read.csv("/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types.csv",
+#                  stringsAsFactors = FALSE)  # sampleA, Group
+
+# add mitotype + combined label
+metadata_sub$mitotype <- mito$Group[match(metadata_sub$Well, mito$V1)]
+metadata_sub$accuratelocation_mito <- ifelse(
+  is.na(metadata_sub$mitotype),
+  NA,
+  paste0(metadata_sub$accuratelocation, "_", metadata_sub$mitotype)
+)
+
+head(metadata_sub[, c("Well","accuratelocation","mitotype","accuratelocation_mito")])
+metadata_sub2 <- metadata_sub[!is.na(metadata_sub$mitotype), ]
+
+
+
+set.seed(123)  # optional, for reproducibility
+
+metadata_sub2 <- subset(metadata_sub2, accuratelocation == "P66")
+
+
+
+
+
+
+
+pop_levels <- unique(metadata_sub2$accuratelocation_mito)
 pairwise_results <- matrix(NA, nrow=length(pop_levels), ncol=length(pop_levels),
                            dimnames=list(pop_levels, pop_levels))
 
@@ -145,10 +188,10 @@ for(i in 1:(length(pop_levels)-1)){
 
       message("Processing: Pop=", pop_levels)
 
-    idx <- metadata_sub$accuratelocation %in% c(pop_levels[i], pop_levels[j])
+    idx <- metadata_sub2$accuratelocation_mito %in% c(pop_levels[i], pop_levels[j])
     
-    sub_samples <- metadata_sub$Well[idx]
-    sub_pop <- factor(metadata_sub$accuratelocation[idx])
+    sub_samples <- metadata_sub2$Well[idx]
+    sub_pop <- factor(metadata_sub2$accuratelocation_mito[idx])
     
     # Only calculate if both populations exist
     if(length(unique(sub_pop)) == 2){
@@ -174,7 +217,7 @@ for(i in 1:(length(pop_levels)-1)){
 diag(pairwise_results) <- 0
 pairwise_results
 
-write.csv(pairwise_results,"/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pairwise_fst2.csv")
+write.csv(pairwise_results,"/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pairwise_fst_mito_rand_superclone.csv")
 
 # Melt the matrix
 fst_long <- melt(pairwise_results, varnames = c("PopulationA", "PopulationB"), value.name = "Fst")
@@ -191,28 +234,41 @@ fst_long
 
 fst_melted <- melt(pairwise_results, varnames = c("PopulationA", "PopulationB"), value.name = "Fst")
 
-# Heatmap
+
+pop_levels <- as.character(unique(c(fst_melted$PopulationA, fst_melted$PopulationB)))
+
+parts <- do.call(rbind, strsplit(pop_levels, "_", fixed = TRUE))
+prefix <- parts[, 1]
+suffix <- parts[, 2]
+
+# numeric sort for P##, otherwise put non-P labels at the end
+prefix_num <- suppressWarnings(as.integer(sub("^P", "", prefix)))
+is_P <- grepl("^P[0-9]+$", prefix)
+
+# order: P sites in numeric order, then non-P labels, within each by A/B/C
+mito_order <- match(suffix, c("A","B","C"))
+mito_order[is.na(mito_order)] <- 99
+
+ord <- order(!is_P, prefix_num, prefix, mito_order, suffix, pop_levels)
+pop_levels2 <- pop_levels[ord]
+
 popheatmapplot <- ggplot(fst_melted, aes(x = PopulationA, y = PopulationB, fill = Fst)) +
   geom_tile(color = "white") +
   geom_text(aes(label = ifelse(is.na(Fst), "", sprintf("%.3f", Fst))), size = 3) +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, limits = c(-1, 1),
-                       name = "Fst") +  theme_bw() +
+  scale_x_discrete(limits = pop_levels2) +
+  scale_y_discrete(limits = pop_levels2) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red",
+                       midpoint = 0, limits = c(-1, 1), name = "Fst") +
+  theme_bw() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     axis.text.y = element_text(size = 10),
     panel.grid = element_blank()
   ) +
-  labs(title = "Pairwise Fst Heatmap", fill = "Fst")
+  labs(title = "Pairwise Fst Heatmap")
 
-
-ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap_genomic2.png", plot = popheatmapplot, width = 7, height = 6, dpi = 300)
-
-
-
-
-
-
-
+ggsave("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/popheatmap_genomic_mito_randommito_superclone.png",
+       plot = popheatmapplot, width = 7, height = 6, dpi = 300)
 
 
 

@@ -11,9 +11,10 @@
 #SBATCH --account=berglandlab
 
 
-module load bcftools
+module load gatk bcftools htslib samtools
 
 OUTDIR="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf"
+cd $OUTDIR
 VCF="$OUTDIR/usdobtusa.mito.biallelic.clean.vcf"
 MITO="/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types.csv"
 
@@ -58,9 +59,27 @@ join -1 1 -2 1 \
   }
 ' > "$TMPDIR/top3_by_mitotype.samples"
 
+
+join -1 1 -2 1 \
+  <(sort -k1,1 "$TMPDIR/mitotype.map") \
+  <(sort -k1,1 "$TMPDIR/avgdp_in_vcf.txt") \
+| awk '{print $2"\t"$1"\t"$3}' \
+| sort -k1,1 -k2,2 \
+> "$TMPDIR/all_samples_depth_mitotype.tsv"
+
+
+#A       Gilmer5_B4      139.257
+
 # 4) final keep list = (top3 per mitotype) + (missing-mitotype samples)
-cat "$TMPDIR/top3_by_mitotype.samples" "$TMPDIR/vcf_missing_mitotype.samples" \
-  | sort -u > "$TMPDIR/keep.samples"
+{
+  cat "$TMPDIR/top3_by_mitotype.samples"
+  cat "$TMPDIR/vcf_missing_mitotype.samples"
+  echo "Gilmer5_B4"
+  echo "Rockpool1_B10"
+  echo "Gilmer5_A3"
+} | grep -vw "SRR14204557" | sort -u > "$TMPDIR/keep.samples"
+
+
 
 echo "Top3-by-mitotype kept: $(wc -l < "$TMPDIR/top3_by_mitotype.samples")"
 echo "Missing-mitotype kept: $(wc -l < "$TMPDIR/vcf_missing_mitotype.samples")"
@@ -129,8 +148,10 @@ sed 's/$/_clone/' "$SAMPLES_TXT" | paste -sd, - >> "$CONSTR"
 # ----------------------------
 # (4) Run snapp_prep.rb -> SNAPP XML
 # ----------------------------
-XML_OUT="$wd/snapp.mito.top3.xml"
-PREFIX_OUT="$wd/snapp.mito.top3"
+XML_OUT="$wd/snapp.mito.top3_plusA.xml"
+PREFIX_OUT="$wd/snapp.mito.top3_plusA"
+
+rm $wd/snapp.mito.top3_plusA.xml
 
 ruby /scratch/rjp5nc/snapp5/snapp_prep.rb \
   -v "$CLEAN_VCF" \
@@ -144,8 +165,17 @@ ruby /scratch/rjp5nc/snapp5/snapp_prep.rb \
 
 
 # WARNING: The maximum number of SNPs has been set to 10000, which is greater
-#     than the number of bi-allelic SNPs with sufficient information (492) for SNAPP.
-# WARNING: Excluded 1429 sites with only missing data in one or more species.
-# WARNING: Excluded 447 monomorphic sites.
+#     than the number of bi-allelic SNPs with sufficient information (514) for SNAPP.
+# WARNING: Excluded 1350 sites with only missing data in one or more species.
+# WARNING: Excluded 504 monomorphic sites.
 
-# INFO: Retained 492 bi-allelic sites.
+# INFO: Retained 514 bi-allelic sites.
+
+# WARNING: As no starting tree has been specified, a random starting tree will be used by
+#     SNAPP. If the random starting tree is in conflict with specified constraints, SNAPP
+#     may not be able to find a suitable state to initiate the MCMC chain. This will lead
+#     to an error message such as 'Could not find a proper state to initialise'. If such
+#     a problem is encountered, it can be solved by providing a starting tree in which
+#     the ages of constrained clades agree with the constraints placed on these clades.
+
+# Wrote SNAPP input in XML format to file /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/snapp.mito.top3_plusA.xml.

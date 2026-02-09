@@ -17,8 +17,8 @@ library(SeqArray)
 options(mc.cores = 1)
 Sys.setenv(OMP_NUM_THREADS = "1")
 
-in_vcf  <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.annot2.clean.vcf.gz"
-out_gds <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.annot2.ALL.gds"
+in_vcf  <- "/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.rmMissGT0.3.vcf.gz"
+out_gds <- "/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.rmMissGT0.3.gds"
 
 # Import ALL INFO fields and ALL FORMAT fields (GT + PL,DP,AD)
 # storage.option=ZIP_RA is the most stable choice across builds
@@ -36,3 +36,10 @@ seqVCF2GDS(
 g <- seqOpen(out_gds)
 print(seqSummary(g))
 seqClose(g)
+
+
+
+
+
+
+

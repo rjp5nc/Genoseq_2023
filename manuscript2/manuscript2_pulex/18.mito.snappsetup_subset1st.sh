@@ -11,14 +11,14 @@
 #SBATCH --account=berglandlab
 
 
-VCF="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb/obtusa.mito.ALLSITES.vcf.gz"
-KEEP="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/samples_lt30pct_missing.txt"
-DROP="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/samples_ge30pct_missing.txt"
+VCF="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.vcf.gz"
+KEEP="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/samples_lt30pct_missing.txt"
+DROP="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/samples_ge30pct_missing.txt"
 
 tmpdir=$(mktemp -d)
 trap 'rm -rf "$tmpdir"' EXIT
 
-cd /scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/cohort_gendb
+cd /scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb
 
 # list samples
 bcftools query -l "$VCF" > "$tmpdir/samples.txt"
@@ -50,3 +50,50 @@ echo "Drop (>=30% missing or NA): $(wc -l < "$DROP")"
 # If you want KEEP to be sample names only:
 cut -f1 "$KEEP" > "${KEEP%.txt}.names.txt"
 echo "Wrote: ${KEEP%.txt}.names.txt"
+
+
+
+bcftools view -H /scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.vcf.gz | head
+
+
+bcftools query -f '[%GT\t]\n' pulex.mito.ALLSITES.vcf.gz | \
+awk '{
+  for(i=1;i<=NF;i++){
+    if($i=="./.") miss[i]++
+    tot[i]++
+  }
+}
+END{
+  for(i=1;i<=NF;i++) printf "sample_col_%d\t%d\t%d\t%.4f\n", i, miss[i], tot[i], miss[i]/tot[i]
+}' > nocall_by_column.txt
+
+
+VCF=/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.vcf.gz
+
+# sample list in order (1-based like your sample_col_1,2,...)
+bcftools query -l "$VCF" | nl -w1 -s$'\t' > sample_order.txt
+
+# join with your nocall_by_column.txt
+awk 'BEGIN{OFS="\t"} {sub("sample_col_","",$1); print $1,$2,$3,$4}' nocall_by_column.txt > nocall_tmp.txt
+
+join -t $'\t' -1 1 -2 1 sample_order.txt nocall_tmp.txt | \
+awk 'BEGIN{OFS="\t"} {print $2,$1,$3,$4,$5}' \
+> nocall_by_sample.txt
+
+# Columns: sample_name  col_index  n_nocall  n_total  frac_nocall
+sort -k5,5nr nocall_by_sample.txt | head -50
+
+
+
+
+awk '$5 > 0.3 {print $1}' nocall_by_sample.txt | sort -u > remove_samples_gt0.3.txt
+wc -l remove_samples_gt0.3.txt
+head remove_samples_gt0.3.txt
+
+
+
+VCF=/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.vcf.gz
+OUT=/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/cohort_gendb/pulex.mito.ALLSITES.rmMissGT0.3.vcf.gz
+
+bcftools view -S ^remove_samples_gt0.3.txt -Oz -o "$OUT" "$VCF"
+bcftools index -t "$OUT"

@@ -35,6 +35,6 @@ ls /scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp5/
 -burnin 10 \
 -height mean \
 -topology MCC \
-/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp.mito.trees \
-/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp.mito.highest1.tree
+/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp5/snapp.mito0.3.trees \
+/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp5/snapp.mito.highest1.tree
 

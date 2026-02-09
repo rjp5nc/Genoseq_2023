@@ -58,7 +58,9 @@ seqSetFilter(genofile, sample.id = samples_to_keep)
 # ---- Step 2: Filter variants with missing rate < 0.05 ----
 miss_rate_per_sample <- seqMissing(genofile, per.variant = FALSE)
 miss_rate_per_variant <- seqMissing(genofile, per.variant = TRUE)
+
 sample_ids <- seqGetData(genofile, "sample.id")
+
 valid_samples <- sample_ids[miss_rate_per_sample < 0.10]
 miss_rate_per_variant <- seqMissing(genofile, per.variant=TRUE)
 valid_variants <- seqGetData(genofile, "variant.id")[miss_rate_per_variant < 0.10]

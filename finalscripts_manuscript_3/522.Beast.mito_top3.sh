@@ -24,6 +24,9 @@ conda activate beast2-277
 cd /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3_plusA
 
 
+rm /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/snapp.mito.top3_plusA.log
+rm /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/snapp.mito.top3_plusA.trees   
+
 #/scratch/rjp5nc/beast/beast/bin/packagemanager -add SNAPP
 
 /scratch/rjp5nc/beast/beast/bin/beast -java -seed 12354 -threads 25 /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3/snapp.mito.top3_plusA.xml

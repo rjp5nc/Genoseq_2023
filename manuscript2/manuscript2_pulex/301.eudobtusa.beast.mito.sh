@@ -23,10 +23,10 @@ conda activate beast2-277
 
 
 
-cd /scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp5/
+cd /scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudpulex_mito_reverse_out/snapp5/
 
 
-XML="/scratch/rjp5nc/UK2022_2024/redone_mito/euobtusa/snapp_from_allsites/snapp.mito0.3obtusaonly.xml"
+XML="/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/snapp_from_allsites/snapp.mito0.3pulexonly.xml"
 
 grep -n 'logEvery=' "$XML" | head -50
 grep -n 'logEvery="0"' "$XML"

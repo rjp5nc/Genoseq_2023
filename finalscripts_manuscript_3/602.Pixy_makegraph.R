@@ -3,24 +3,18 @@
 #R
 
 library(data.table)
-fst_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000/pixy_10000__fst.txt",header = TRUE,sep = "\t")
-dxy_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000/pixy_10000__dxy.txt",header = TRUE,sep = "\t")
-pi_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000/pixy_10000__pi.txt",header = TRUE,sep = "\t")
+fst_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000_withmitotype/pixy_10000_mitotype_fst.txt",header = TRUE,sep = "\t")
+dxy_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000_withmitotype/pixy_10000_mitotype_dxy.txt",header = TRUE,sep = "\t")
+pi_raw <- read.table("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000_withmitotype/pixy_10000_mitotype_pi.txt",header = TRUE,sep = "\t")
 
 library(ggplot2)
 
 
-chrom_keep <- paste0("JAACYE0100000", sprintf("%02d", 1:12), ".1")
+fst_subset <- fst_raw[grepl("^DOB", fst_raw$chromosome), ]
+dxy_subset <- dxy_raw[grepl("^DOB", dxy_raw$chromosome), ]
+pi_subset  <- pi_raw [grepl("^DOB", pi_raw$chromosome), ]
 
-# Subset the data
-fst_subset <- fst_raw[fst_raw$chromosome %in% chrom_keep, ]
 
-fst_subsetsubset <- subset(fst_subset, chromosome == "JAACYE010000007.1")
-
-fst_1060001to1120001 <- subset(fst_subsetsubset, window_pos_1 > 1060000 & window_pos_1 < 1120002)
-unique(fst_subsetsubset$window_pos_1)
-# Check
-unique(fst_subset$chromosome)
 
 # Clean up
 fst_clean <- na.omit(fst_subset)
@@ -32,11 +26,36 @@ fst_clean$avg_wc_fst   <- as.numeric(fst_clean$avg_wc_fst)
 # Add combined comparison label
 fst_clean$comparison <- paste(fst_clean$pop1, fst_clean$pop2, sep = "_")
 
+fst_cleansubset <- subset(fst_clean, comparison == "P66_A_P66_B" |
+comparison == "P66_A_P66_C" |
+comparison == "P66_C_P66_B" 
+)
+
+# fst_cleansubset <- subset(fst_clean, comparison == "P63_B_P63_A" |
+# comparison == "P63_C_P63_A" |
+# comparison == "P63_C_P63_B" 
+# )
+
+
+# fst_cleansubset <- subset(fst_clean, 
+# comparison == "P62_C_P62_B" 
+# )
+# unique(fst_cleansubset$comparison)
+
+
+mean(subset(fst_cleansubset,comparison == "P66_A_P66_C")$avg_wc_fst)
+mean(subset(fst_cleansubset,comparison == "P66_A_P66_B")$avg_wc_fst)
+mean(subset(fst_cleansubset,comparison == "P66_C_P66_B")$avg_wc_fst)
+
+fst_cleansubsethighfst <- subset(fst_cleansubset, avg_wc_fst >= 0.99)
+
+summary(fst_cleansubsethighfst$no_snps)
+
 # Save plot as PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/fst_manhattan10000.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/betweenmitotypes/fst_manhattan10000_66.png",
     width = 10000, height = 5000, res = 300)
 
-ggplot(fst_clean, aes(x = window_pos_1, y = avg_wc_fst)) +
+ggplot(fst_cleansubset, aes(x = window_pos_1, y = avg_wc_fst)) +
   geom_point(size = 0.5, alpha = 0.6, color = "darkblue") +
   facet_grid(comparison ~ chromosome, scales = "free_x", space = "free_x") +
   labs(
@@ -61,12 +80,6 @@ dev.off()
 
 
 
-
-chrom_keep <- paste0("JAACYE0100000", sprintf("%02d", 1:12), ".1")
-
-dxy_subset <- dxy_raw[dxy_raw$chromosome %in% chrom_keep, ]
-
-
 # Check
 unique(dxy_subset$chromosome)
 
@@ -81,7 +94,7 @@ dxy_clean$avg_dxy   <- as.numeric(dxy_clean$avg_dxy)
 dxy_clean$comparison <- paste(dxy_clean$pop1, dxy_clean$pop2, sep = "_")
 
 # Save plot as PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dxy_manhattan10000.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/betweenmitotypes/dxy_manhattan10000.png",
     width = 10000, height = 5000, res = 300)
 
 ggplot(dxy_clean, aes(x = window_pos_1, y = avg_dxy)) +
@@ -120,15 +133,6 @@ dev.off()
 
 
 
-
-
-
-
-chrom_keep <- paste0("JAACYE0100000", sprintf("%02d", 1:12), ".1")
-
-pi_subset <- pi_raw[pi_raw$chromosome %in% chrom_keep, ]
-
-
 # Check
 unique(pi_subset$chromosome)
 
@@ -142,7 +146,7 @@ pi_clean$avg_pi   <- as.numeric(pi_clean$avg_pi)
 # Add combined comparison label
 
 # Save plot as PNG
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pi_manhattan10000.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/betweenmitotypes/pi_manhattan10000.png",
     width = 10000, height = 5000, res = 300)
 
 ggplot(pi_clean, aes(x = window_pos_1, y = avg_pi)) +
@@ -170,7 +174,7 @@ dev.off()
 
 
 
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/dxy_box_10000.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/betweenmitotypes/dxy_box_10000.png",
     width = 5000, height = 2000, res = 300)
 
 ggplot(dxy_clean, aes(x = comparison, y = avg_dxy)) +
@@ -193,7 +197,7 @@ dev.off()
 
 
 
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pi_box_10000.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/betweenmitotypes/pi_box_10000.png",
     width = 5000, height = 2000, res = 300)
 
 ggplot(pi_clean, aes(x = pop, y = avg_pi)) +
@@ -297,7 +301,7 @@ df_binned <- windows_expanded %>%
 
 
   
-png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pi_box_10000_windowed_50000.png",
+png("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/betweenmitotypes/pi_box_10000_windowed_50000.png",
     width = 5000, height = 2000, res = 300)
 
 ggplot(df_binned2, aes(x = pop, y = avg_pi)) +

@@ -5,8 +5,8 @@
 #SBATCH -N 1 # on one node
 #SBATCH -t 0-48:00  ### 48 hours
 #SBATCH --mem 60G
-#SBATCH -o /scratch/rjp5nc/move.%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/move.%A_%a.err # Standard error
+#SBATCH -o /scratch/rjp5nc/err/move.%A_%a.out # Standard output
+#SBATCH -e /scratch/rjp5nc/err/move.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab
 

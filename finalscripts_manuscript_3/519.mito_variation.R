@@ -36,6 +36,10 @@ metadata_with_clone <- read.csv("/project/berglandlab/Robert/UKSequencing2022_20
 
 samples <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/Sample_ID_Species_merged_20251227.csv")
 
+samples <- subset(samples, !grepl("^bdw", Sample_ID_old))
+
+subset(samples, grepl("^bdw", Sample_ID_old))
+
 usobtusasamps <- subset(samples, Species == "Daphnia obtusa")
 
 metadata_with_clone <- read.csv("/project/berglandlab/Robert/UKSequencing2022_2024/old_stuff/metadata_with_clone.csv", header = TRUE)
@@ -148,6 +152,7 @@ valid_samples <- sample_ids[miss_rate_per_sample < 0.10]
 miss_rate_per_variant <- seqMissing(genofile, per.variant=TRUE)
 valid_variants <- seqGetData(genofile, "variant.id")[miss_rate_per_variant < 0.10]
 
+
 final_valid_samples <- intersect(valid_samples, samples_to_keep)
 
 # seqSetFilter(genofile, sample.id = final_valid_samples)
@@ -157,6 +162,14 @@ dp <- seqGetData(genofile, "annotation/format/DP")
 mean_depth <- rowMeans(dp, na.rm = TRUE)
 keep <- which(miss_rate < 0.15)
 # keep <- which(miss_rate < 0.10)
+
+
+#ADD THIS FOR COI ANALYSIS - sites from Penton 2004, COI primers aligned to Ref
+
+# keep <- keep[
+#   keep >= 1421 & keep <= 2129
+# ]
+
 
 g_samples <- seqGetData(genofile, "sample.id")
 
@@ -276,15 +289,33 @@ out_tbl <- file.path(out_dir, paste0("allsite_pairwise_diff_vs_", make.names(ref
 readr::write_tsv(diff_df, out_tbl)
 message("Wrote: ", out_tbl)
 
-p_box <- ggplot(diff_df %>% filter(sample != ref_sample, !is.na(group)),
-                aes(x = group, y = prop_diff)) +
+
+
+plot_df <- diff_df %>%
+  mutate(group = str_trim(as.character(group))) %>%
+  filter(
+    !is.na(group),
+    group != "",
+    !tolower(group) %in% c("na", "n/a"),
+    sample != ref_sample   # drop the ref sample no matter what
+  )
+
+p_box <- ggplot(plot_df, aes(x = group, y = prop_diff)) +
   geom_boxplot(outlier.shape = NA) +
   geom_jitter(width = 0.15, height = 0, alpha = 0.6) +
-  labs(title = paste0("All-site differences vs ", ref_sample, " (Group A ref)"),
-       x = "Group", y = "Proportion different (all sites)") +
+  labs(
+    title = paste0("All-site differences vs ", ref_sample, " (Group A ref)"),
+    x = "Group", y = "Proportion different (all sites)"
+  ) +
   theme_bw()
-ggsave(file.path(out_dir, paste0("allsite_prop_diff_vs_", make.names(ref_sample), "_by_group.png")),
-       p_box, width = 6, height = 5, dpi = 600)
+
+ggsave(
+  file.path(out_dir, paste0("allsite_prop_diff_vs_", make.names(ref_sample), "_by_group.pdf")),
+  p_box, width = 6, height = 5, dpi = 600
+)
+
+
+
 
 p_box <- ggplot(diff_df %>% filter(sample != ref_sample),
                 aes(x = group, y = prop_diff)) +
@@ -673,6 +704,135 @@ saveRDS(
   file = file.path(out_dir, "allsite_pairwise_matrices.rds")
 )
 
+
+
+
+
+pairwise_long <- as.data.table(pairwise_long)
+meta <- as.data.table(meta)
+
+# -----------------------------
+# 1) Deduplicate by sample IDs
+# -----------------------------
+pairwise_uniq <- pairwise_long[sampleA != sampleB]
+
+pairwise_uniq[, sample_min := pmin(sampleA, sampleB)]
+pairwise_uniq[, sample_max := pmax(sampleA, sampleB)]
+
+# keep one row per unordered pair
+pairwise_uniq <- unique(pairwise_uniq, by = c("sample_min", "sample_max"))
+
+# --------------------------------
+# 2) Join mitotypes onto each side
+# --------------------------------
+pairwise_anno <- merge(
+  pairwise_uniq,
+  meta[, .(sampleA = sample.id, mitoA = mitotype)],
+  by = "sampleA",
+  all.x = TRUE
+)
+
+pairwise_anno <- merge(
+  pairwise_anno,
+  meta[, .(sampleB = sample.id, mitoB = mitotype)],
+  by = "sampleB",
+  all.x = TRUE
+)
+
+# ----------------------------------------
+# 3) Labels (directed + undirected version)
+# ----------------------------------------
+pairwise_anno[, mito_comp := paste0(mitoA, "_", mitoB)]
+pairwise_anno[, mito_comp_sorted := paste0(pmin(mitoA, mitoB), "_", pmax(mitoA, mitoB))]
+
+# ----------------------------------------
+# (Optional) drop NA / "NA" mitotypes
+# ----------------------------------------
+pairwise_anno <- pairwise_anno[
+  !is.na(mitoA) & !is.na(mitoB) & mitoA != "NA" & mitoB != "NA"
+]
+
+# sanity check: no duplicate unordered pairs remain
+stopifnot(pairwise_anno[, .N, by = .(sample_min, sample_max)][N > 1, .N] == 0)
+
+pairwise_anno[, mito_comp := paste0(pmin(mitoA, mitoB), "_", pmax(mitoA, mitoB))]
+
+table(pairwise_anno$mito_comp)
+
+head(pairwise_anno)
+
+
+
+
+
+
+p_box2 <- ggplot(pairwise_anno, aes(x = mito_comp, y = prop_diff)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.15, height = 0, alpha = 0.6) +
+  labs(
+    title = paste0("Mitotype comparisons"),
+    x = "Group", y = "Proportion different (all sites)"
+  ) + xlab("Mitotype Comparison")+
+  theme_bw()
+
+ggsave(
+  file.path(out_dir, paste0("allsite_prop_diff_all.pdf")),
+  p_box2, width = 15, height = 5, dpi = 600
+)
+
+
+
+p_box3 <- ggplot(subset(pairwise_anno, mito_comp == "A_A" | 
+        mito_comp == "A_B" |
+         mito_comp == "A_C" |
+          mito_comp == "B_B" |          
+          mito_comp == "B_C" |
+                    mito_comp == "C_C" ), aes(x = mito_comp, y = prop_diff)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.15, height = 0, alpha = 0.6) +
+  labs(
+    title = paste0("NA2 to NA2"),
+    x = "Group", y = "Proportion different (all sites)"
+  ) + ylim(0,0.05)+
+  theme_bw()
+
+ggsave(
+  file.path(out_dir, paste0("allsite_prop_diff_ABC.pdf")),
+  p_box3, width = 6, height = 5, dpi = 600
+)
+
+
+
+
+p_box4 <- ggplot(subset(pairwise_anno, mito_comp == "D_D" | 
+        mito_comp == "D_E" |
+         mito_comp == "D_F" |
+          mito_comp == "E_E" |          
+          mito_comp == "E_F" |
+                    mito_comp == "F_F" ), aes(x = mito_comp, y = prop_diff)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.15, height = 0, alpha = 0.6) +
+  labs(
+    title = paste0("NA1 to NA1"),
+    x = "Group", y = "Proportion different (all sites)"
+  ) + ylim(0,0.05)+
+  theme_bw()
+
+ggsave(
+  file.path(out_dir, paste0("allsite_prop_diff_DEF.pdf")),
+  p_box4, width = 6, height = 5, dpi = 600
+)
+
+
+p_box5 <- p_box4 + p_box3 +
+  plot_annotation(tag_levels = "A")
+
+
+ggsave(
+  file.path(out_dir, paste0("allsite_prop_diff_NA1vNA2.pdf")),
+  p_box5, width = 10, height = 5, dpi = 600
+)
+
 # ------------------------------------------------------------
 # 7) Distance matrix for NJ tree
 # ------------------------------------------------------------
@@ -744,6 +904,10 @@ ggsave(file.path(out_dir, "diff_rates_300_perc.png"),
        pairwise_long_diff_plots_300_perc, width = 7, height = 6, dpi = 300)
 
 
+ggsave(file.path(out_dir, "diff_rates_300_perc.pdf"),
+       pairwise_long_diff_plots_300_perc, width = 7, height = 6, dpi = 300)
+
+
 
 
 diffs15 <- subset(pairwise_long, Similarity >= 0.995)
@@ -794,7 +958,17 @@ unique_clones <- diffs15_samp %>%
 # 10) Tip colors (CORRECT alignment)
 # ------------------------------------------------------------
 groups <- sort(unique(unique_clones$Group))
-group_colors <- setNames(rainbow(length(groups)), groups)
+
+group_colors <- c(
+  A       = "#F8766D",
+  B       = "#C49A00",
+  C       = "#53B400",
+  D       = "#00C094",
+  E       = "#00B6EB",
+  F       = "#A58AFF",
+  Unknown = "#FB61D7"
+)
+
 
 tip_groups <- unique_clones$Group[
   match(tree_rooted$tip.label, unique_clones$sample)
@@ -970,7 +1144,7 @@ p_circ <- ggtree(tree_plot, layout = "fan") %<+% tip_df +
     size = 2,
     offset = 0.0015   # <- adjust this value if needed
   ) +
-  scale_color_manual(values = mito_cols, name = "Mitotype", na.value = "grey70") +
+  scale_color_manual(values = group_colors, name = "Mitotype", na.value = "grey70") +
   ggnewscale::new_scale_color() +
   geom_tippoint(aes(color = tip_class), size = 2.5) +
   scale_color_manual(
@@ -1221,6 +1395,10 @@ p <- ggplot(pca_merged, aes(PC1, PC2, col = mitotype)) +
 ggsave(file.path(out_dir, "usobtusa_pca_mito_PC1_PC2_noNA.png"),
        p, width = 7, height = 6, dpi = 300)
 
+
+ggsave(file.path(out_dir, "usobtusa_pca_mito_PC1_PC2_noNA.pdf"),
+       p, width = 7, height = 6, dpi = 300)
+
 # ----------------------------
 # Save kept IDs
 # ----------------------------
@@ -1238,3 +1416,81 @@ fwrite(data.table(variant.id = variant_ids),
 
 seqClose(gds)
 message("DONE")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

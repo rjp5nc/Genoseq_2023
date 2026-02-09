@@ -1,8 +1,9 @@
 #ijob -A berglandlab -c10 -p standard --mem=40G
 #module load gcc/11.4.0  openmpi/4.1.4 icu R/4.3.1; R
-#R
 
 #14642bp
+
+
 library(SeqArray)
 library(gdsfmt)
 library(dplyr)
@@ -12,18 +13,28 @@ library(purrr)
 library(tidyr)
 library(ggplot2)
 
-gds_path <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.annot2.ALL.gds"
-mitotype_csv <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv"
-out_dir <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/unique_snps_by_group"
+gds_path <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/usdobtusa_mito_allsites_all.haploid.annotated2.gds"
+mitotype_csv <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types_v2.csv"
+
+
+mitotype_csv <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types.csv"
+
+out_dir <- "/scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/unique_snps_by_group"
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 # ---- Mitotype map ----
 mitotypes <- read.csv(mitotype_csv, stringsAsFactors = FALSE)
+names(mitotypes)[1] <- "CloneA"
+names(mitotypes)[2] <- "mitotype"
+
+mitotypes
+
+
 # Normalize columns and drop the first index column if present
-stopifnot(all(c("CloneA","Group") %in% names(mitotypes)))
+stopifnot(all(c("CloneA","mitotype") %in% names(mitotypes)))
 mito <- mitotypes %>%
   transmute(sample = as.character(CloneA),
-            group  = as.character(Group)) %>%
+            group  = as.character(mitotype)) %>%
   mutate(sample = str_trim(sample), group = str_trim(group)) %>%
   filter(nzchar(sample), nzchar(group))
 
@@ -49,6 +60,9 @@ keep_samples <- g_samples[mask]
 keep_samples <- keep_samples[!is.na(keep_samples)]  # drop any NA slots
 stopifnot(all(!is.na(keep_samples)))
 
+
+
+
 message(sprintf("Keeping %d/%d (mean DP>20). NA mean-DP samples: %d",
                 length(keep_samples), length(g_samples), sum(is.na(mean_dp))))
 
@@ -58,8 +72,8 @@ seqSetFilter(g, sample.id = keep_samples, action = "set")
 samps <- seqGetData(g, "sample.id")   # definitive order for columns
 
 ## 3) Rebuild mito_keep strictly from current filtered order
-mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types.csv",
-                      stringsAsFactors = FALSE)
+#mitotypes <- read.csv("/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types_v2.csv",
+#                      stringsAsFactors = FALSE)
 new_samples <- c("SRR5012393", "SRR5012394", "SRR5012771",
                  "SRR5012396", "SRR5012770", "SRR5012773")
 
@@ -68,7 +82,7 @@ new_rows <- data.frame(
   X = seq(max(mitotypes$X, na.rm = TRUE) + 1,
           length.out = length(new_samples)),
   CloneA = new_samples,
-  Group = "XX",
+  mitotype = "XX",
   stringsAsFactors = FALSE
 )
 
@@ -78,12 +92,27 @@ mitotypes <- rbind(mitotypes, new_rows)
 # Check the new tail
 tail(mitotypes)
 
-mitotypes <- subset(mitotypes, Group %in% c("A", "B", "C", "D", "XX"))
+mitotypes <- subset(mitotypes, mitotype %in% c("A", "B", "C", "D", "E", "F", "XX"))
+mitotypesE <- subset(mitotypes, mitotype %in% c("E", "F", "XX"))
 
 mito_keep <- mitotypes %>%
   transmute(sample = trimws(as.character(CloneA)),
-            group  = trimws(as.character(Group))) %>%
+            group  = trimws(as.character(mitotype))) %>%
   semi_join(tibble(sample = samps), by = "sample")
+
+
+write.table(mito_keep$sample, "/scratch/rjp5nc/UK2022_2024/allsites_mito/alignment_us/keep_samplesdp20.txt",
+            sep = "\t",
+            row.names = FALSE,
+            quote = FALSE)
+
+
+
+write.table(mito_keep, "/scratch/rjp5nc/UK2022_2024/allsites_mito/alignment_us/conversion.txt",
+            sep = "\t",
+            row.names = TRUE,
+            quote = FALSE)
+
 
 ## 4) Pull ALL sites genotypes; ensure GT is [variants x samples]
 GT_raw <- seqGetData(g, "genotype")  # haploid: ploidy x variants x samples
@@ -109,7 +138,7 @@ stopifnot(length(A_samps) > 0)
 ref_sample <- tibble(sample = samps, mean_dp = as.numeric(mean_dp_kept)) %>%
   filter(sample %in% A_samps) %>%
   arrange(desc(mean_dp)) %>% slice(1) %>% pull(sample)
-message("Reference sample (Group A): ", ref_sample)
+message("Reference sample (mitotype A): ", ref_sample)
 
 ## 6) Count differences per sample vs reference across ALL sites
 ref_idx <- match(ref_sample, samps); stopifnot(!is.na(ref_idx))
@@ -148,13 +177,23 @@ p_box <- ggplot(diff_df %>% filter(sample != ref_sample, !is.na(group)),
                 aes(x = group, y = prop_diff)) +
   geom_boxplot(outlier.shape = NA) +
   geom_jitter(width = 0.15, height = 0, alpha = 0.6) +
-  labs(title = paste0("All-site differences vs ", ref_sample, " (Group A ref)"),
-       x = "Group", y = "Proportion different (all sites)") +
+  labs(title = paste0("All-site differences vs ", ref_sample, " (mitotype A ref)"),
+       x = "mitotype", y = "Proportion different (all sites)") +
   theme_bw()
 ggsave(file.path(out_dir, paste0("allsite_prop_diff_vs_", make.names(ref_sample), "_by_group.png")),
-       p_box, width = 8, height = 5, dpi = 300)
+       p_box, width = 6, height = 5, dpi = 600)
 
+p_box <- ggplot(diff_df %>% filter(sample != ref_sample),
+                aes(x = group, y = prop_diff)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.15, height = 0, alpha = 0.6) +
+  labs(title = paste0("All-site differences vs ", ref_sample, " (mitotype A ref)"),
+       x = "mitotype", y = "Proportion different (all sites)") +
+  theme_bw()
+ggsave(file.path(out_dir, paste0("allsite_prop_diff_vs_", make.names(ref_sample), "_by_group_WithNAsover20dp.png")),
+       p_box, width = 4, height = 5, dpi = 300)
 
+write.csv(diff_df,"/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types_diff_df.csv")
 
 
 
@@ -251,7 +290,7 @@ p_tracks <- ggplot(subset(win_df, !is.na(group)), aes(x = mid, y = prop_diff, gr
     title = paste0("Across-genome differences vs ", ref_sample, " (", window_size/1000, " kb windows)"),
     x = "Genomic position (bp)",
     y = "Proportion different",
-    color = "Group"
+    color = "mitotype"
   ) +
   theme_bw(base_size = 10) +
   theme(
@@ -271,7 +310,7 @@ p_group <- ggplot(subset(group_mean, !is.na(group)), aes(x = mid, y = prop_mean,
     title = paste0("Across-genome group mean differences vs ", ref_sample, " (", window_size/1000, " kb windows)"),
     x = "Genomic position (bp)",
     y = "Proportion different (group mean)",
-    color = "Group"
+    color = "mitotype"
   ) +
   theme_bw(base_size = 10) +
   theme(
@@ -523,7 +562,7 @@ if ("group" %in% names(df_notrna)) {
       title = paste0("Differences vs ", ref_sample, " by gene region and group (non-tRNA)"),
       x = "Gene",
       y = "Proportion different",
-      fill = "Group"
+      fill = "mitotype"
     ) +
     theme_bw(base_size = 10) +
     theme(
@@ -617,17 +656,17 @@ if (anyNA(D)) {
 tree <- nj(as.dist(D))
 
 ## ---------- Tip metadata: only mito_type (Group), include NAs ----------
-mitotypes <- read.csv(mitotype_csv, stringsAsFactors = FALSE)
+#mitotypes <- read.csv(mitotype_csv, stringsAsFactors = FALSE)
 # (Optional) append SRR... as XX if you want them present with a label
 extra <- c("SRR5012393","SRR5012394","SRR5012771","SRR5012396","SRR5012770","SRR5012773")
 mitotypes <- bind_rows(
-  mitotypes %>% select(CloneA, Group),
-  tibble(CloneA = extra, Group = "XX")
+  mitotypes %>% select(CloneA, mitotype),
+  tibble(CloneA = extra, mitotype = "XX")
 )
 
 tip_meta <- tibble(sample = samps) %>%
   left_join(mitotypes %>% transmute(sample = as.character(CloneA),
-                                    mito_type = as.character(Group)),
+                                    mito_type = as.character(mitotype)),
             by = "sample")
 
 tip_meta2 <- tip_meta %>%
@@ -682,3 +721,412 @@ p_circ <- ggtree(tree_rooted, layout = "circular") %<+% tip_meta2 +
   theme_tree2()
 
 ggsave(file.path(out_dir, "NJ_IBS_circular_rooted.png"), p_circ, width = 10, height = 10, dpi = 600)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#PCA
+
+
+
+
+suppressPackageStartupMessages({
+  library(SeqArray)
+  library(data.table)
+  library(ggplot2)
+})
+
+# ----------------------------
+# Paths
+# ----------------------------
+gds_path     <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.annot2.ALL.gds"
+#mitotype_csv <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types_v2.csv"
+out_dir      <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/unique_snps_by_group"
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+
+# ----------------------------
+# Parameters
+# ----------------------------
+dp_cutoff <- 30
+miss_cutoff <- 0.05
+maf_cutoff <- 0.00
+impute_missing <- TRUE
+
+# ----------------------------
+# Read + clean metadata
+# KEEP A, DROP ALL UNASSIGNED
+# ----------------------------
+meta <- fread(mitotype_csv, header = TRUE)
+setnames(meta, c("idx", "sample.id", "mitotype"))
+
+meta[, sample.id := trimws(as.character(sample.id))]
+meta[, mitotype  := trimws(as.character(mitotype))]
+
+meta[tolower(mitotype) %in% c("na","nan","none","unknown",""), mitotype := NA]
+meta <- meta[!is.na(mitotype) & sample.id != ""]
+
+# enforce 1:1 mapping
+bad <- meta[, .(n = uniqueN(mitotype)), by = sample.id][n > 1]
+if (nrow(bad)) stop("ERROR: conflicting mitotypes in CSV")
+
+meta <- meta[, .(mitotype = mitotype[1]), by = sample.id]
+meta_samples <- meta$sample.id
+
+# ----------------------------
+# Open GDS
+# ----------------------------
+gds <- seqOpen(gds_path)
+
+# ----------------------------
+# Sample filter 1: must have mitotype
+# ----------------------------
+gds_samples <- seqGetData(gds, "sample.id")
+keep_samples <- intersect(gds_samples, meta_samples)
+seqSetFilter(gds, sample.id = keep_samples, verbose = TRUE)
+
+# ----------------------------
+# Sample filter 2: mean DP > cutoff
+# ----------------------------
+DP <- seqGetData(gds, "annotation/format/DP")
+DP_mat <- if (is.list(DP)) do.call(rbind, DP) else DP
+
+g_samples <- seqGetData(gds, "sample.id")
+
+mean_dp <- if (ncol(DP_mat) == length(g_samples)) {
+  colMeans(DP_mat, na.rm = TRUE)
+} else {
+  rowMeans(DP_mat, na.rm = TRUE)
+}
+
+keep_samples <- g_samples[!is.na(mean_dp) & mean_dp > dp_cutoff]
+keep_samples <- intersect(keep_samples, meta_samples)
+seqSetFilter(gds, sample.id = keep_samples, verbose = TRUE)
+
+# LOCK sample IDs (FILTER-AWARE)
+sample_ids <- seqGetData(gds, "sample.id")
+message("Final samples kept: ", length(sample_ids))
+
+# HARD CHECK
+if (anyNA(match(sample_ids, meta$sample.id))) {
+  stop("ERROR: sample without mitotype survived filtering")
+}
+
+# ----------------------------
+# Read genotype (KNOWN LAYOUT: 1 x sample x variant)
+# ----------------------------
+geno <- seqGetData(gds, "genotype")
+stopifnot(dim(geno)[1] == 1, dim(geno)[2] == length(sample_ids))
+
+X <- geno[1, , , drop = TRUE]   # sample x variant
+rownames(X) <- sample_ids
+X[!is.na(X) & X > 1] <- 1
+
+message(sprintf("Loaded X: %d samples x %d variants", nrow(X), ncol(X)))
+
+# ----------------------------
+# Variant filters (in memory)
+# ----------------------------
+is_poly <- apply(X, 2, function(z) length(unique(z[!is.na(z)])) > 1)
+X <- X[, is_poly, drop = FALSE]
+if (ncol(X) < 2) stop("Too few polymorphic variants")
+
+miss_rate <- colMeans(is.na(X))
+keep_miss <- miss_rate <= miss_cutoff
+X <- X[, keep_miss, drop = FALSE]
+if (ncol(X) < 2) stop("Too few variants after missing filter")
+
+keep_maf <- NULL
+if (maf_cutoff > 0) {
+  af <- colMeans(X, na.rm = TRUE)
+  maf <- pmin(af, 1 - af)
+  keep_maf <- maf >= maf_cutoff
+  X <- X[, keep_maf, drop = FALSE]
+}
+
+if (impute_missing && anyNA(X)) {
+  cm <- colMeans(X, na.rm = TRUE)
+  idx <- which(is.na(X), arr.ind = TRUE)
+  X[idx] <- cm[idx[,2]]
+}
+
+# ----------------------------
+# PCA
+# ----------------------------
+pca <- prcomp(X, center = TRUE, scale. = FALSE)
+varprop <- (pca$sdev^2) / sum(pca$sdev^2)
+scores <- pca$x
+
+pca_data <- data.frame(
+  sample.id = sample_ids,
+  PC1 = scores[,1],
+  PC2 = scores[,2],
+  PC3 = if (ncol(scores) >= 3) scores[,3] else NA,
+  PC4 = if (ncol(scores) >= 4) scores[,4] else NA,
+  PC5 = if (ncol(scores) >= 5) scores[,5] else NA
+)
+
+write.csv(pca_data, file.path(out_dir, "usobtusa_mito_pca.csv"),
+          row.names = FALSE, quote = FALSE)
+
+# ----------------------------
+# Merge mitotype (NO NA ALLOWED)
+# ----------------------------
+pca_merged <- merge(pca_data, meta, by = "sample.id", all.x = TRUE)
+if (anyNA(pca_merged$mitotype)) stop("ERROR: NA mitotypes in PCA")
+
+write.csv(pca_merged,
+          file.path(out_dir, "usobtusa_mito_pca_with_mitotype.csv"),
+          row.names = FALSE, quote = FALSE)
+
+# ----------------------------
+# Plot
+# ----------------------------
+p <- ggplot(pca_merged, aes(PC1, PC2, col = mitotype)) +
+  geom_point(size = 2) +
+  theme_bw() +
+  labs(
+    title = "mtDNA PCA (filtered samples + variants)",
+    x = paste0("PC1 (", round(varprop[1]*100,1), "%)"),
+    y = paste0("PC2 (", round(varprop[2]*100,1), "%)")
+  )
+
+ggsave(file.path(out_dir, "usobtusa_pca_mito_PC1_PC2.png"),
+       p, width = 7, height = 6, dpi = 300)
+
+# ----------------------------
+# Save kept IDs
+# ----------------------------
+fwrite(data.table(sample.id = sample_ids),
+       file.path(out_dir, "kept_samples.txt"),
+       col.names = FALSE)
+
+variant_ids <- seqGetData(gds, "variant.id")
+variant_ids <- variant_ids[is_poly][keep_miss]
+if (maf_cutoff > 0) variant_ids <- variant_ids[keep_maf]
+
+fwrite(data.table(variant.id = variant_ids),
+       file.path(out_dir, "kept_variants.txt"),
+       col.names = FALSE)
+
+seqClose(gds)
+message("DONE")
+
+
+
+# PCA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Keep NA's
+
+
+
+
+
+suppressPackageStartupMessages({
+  library(SeqArray)
+  library(data.table)
+  library(ggplot2)
+})
+
+# ----------------------------
+# Paths
+# ----------------------------
+gds_path     <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/usdobtusa_mito_allsites.annot2.ALL.gds"
+#mitotype_csv <- "/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/mito_types_v2.csv"
+out_dir      <- "/scratch/rjp5nc/UK2022_2024/allsites_mito/unique_snps_by_group"
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+
+# ----------------------------
+# Parameters
+# ----------------------------
+dp_cutoff <- 30
+miss_cutoff <- 0.05
+maf_cutoff <- 0.00
+impute_missing <- TRUE
+
+# ----------------------------
+# Read + clean metadata
+# KEEP A, DROP ALL UNASSIGNED
+# ----------------------------
+meta <- fread(mitotype_csv, header = TRUE)
+setnames(meta, c("idx", "sample.id", "mitotype"))
+
+meta[, sample.id := trimws(as.character(sample.id))]
+meta[, mitotype  := trimws(as.character(mitotype))]
+
+meta[tolower(mitotype) %in% c("na","nan","none","unknown",""), mitotype := NA]
+meta <- meta[!is.na(mitotype) & sample.id != ""]
+
+# enforce 1:1 mapping
+bad <- meta[, .(n = uniqueN(mitotype)), by = sample.id][n > 1]
+if (nrow(bad)) stop("ERROR: conflicting mitotypes in CSV")
+
+meta <- meta[, .(mitotype = mitotype[1]), by = sample.id]
+meta_samples <- meta$sample.id
+
+# ----------------------------
+# Open GDS
+# ----------------------------
+gds <- seqOpen(gds_path)
+
+# ----------------------------
+# Sample filter 1: must have mitotype
+# ----------------------------
+gds_samples <- seqGetData(gds, "sample.id")
+seqSetFilter(gds, sample.id = gds_samples, verbose = TRUE)
+
+# ----------------------------
+# Sample filter 2: mean DP > cutoff
+# ----------------------------
+DP <- seqGetData(gds, "annotation/format/DP")
+DP_mat <- if (is.list(DP)) do.call(rbind, DP) else DP
+
+g_samples <- seqGetData(gds, "sample.id")
+
+mean_dp <- if (ncol(DP_mat) == length(g_samples)) {
+  colMeans(DP_mat, na.rm = TRUE)
+} else {
+  rowMeans(DP_mat, na.rm = TRUE)
+}
+
+keep_samples <- g_samples[!is.na(mean_dp) & mean_dp > dp_cutoff]
+seqSetFilter(gds, sample.id = keep_samples, verbose = TRUE)
+
+# LOCK sample IDs (FILTER-AWARE)
+sample_ids <- seqGetData(gds, "sample.id")
+message("Final samples kept: ", length(sample_ids))
+
+# HARD CHECK
+if (anyNA(match(sample_ids, meta$sample.id))) {
+  stop("ERROR: sample without mitotype survived filtering")
+}
+
+# ----------------------------
+# Read genotype (KNOWN LAYOUT: 1 x sample x variant)
+# ----------------------------
+geno <- seqGetData(gds, "genotype")
+stopifnot(dim(geno)[1] == 1, dim(geno)[2] == length(sample_ids))
+
+X <- geno[1, , , drop = TRUE]   # sample x variant
+rownames(X) <- sample_ids
+X[!is.na(X) & X > 1] <- 1
+
+message(sprintf("Loaded X: %d samples x %d variants", nrow(X), ncol(X)))
+
+# ----------------------------
+# Variant filters (in memory)
+# ----------------------------
+is_poly <- apply(X, 2, function(z) length(unique(z[!is.na(z)])) > 1)
+X <- X[, is_poly, drop = FALSE]
+if (ncol(X) < 2) stop("Too few polymorphic variants")
+
+miss_rate <- colMeans(is.na(X))
+keep_miss <- miss_rate <= miss_cutoff
+X <- X[, keep_miss, drop = FALSE]
+if (ncol(X) < 2) stop("Too few variants after missing filter")
+
+keep_maf <- NULL
+if (maf_cutoff > 0) {
+  af <- colMeans(X, na.rm = TRUE)
+  maf <- pmin(af, 1 - af)
+  keep_maf <- maf >= maf_cutoff
+  X <- X[, keep_maf, drop = FALSE]
+}
+
+if (impute_missing && anyNA(X)) {
+  cm <- colMeans(X, na.rm = TRUE)
+  idx <- which(is.na(X), arr.ind = TRUE)
+  X[idx] <- cm[idx[,2]]
+}
+
+# ----------------------------
+# PCA
+# ----------------------------
+pca <- prcomp(X, center = TRUE, scale. = FALSE)
+varprop <- (pca$sdev^2) / sum(pca$sdev^2)
+scores <- pca$x
+
+pca_data <- data.frame(
+  sample.id = sample_ids,
+  PC1 = scores[,1],
+  PC2 = scores[,2],
+  PC3 = if (ncol(scores) >= 3) scores[,3] else NA,
+  PC4 = if (ncol(scores) >= 4) scores[,4] else NA,
+  PC5 = if (ncol(scores) >= 5) scores[,5] else NA
+)
+
+write.csv(pca_data, file.path(out_dir, "usobtusa_mito_pca.csv"),
+          row.names = FALSE, quote = FALSE)
+
+# ----------------------------
+# Merge mitotype (NO NA ALLOWED)
+# ----------------------------
+pca_merged <- merge(pca_data, meta, by = "sample.id", all.x = TRUE)
+if (anyNA(pca_merged$mitotype)) stop("ERROR: NA mitotypes in PCA")
+
+write.csv(pca_merged,
+          file.path(out_dir, "usobtusa_mito_pca_with_mitotype.csv"),
+          row.names = FALSE, quote = FALSE)
+
+# ----------------------------
+# Plot
+# ----------------------------
+p <- ggplot(pca_merged, aes(PC1, PC2, col = mitotype)) +
+  geom_point(size = 2) +
+  theme_bw() +
+  labs(
+    title = "mtDNA PCA (filtered samples + variants)",
+    x = paste0("PC1 (", round(varprop[1]*100,1), "%)"),
+    y = paste0("PC2 (", round(varprop[2]*100,1), "%)")
+  )
+
+ggsave(file.path(out_dir, "usobtusa_pca_mito_PC1_PC2.png"),
+       p, width = 7, height = 6, dpi = 300)
+
+# ----------------------------
+# Save kept IDs
+# ----------------------------
+fwrite(data.table(sample.id = sample_ids),
+       file.path(out_dir, "kept_samples.txt"),
+       col.names = FALSE)
+
+variant_ids <- seqGetData(gds, "variant.id")
+variant_ids <- variant_ids[is_poly][keep_miss]
+if (maf_cutoff > 0) variant_ids <- variant_ids[keep_maf]
+
+fwrite(data.table(variant.id = variant_ids),
+       file.path(out_dir, "kept_variants.txt"),
+       col.names = FALSE)
+
+seqClose(gds)
+message("DONE")
+
+
+
+# PCA
+
+
+

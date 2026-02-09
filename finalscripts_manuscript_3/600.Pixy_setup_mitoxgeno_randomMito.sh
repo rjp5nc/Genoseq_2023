@@ -36,30 +36,53 @@ awk -F',' 'NR>1 {print $1 "\t" $6}' /project/berglandlab/Robert/UKSequencing2022
 awk 'NF==2' pops.txt > pops_filtered.txt
 
 
-awk -F'[,\t ]+' '
+gawk -F'[,\t ]+' '
+BEGIN {
+  # Optional reproducible seed: set SEED=123 before running
+  if ("SEED" in ENVIRON) srand(ENVIRON["SEED"]+0); else srand()
+}
 NR==FNR {
-  if (FNR>1) mito[$1]=$2; next
+  if (FNR>1) mito[$1]=$2   # read mito_types.csv: sampleA -> Group
+  next
 }
-($1 in mito) {
-  print $1, $2 "_" mito[$1]
+$2=="P66" && ($1 in mito) {
+  n++
+  samp[n]=$1
+  pop[n]=$2
+  grp[n]=mito[$1]
 }
-' /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types.csv pops_filtered.txt > pops_filtered_withmitotype.txt
+END {
+  # Fisher–Yates shuffle of grp[] (preserves counts exactly)
+  for (i=n; i>1; i--) {
+    j=int(rand()*i)+1
+    tmp=grp[i]; grp[i]=grp[j]; grp[j]=tmp
+  }
+  for (i=1; i<=n; i++) {
+    print samp[i], pop[i] "_" grp[i]
+  }
+}
+' /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/mito_types.csv \
+  pops_filtered.txt > pops_filtered_P66_withmitotype_rand.txt
 
 
 $CONDA_PREFIX/bin/bcftools query -l  /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa_renamed_annotated.vcf.gz > vcf_samples.txt
 
-grep -Ff vcf_samples.txt pops_filtered_withmitotype.txt > pops_both.txt
+grep -Ff vcf_samples.txt pops_filtered_P66_withmitotype_rand.txt > pops_both.txt
 
-awk '$2 != "PBO66_A"' pops_filtered_withmitotype.txt > pops_filtered_withmitotype2.txt
+awk '$2 !~ /^PBO/' pops_filtered_P66_withmitotype_rand.txt > pops_fixed_withmitotype.noPBO.txt
 
-grep -Ff <($CONDA_PREFIX/bin/bcftools query -l trimmed10bp_allsites_Repeatmasked_usobtusa.filtered_bgz2.vcf.gz) pops_filtered_withmitotype2.txt > pops_fixed_withmitotype.txt
+grep -Ff <($CONDA_PREFIX/bin/bcftools query -l /scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa_renamed_annotated.vcf.gz) pops_fixed_withmitotype.noPBO.txt > pops_fixed_withmitotype2.txt
 
 
 VCF="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/trimmed10bp_allsites_usobtusa_renamed_annotated.vcf.gz"
-POPS="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed_withmitotype.txt"
+POPS="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/pops_fixed_withmitotype2.txt"
+
+awk 'BEGIN{OFS="\t"} {print $1,$2}' pops_fixed_withmitotype2.txt \
+  > pops_fixed_withmitotype.pixy.txt
+
 
 # --- Output directory ---
-OUTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000_withmitotype"
+OUTDIR="/scratch/rjp5nc/UK2022_2024/daphnia_phylo/usdobtusa_indv/results_pixy10000_withmitotype_random"
 mkdir -p ${OUTDIR}
 
 # --- Parameters ---

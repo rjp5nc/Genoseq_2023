@@ -31,6 +31,9 @@ ls /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3_plusA/
 # Open density tree with beast2
 #/home/rjp5nc/beast/bin/densitree
 
+rm /scratch/rjp5nc/UK2022_2024/NA1_Dobtusa/allsites_mito/gatk_gvcf_top3_plusA/snapp.mito.highest1.tree
+
+
 /scratch/rjp5nc/beast/beast/bin/treeannotator \
 -burnin 10 \
 -height mean \

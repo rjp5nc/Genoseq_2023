@@ -13,36 +13,14 @@
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 #SBATCH --array=1-12
 
-# ls /scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/eupulex_chr \
-#   | grep '^Scaffold_' \
-#   | sort -V > scaffolds.txt
-
-cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulex_indv/gvcf/
-
 
 module load gatk
+cd /scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulex_indv/gvcf
 
-REF=/scratch/rjp5nc/Reference_genomes/orig_ref/eu_pulex_totalHiCwithallbestgapclosed.clean.fa
-SCAF=$(sed -n "${SLURM_ARRAY_TASK_ID}p" scaffolds.txt)
+find combined_by_scaffold -name "Scaffold_*.merged.g.vcf.gz" | sort -V > merged_gvcfs.list
 
-IN_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/gvcf/eupulex_chr/${SCAF}
-OUT_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulex_indv/gvcf/combined_by_scaffold
-TMP_DIR=/scratch/rjp5nc/UK2022_2024/daphnia_phylo/eupulex_indv/gvcf/tmp/${SCAF}
+gatk GatherVcfs \
+  -I merged_gvcfs.list \
+  -O eupulex_all_scaffolds.merged.g.vcf.gz
 
-mkdir -p "$OUT_DIR" "$TMP_DIR"
-
-find "$IN_DIR" -name "*.g.vcf.gz" | sort > "$TMP_DIR/${SCAF}.gvcfs.list"
-
-# optional but recommended: check indexes
-while read f; do
-  [[ -f "${f}.tbi" ]] || { echo "Missing index: ${f}.tbi" >&2; exit 2; }
-done < "$TMP_DIR/${SCAF}.gvcfs.list"
-
-# CombineGVCFs with xargs to avoid huge command line expansions
-xargs -a "$TMP_DIR/${SCAF}.gvcfs.list" -I{} echo -V {} > "$TMP_DIR/${SCAF}.V.args"
-
-gatk --java-options "-Xmx56g -Djava.io.tmpdir=$TMP_DIR" CombineGVCFs \
-  -R "$REF" \
-  $(cat "$TMP_DIR/${SCAF}.V.args") \
-  -L "$SCAF" \
-  -O "$OUT_DIR/${SCAF}.merged.g.vcf.gz"
+tabix -p vcf eupulex_all_scaffolds.merged.g.vcf.gz

@@ -21,9 +21,9 @@ conda activate beast2-277
 
 #conda install -c bioconda libbeagle
 
-cd /scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp5/
+cd /scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/snapp_from_allsites
 
-ls /scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp5/
+ls /scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/snapp_from_allsites
 
 # Open resutls with Tracer
 #/home/rjp5nc/tracer/bin/tracer
@@ -35,6 +35,6 @@ ls /scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp5/
 -burnin 10 \
 -height mean \
 -topology MCC \
-/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp.mito.trees \
-/scratch/rjp5nc/UK2022_2024/mitogvcf/gvcf/eudobtusa_mito_reverse_out/snapp.mito.highest1.tree
+/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/snapp_from_allsites/snapp.mito0.3.trees \
+/scratch/rjp5nc/UK2022_2024/redone_mito/eupulex/snapp_from_allsites/snapp.mito.highest1.tree
 
