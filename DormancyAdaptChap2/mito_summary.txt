@@ -1,0 +1,2 @@
+Alignment_name	No_of_taxa	Alignment_length	Total_matrix_cells	Undetermined_characters	Missing_percent	No_variable_sites	Proportion_variable_sites	Parsimony_informative_sites	Proportion_parsimony_informative	AT_content	GC_content	A	C	G	T	K	M	R	Y	S	W	B	V	H	D	X	N	O	-	?
+all_aligned_unique.fasta	1632	15659	25555488	883008	3.455	7476	0.477	6227	0.398	0.637	0.363	7954482	5034381	3906966	7748645	1588	2048	9815	11241	1023	2291	0	0	0	0	0	0	0	883008	0
