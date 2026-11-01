@@ -13,25 +13,31 @@
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 set -euo pipefail
 
-module load fastp
+module load trimmomatic/0.40
 module load bowtie2
 module load samtools
 
-threads=16
+threads=60
 wd=/scratch/rjp5nc/vorticella
 ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
 idxdir=$wd/daphnia_idx
 idx=$idxdir/US_obtusa
+
+jar=$(ls "$EBROOTTRIMMOMATIC"/*.jar | head -1)
+adapters=$EBROOTTRIMMOMATIC/adapters/TruSeq3-PE-2.fa
 
 mkdir -p "$idxdir"
 cd "$wd"
 
 # 1. Trim
 if [ ! -s trim_R1.fq.gz ] || [ ! -s trim_R2.fq.gz ]; then
-  fastp -i Rockpool4_D1-F12_R1.fq.gz -I Rockpool4_D1-F12_R2.fq.gz \
-        -o trim_R1.fq.gz -O trim_R2.fq.gz \
-        --detect_adapter_for_pe -w "$threads" \
-        -h fastp.html -j fastp.json
+  java -jar "$jar" PE -threads "$threads" -phred33 \
+    Rockpool4_D1-F12_R1.fq.gz Rockpool4_D1-F12_R2.fq.gz \
+    trim_R1.fq.gz unpaired_R1.fq.gz \
+    trim_R2.fq.gz unpaired_R2.fq.gz \
+    ILLUMINACLIP:"$adapters":2:30:10:2:True \
+    LEADING:3 TRAILING:3 SLIDINGWINDOW:4:20 MINLEN:50 \
+    2> trimmomatic.log
 fi
 
 # 2. Build index (skipped if it already exists)
@@ -52,4 +58,5 @@ samtools fastq -@ 4 -c 6 \
   nonDaphnia.namesorted.bam
 
 samtools flagstat nonDaphnia.namesorted.bam > nonDaphnia.flagstat.txt
+cat trimmomatic.log
 cat host_mapping.log
