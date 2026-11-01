@@ -11,13 +11,13 @@
 #SBATCH --account berglandlab_standard
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
-
 set -euo pipefail
 
+module load fastp
 module load bowtie2
 module load samtools
 
-threads=60
+threads=16
 wd=/scratch/rjp5nc/vorticella
 ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
 idxdir=$wd/daphnia_idx
@@ -26,18 +26,26 @@ idx=$idxdir/US_obtusa
 mkdir -p "$idxdir"
 cd "$wd"
 
-# Build Daphnia index (skipped if it already exists)
+# 1. Trim
+if [ ! -s trim_R1.fq.gz ] || [ ! -s trim_R2.fq.gz ]; then
+  fastp -i Rockpool4_D1-F12_R1.fq.gz -I Rockpool4_D1-F12_R2.fq.gz \
+        -o trim_R1.fq.gz -O trim_R2.fq.gz \
+        --detect_adapter_for_pe -w "$threads" \
+        -h fastp.html -j fastp.json
+fi
+
+# 2. Build index (skipped if it already exists)
 if [ ! -e "${idx}.1.bt2" ] && [ ! -e "${idx}.1.bt2l" ]; then
   bowtie2-build --threads "$threads" "$ref" "$idx"
 fi
 
-# Map, keep pairs where both reads are unmapped, sort by name
+# 3. Map, keep pairs where both reads are unmapped, sort by name
 bowtie2 -x "$idx" -1 trim_R1.fq.gz -2 trim_R2.fq.gz -p "$threads" \
         --very-sensitive 2> host_mapping.log \
   | samtools view -@ 4 -b -f 12 -F 256 - \
   | samtools sort -n -@ 4 -m 2G -T "$wd/sorttmp" -o nonDaphnia.namesorted.bam -
 
-# Convert to paired FASTQ
+# 4. Convert to paired FASTQ
 samtools fastq -@ 4 -c 6 \
   -1 nonDaphnia_R1.fq.gz -2 nonDaphnia_R2.fq.gz \
   -0 /dev/null -s /dev/null -n \
