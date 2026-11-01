@@ -3,7 +3,7 @@
 #SBATCH -J move # A single job name for the array
 #SBATCH --ntasks-per-node=16 # one core
 #SBATCH -N 1 # on one node
-#SBATCH -t 0:48:00:00  ### 48 hours
+#SBATCH -t 48:00:00
 #SBATCH --mem 60G
 #SBATCH -o /scratch/rjp5nc/err/move.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/move.%A_%a.err # Standard error
