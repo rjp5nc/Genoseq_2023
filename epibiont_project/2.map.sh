@@ -8,7 +8,7 @@
 #SBATCH -o /scratch/rjp5nc/err/move.%A_%a.out # Standard output
 #SBATCH -e /scratch/rjp5nc/err/move.%A_%a.err # Standard error
 #SBATCH -p standard
-#SBATCH --account berglandlab
+#SBATCH --account berglandlab_standard
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
