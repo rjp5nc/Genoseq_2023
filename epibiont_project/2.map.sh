@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J move # A single job name for the array
-#SBATCH --ntasks-per-node=60 # one core
+#SBATCH --ntasks-per-node=16 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 0:24:00  ### 48 hours
 #SBATCH --mem 60G
@@ -17,7 +17,7 @@ module load trimmomatic/0.40
 module load bowtie2
 module load samtools
 
-threads=60
+threads=16
 wd=/scratch/rjp5nc/vorticella
 ref=/scratch/rjp5nc/Reference_genomes/post_kraken/US_obtusa_onlydaps.fa
 idxdir=$wd/daphnia_idx
@@ -31,7 +31,7 @@ cd "$wd"
 
 # 1. Trim
 if [ ! -s trim_R1.fq.gz ] || [ ! -s trim_R2.fq.gz ]; then
-  java -jar "$jar" PE -threads "$threads" -phred33 \
+  java -Xmx24G -jar "$jar" PE -threads 16 -phred33 \
     Rockpool4_D1-F12_R1.fq.gz Rockpool4_D1-F12_R2.fq.gz \
     trim_R1.fq.gz unpaired_R1.fq.gz \
     trim_R2.fq.gz unpaired_R2.fq.gz \
