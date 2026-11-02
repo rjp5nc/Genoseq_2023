@@ -13,6 +13,7 @@
 #SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
 
 set -euo pipefail
+module load miniforge
 export PATH=$HOME/MEGAHIT-1.2.9-Linux-x86_64-static/bin:$PATH
 
 cd /scratch/rjp5nc/vorticella
