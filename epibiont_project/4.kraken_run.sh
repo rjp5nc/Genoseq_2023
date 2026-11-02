@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH -J move # A single job name for the array
-#SBATCH --ntasks-per-node=16 # one core
+#SBATCH --ntasks-per-node=40 # one core
 #SBATCH -N 1 # on one node
 #SBATCH -t 48:00:00
 #SBATCH --mem 60G
@@ -30,4 +30,6 @@ kraken2 --db /scratch/rjp5nc/krakenDB/pluspf16 --threads 16 --paired \
 
   head -5 sub_kraken_report.txt                    # unclassified vs. root
 awk '$4=="P"' sub_kraken_report.txt | sort -k1,1nr | head -20   # top phyla
-grep -i ciliophora sub_kraken_report.txt
+grep -i ciliophora sub_kraken_report.
+
+/scratch/rjp5nc/err/move.22275796_4294967294.out
