@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 #
 #SBATCH -J kraken2_v2
