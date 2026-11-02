@@ -1,35 +1,36 @@
 #!/usr/bin/env bash
 #
-#SBATCH -J move # A single job name for the array
-#SBATCH --ntasks-per-node=40 # one core
-#SBATCH -N 1 # on one node
-#SBATCH -t 48:00:00
-#SBATCH --mem 60G
-#SBATCH -o /scratch/rjp5nc/err/move.%A_%a.out # Standard output
-#SBATCH -e /scratch/rjp5nc/err/move.%A_%a.err # Standard error
+#SBATCH -J kraken2_v2
+#SBATCH --ntasks-per-node=16
+#SBATCH -N 1
+#SBATCH -t 4:00:00
+#SBATCH --mem 30G
+#SBATCH -o /scratch/rjp5nc/err/kraken2_v2.%A_%a.out
+#SBATCH -e /scratch/rjp5nc/err/kraken2_v2.%A_%a.err
 #SBATCH -p standard
 #SBATCH --account berglandlab_standard
-#SBATCH --mail-type=END               # Send email at job completion
-#SBATCH --mail-user=rjp5nc@virginia.edu    # Email address for notifications
-
+#SBATCH --mail-type=END
+#SBATCH --mail-user=rjp5nc@virginia.edu
 
 set -euo pipefail
 module load kraken2
+module load seqkit
 
 cd /scratch/rjp5nc/vorticella
 
-if [ ! -s sub_R1.fq ]; then
-  zcat nonDaphnia_R1.fq.gz | head -4000000 > sub_R1.fq
-  zcat nonDaphnia_R2.fq.gz | head -4000000 > sub_R2.fq
+# Random ~1% of pairs; same seed keeps pairs matched
+if [ ! -s sub2_R1.fq.gz ]; then
+  seqkit sample -p 0.01 -s 42 -j 8 nonDaphnia2_R1.fq.gz -o sub2_R1.fq.gz
+  seqkit sample -p 0.01 -s 42 -j 8 nonDaphnia2_R2.fq.gz -o sub2_R2.fq.gz
 fi
+seqkit stats sub2_R1.fq.gz sub2_R2.fq.gz
 
 kraken2 --db /scratch/rjp5nc/krakenDB/pluspf16 --threads 16 --paired \
-  --report sub_kraken_report.txt --output /dev/null \
-  sub_R1.fq sub_R2.fq
+  --confidence 0.1 \
+  --report sub2_kraken_report.txt --output /dev/null \
+  sub2_R1.fq.gz sub2_R2.fq.gz
 
-
-  head -5 sub_kraken_report.txt                    # unclassified vs. root
-awk '$4=="P"' sub_kraken_report.txt | sort -k1,1nr | head -20   # top phyla
-grep -i ciliophora sub_kraken_report.
-
-/scratch/rjp5nc/err/move.22275796_4294967294.out
+head -5 sub2_kraken_report.txt
+awk '$4=="P"' sub2_kraken_report.txt | sort -k1,1nr | head -20
+grep -i ciliophora sub2_kraken_report.txt || echo "no Ciliophora hits"
+awk '$1 > 1' sub2_kraken_report.txt > sub2_kraken_above1pct.txt
