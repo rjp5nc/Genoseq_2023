@@ -3,8 +3,8 @@
 #SBATCH -J mitofinder_megahit
 #SBATCH --ntasks-per-node=40
 #SBATCH -N 1
-#SBATCH -t 48:00:00
-#SBATCH --mem 100G
+#SBATCH -t 1:00:00
+#SBATCH --mem 40G
 #SBATCH -o /scratch/rjp5nc/err/mitofinder_megahit.%A_%a.out
 #SBATCH -e /scratch/rjp5nc/err/mitofinder_megahit.%A_%a.err
 #SBATCH -p standard
@@ -12,20 +12,18 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=rjp5nc@virginia.edu
 
-set -euo pipefail
+
 cd /scratch/rjp5nc/vorticella/mitofinder
+module load seqkit blast
 
+# 1. Reference mitochondrial proteins (all 15 ciliate mitogenomes, incl. Thuricola)
+cp test_run/translated_genes_for_database.fasta ref_mito_proteins.faa
+grep -c ">" ref_mito_proteins.faa
 
-export PATH=/home/rjp5nc/miniconda3/envs/mitofinder/bin:$PATH
-mitofinder --version
-
-mitofinder -j vort_mito_megahit \
-    -a megahit_all.fa \
-    -r ciliate_mito_refs_clean.gb \
-    -o 4 \
-    -p 40 -m 100 \
-    --new-genes \
-    --tRNA-annotation trnascan \
-    --allow-intron
-
-echo "Done: $(date)"
+# 2. Search the full MEGAHIT assembly (all contigs >= 300 bp), mito code 4
+seqkit seq -m 300 megahit_all.fa > megahit_300.fa
+makeblastdb -in megahit_300.fa -dbtype nucl -out megahit_300 > /dev/null
+tblastn -query ref_mito_proteins.faa -db megahit_300 -db_gencode 4 \
+  -evalue 1e-5 -num_threads 16 -max_target_seqs 50 \
+  -outfmt "6 qseqid sseqid pident length evalue bitscore" > mito_tblastn.tsv
+wc -l mito_tblastn.tsv
