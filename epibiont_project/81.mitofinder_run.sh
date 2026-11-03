@@ -14,8 +14,10 @@
 
 set -euo pipefail
 cd /scratch/rjp5nc/vorticella/mitofinder
-module load miniforge
-source activate mitofinder
+
+
+export PATH=/home/rjp5nc/miniconda3/envs/mitofinder/bin:$PATH
+mitofinder --version
 
 mitofinder -j vort_mito_megahit \
     -a megahit_all.fa \
