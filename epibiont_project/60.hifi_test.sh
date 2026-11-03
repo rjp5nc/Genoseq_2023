@@ -14,7 +14,7 @@
 
 set -euo pipefail
 module purge
-module load minimap2 samtools seqkit
+module load minimap2 samtools seqkit gcc/14.2.0
 
 f=/scratch/rjp5nc/HMW/HMWDNAElvis3/m84128_250121_222443_s2.hifi_reads.bc2104.fq.gz
 cd /scratch/rjp5nc/vorticella/hifi_check
