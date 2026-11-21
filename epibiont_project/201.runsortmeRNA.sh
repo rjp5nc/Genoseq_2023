@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 #SBATCH --job-name=sortmerna7_L3L4
 #SBATCH --output=/scratch/rjp5nc/ssu_analysis/logs/sortmerna7_L3L4_%A_%a.out
