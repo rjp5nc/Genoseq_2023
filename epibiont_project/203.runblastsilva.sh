@@ -8,6 +8,7 @@
 #SBATCH --ntasks=1
 #SBATCH --partition=standard
 #SBATCH --account=berglandlab_standard
+#SBATCH --array=0-1
 
 set -euo pipefail
 
