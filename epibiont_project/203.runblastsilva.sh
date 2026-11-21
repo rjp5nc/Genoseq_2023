@@ -2,9 +2,9 @@
 #SBATCH --job-name=blast_ssu_L6
 #SBATCH --output=/scratch/rjp5nc/ssu_analysis/blast_test/blast_L6_%j.out
 #SBATCH --error=/scratch/rjp5nc/ssu_analysis/blast_test/blast_L6_%j.err
-#SBATCH --time=12:00:00
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task=16
+#SBATCH --time=4:00:00
+#SBATCH --mem=16G
+#SBATCH --cpus-per-task=8
 #SBATCH --ntasks=1
 #SBATCH --partition=standard
 #SBATCH --account=berglandlab_standard
@@ -64,19 +64,20 @@ fi
 
 # Step 3: BLAST ALL reads against SILVA
 blastn \
-  -query "$FASTA" \
-  -db "$BASE/databases/blast/silva_ssu" \
-  -task megablast \
-  -num_threads "${SLURM_CPUS_PER_TASK:-16}" \
-  -max_target_seqs 50 \
-  -evalue 1e-10 \
-  -outfmt "6 qseqid sseqid pident length qlen qcovhsp evalue bitscore stitle" \
-  -out "$BLAST"
+    -query "$FASTA" \
+    -db "$BASE/databases/blast/silva_ssu" \
+    -task megablast \
+    -num_threads "${SLURM_CPUS_PER_TASK:-8}" \
+    -max_target_seqs 10 \
+    -evalue 1e-10 \
+    -outfmt "6 qseqid sseqid pident length qlen qcovhsp evalue bitscore stitle" \
+    -out "$OUTDIR/aligned_blast_relaxed.tsv"
 
-# Step 4: Filter BLAST hits
+# Filter using relaxed thresholds
 awk -F '\t' '
-  $3 >= 95 && $6 >= 80
-' "$BLAST" > "$FILTERED"
+    $3 >= 90 && $6 >= 60
+' "$OUTDIR/aligned_blast_relaxed.tsv" \
+    > "$OUTDIR/aligned_filtered_relaxed.tsv"
 
 # Step 5: Summary
 echo "--------------------------------"
