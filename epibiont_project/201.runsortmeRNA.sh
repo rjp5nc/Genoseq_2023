@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --partition=standard
 #SBATCH --account=berglandlab_standard
-#SBATCH --array=1-576%10
+#SBATCH --array=1
 
 set -euo pipefail
 
