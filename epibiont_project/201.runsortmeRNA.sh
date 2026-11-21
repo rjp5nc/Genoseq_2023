@@ -3,9 +3,9 @@
 #SBATCH --output=/scratch/rjp5nc/ssu_analysis/logs/sortmerna7_%A_%a.out
 #SBATCH --error=/scratch/rjp5nc/ssu_analysis/logs/sortmerna7_%A_%a.err
 #SBATCH --time=12:00:00
-#SBATCH --mem=16G
+#SBATCH --mem=40G
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=16
 #SBATCH --partition=standard
 #SBATCH --account=berglandlab_standard
 #SBATCH --array=1
